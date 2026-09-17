@@ -7,7 +7,7 @@ import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
 import { AchievementsModal } from './components/GameBoard/AchievementsModal';
 
 export function App() {
-  const [activePeriodIndex, setActivePeriodIndex] = useState<number>(0);
+  const [activePeriodIndex, setActivePeriodIndex] = useState<number | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<MilestonePhoto | null>(null);
   const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
@@ -24,7 +24,7 @@ export function App() {
         }
       }
     }
-    return new Set([0]); // First period visited by default
+    return new Set();
   });
 
   // Periods state (allows local photo additions/replacements)
@@ -50,15 +50,17 @@ export function App() {
   });
 
   // Mark period as visited whenever it is selected
-  const handleSelectPeriod = (index: number) => {
+  const handleSelectPeriod = (index: number | null) => {
     setActivePeriodIndex(index);
-    setVisitedIndices((prev) => {
-      const updated = new Set(prev).add(index);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('dgrh_visited_periods', JSON.stringify(Array.from(updated)));
-      }
-      return updated;
-    });
+    if (index !== null) {
+      setVisitedIndices((prev) => {
+        const updated = new Set(prev).add(index);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('dgrh_visited_periods', JSON.stringify(Array.from(updated)));
+        }
+        return updated;
+      });
+    }
   };
 
   // Open standalone photo lightbox modal (shows strictly the photo and its archival info)

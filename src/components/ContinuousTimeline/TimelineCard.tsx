@@ -2,13 +2,14 @@ import React from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { 
-  Sparkles, Image as ImageIcon 
+  Sparkles, Image as ImageIcon, X 
 } from 'lucide-react';
 
 interface TimelineCardProps {
   period: HistoricalPeriod;
   isActive: boolean;
   onSelect: () => void;
+  onClose?: () => void;
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
 }
 
@@ -34,6 +35,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   period,
   isActive,
   onSelect,
+  onClose,
   onOpenPhoto,
 }) => {
   const cardBgClass = pureBgColors[period.index % pureBgColors.length];
@@ -44,6 +46,20 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       <div
         className={`relative w-[94vw] sm:w-[780px] md:w-[920px] lg:w-[1040px] xl:w-[1140px] max-w-[1160px] h-[calc(100vh-11.5rem)] min-h-[480px] max-h-[670px] rounded-3xl p-4 sm:p-5 lg:p-6 shadow-2xl shadow-slate-950/40 ring-2 ring-white border-2.5 border-slate-950 ${cardBgClass} text-white transition-all duration-300 select-none`}
       >
+        {/* Top-Right Collapse Button to return to unselected timeline */}
+        {onClose && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              soundFx.playCardTick();
+              onClose();
+            }}
+            className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/20 hover:bg-white text-white hover:text-slate-950 border border-white/30 transition-all cursor-pointer z-30 shadow-md"
+            title="Recolher card e voltar à visão geral"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 h-full items-stretch overflow-hidden">
           {/* ================= COLUNA 1: FOTOS HISTÓRICAS DO PERÍODO ================= */}
           <div className="flex flex-col justify-between h-full min-w-0">
