@@ -44,7 +44,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   if (isActive) {
     return (
       <div
-        className={`relative w-[94vw] sm:w-[780px] md:w-[920px] lg:w-[1040px] xl:w-[1140px] max-w-[1160px] h-[calc(100vh-11.5rem)] min-h-[480px] max-h-[670px] rounded-3xl p-4 sm:p-5 lg:p-6 shadow-2xl shadow-slate-950/40 ring-2 ring-white border-2.5 border-slate-950 ${cardBgClass} text-white transition-all duration-300 select-none`}
+        className={`relative w-[94vw] sm:w-[780px] md:w-[920px] lg:w-[1040px] xl:w-[1140px] max-w-[1160px] h-[calc(100vh-11.5rem)] min-h-[480px] max-h-[670px] rounded-3xl p-4 sm:p-5 lg:p-6 shadow-2xl shadow-slate-950/40 ring-2 ring-white border-2.5 border-slate-950 ${cardBgClass} text-white transition-shadow duration-300 select-none`}
       >
         {/* Top-Right Collapse Button to return to unselected timeline */}
         {onClose && (
@@ -170,14 +170,13 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   // ================= 2. UNSELECTED NEIGHBOR CARD: COMPACT 1-COLUMN PREVIEW =================
   const handleNeighborClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    soundFx.playCardTick();
     onSelect();
   };
 
   return (
     <div
       onClick={handleNeighborClick}
-      className={`relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-2xl border-2.5 border-slate-950 ${cardBgClass} text-white cursor-pointer select-none transition-all duration-300 hover:opacity-95 hover:-translate-y-2 hover:brightness-105`}
+      className={`relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-2xl border-2.5 border-slate-950 ${cardBgClass} text-white cursor-pointer select-none transition-[transform,box-shadow,filter] duration-200 hover:opacity-95 hover:-translate-y-2 hover:brightness-105`}
     >
       {/* Top: Period Years */}
       <div className="text-center py-1">

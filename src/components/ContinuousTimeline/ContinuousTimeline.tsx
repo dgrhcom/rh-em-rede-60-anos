@@ -57,6 +57,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const tweenRef = useRef<gsap.core.Tween | null>(null);
   const introTweenRef = useRef<gsap.core.Tween | null>(null);
 
+  const currentPositionRef = useRef<number>(currentPosition);
+  useEffect(() => {
+    currentPositionRef.current = currentPosition;
+  }, [currentPosition]);
+  const prevActiveIndexRef = useRef<number | null>(activeIndex);
+
   // Responsive spacing calculation
   useEffect(() => {
     const updateSpacing = () => {
@@ -89,24 +95,28 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   // Smoothly slide to index using GSAP
   const slideToIndex = useCallback((index: number, duration = 0.6) => {
     const target = Math.max(0, Math.min(totalPeriods - 1, index));
+    prevActiveIndexRef.current = target;
     soundFx.playCardTick();
     onSelectPeriod(target);
 
     if (tweenRef.current) tweenRef.current.kill();
 
-    const obj = { pos: currentPosition };
+    const startPos = currentPositionRef.current;
+    const obj = { pos: startPos };
     tweenRef.current = gsap.to(obj, {
       pos: target,
       duration,
       ease: 'power3.out',
       onUpdate: () => {
+        currentPositionRef.current = obj.pos;
         setCurrentPosition(obj.pos);
       },
       onComplete: () => {
+        currentPositionRef.current = target;
         setCurrentPosition(target);
       },
     });
-  }, [currentPosition, onSelectPeriod, totalPeriods]);
+  }, [onSelectPeriod, totalPeriods]);
 
   // Execute Opening Animation: strictly guarantees all cards are unselected at start,
   // animates cards dealing out from the 3D fan, and selects the first card (index 0) by default upon completion.
@@ -114,6 +124,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     if (introStatus === 'animating') return;
 
     // 1. Strictly guarantee all cards are unselected before and during the opening
+    prevActiveIndexRef.current = null;
+    currentPositionRef.current = 0;
     onSelectPeriod(null);
     setCurrentPosition(0);
     setIntroStatus('animating');
@@ -156,6 +168,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const handleReplayIntro = useCallback(() => {
     if (introTweenRef.current) introTweenRef.current.kill();
     if (tweenRef.current) tweenRef.current.kill();
+    prevActiveIndexRef.current = null;
+    currentPositionRef.current = 0;
     onSelectPeriod(null);
     setCurrentPosition(0);
     setIntroProgress(0);
@@ -170,25 +184,35 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
   }, []);
 
-  // Sync when activeIndex changes externally
+  // Sync when activeIndex changes externally (e.g. from bottom navigation)
   useEffect(() => {
-    if (activeIndex !== null && Math.abs(currentPosition - activeIndex) > 0.05 && !isDragging && !isIntroActive) {
-      slideToIndex(activeIndex, 0.5);
+    if (
+      activeIndex !== null &&
+      activeIndex !== prevActiveIndexRef.current &&
+      !isDragging &&
+      !isIntroActive
+    ) {
+      prevActiveIndexRef.current = activeIndex;
+      if (Math.abs(currentPositionRef.current - activeIndex) > 0.01) {
+        slideToIndex(activeIndex, 0.5);
+      }
+    } else {
+      prevActiveIndexRef.current = activeIndex;
     }
-  }, [activeIndex, isDragging, isIntroActive, currentPosition, slideToIndex]);
+  }, [activeIndex, isDragging, isIntroActive, slideToIndex]);
 
   // Next & Previous
   const handlePrev = useCallback(() => {
-    const current = activeIndex ?? Math.round(currentPosition);
+    const current = activeIndex ?? Math.round(currentPositionRef.current);
     const nextIdx = Math.max(0, current - 1);
     slideToIndex(nextIdx);
-  }, [activeIndex, currentPosition, slideToIndex]);
+  }, [activeIndex, slideToIndex]);
 
   const handleNext = useCallback(() => {
-    const current = activeIndex ?? Math.round(currentPosition);
+    const current = activeIndex ?? Math.round(currentPositionRef.current);
     const nextIdx = Math.min(totalPeriods - 1, current + 1);
     slideToIndex(nextIdx);
-  }, [activeIndex, currentPosition, totalPeriods, slideToIndex]);
+  }, [activeIndex, totalPeriods, slideToIndex]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -284,6 +308,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     } else if (rawPos > totalPeriods - 1) {
       clampedPos = totalPeriods - 1 + (rawPos - (totalPeriods - 1)) * 0.3;
     }
+    currentPositionRef.current = clampedPos;
     setCurrentPosition(clampedPos);
   };
 
@@ -292,18 +317,20 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setIsDragging(false);
 
     // Snap to nearest integer index smoothly
-    const nearestIndex = Math.max(0, Math.min(totalPeriods - 1, Math.round(currentPosition)));
+    const nearestIndex = Math.max(0, Math.min(totalPeriods - 1, Math.round(currentPositionRef.current)));
     if (tweenRef.current) tweenRef.current.kill();
 
-    const obj = { pos: currentPosition };
+    const obj = { pos: currentPositionRef.current };
     tweenRef.current = gsap.to(obj, {
       pos: nearestIndex,
       duration: 0.45,
       ease: 'power3.out',
       onUpdate: () => {
+        currentPositionRef.current = obj.pos;
         setCurrentPosition(obj.pos);
       },
       onComplete: () => {
+        currentPositionRef.current = nearestIndex;
         setCurrentPosition(nearestIndex);
       },
     });
@@ -478,6 +505,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   transformOrigin: 'center center',
                   opacity: currentOpacity,
                   zIndex: currentZIndex,
+                  willChange: 'transform, opacity',
+                  backfaceVisibility: 'hidden',
                 }}
               >
                 <TimelineCard

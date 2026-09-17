@@ -10,7 +10,7 @@ export const Header: React.FC<HeaderProps> = ({ isCentered = true }) => {
       <div
         className={`fixed z-40 pointer-events-none transition-all duration-700 ease-in-out ${
           isCentered
-            ? 'top-6 sm:top-8 md:top-10 left-1/2 -translate-x-1/2'
+            ? 'top-[14vh] sm:top-[16vh] md:top-[18vh] left-1/2 -translate-x-1/2'
             : 'top-0 left-0 translate-x-0'
         }`}
         style={{
