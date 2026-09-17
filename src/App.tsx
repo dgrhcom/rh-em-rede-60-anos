@@ -1,0 +1,116 @@
+import { useState } from 'react';
+import type { HistoricalPeriod, MilestonePhoto } from './types/timeline';
+import { timelinePeriods } from './data/timelineData';
+import { Header } from './components/Header';
+import { ContinuousTimeline } from './components/ContinuousTimeline/ContinuousTimeline';
+import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
+import { AchievementsModal } from './components/GameBoard/AchievementsModal';
+
+export function App() {
+  const [activePeriodIndex, setActivePeriodIndex] = useState<number>(0);
+  const [selectedPhoto, setSelectedPhoto] = useState<MilestonePhoto | null>(null);
+  const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
+  const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
+
+  // Track visited periods for achievements and timeline progress
+  const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('dgrh_visited_periods');
+      if (stored) {
+        try {
+          return new Set(JSON.parse(stored));
+        } catch {
+          // ignore parsing error
+        }
+      }
+    }
+    return new Set([0]); // First period visited by default
+  });
+
+  // Periods state (allows local photo additions/replacements)
+  const [periods] = useState<HistoricalPeriod[]>(() => {
+    if (typeof window !== 'undefined') {
+      const storedPhotos = localStorage.getItem('dgrh_custom_photos');
+      if (storedPhotos) {
+        try {
+          const photoMap: Record<string, string> = JSON.parse(storedPhotos);
+          return timelinePeriods.map((p) => ({
+            ...p,
+            photos: p.photos.map((ph) => ({
+              ...ph,
+              url: photoMap[`${p.id}_${ph.id}`] || ph.url,
+            })),
+          }));
+        } catch {
+          // fallback
+        }
+      }
+    }
+    return timelinePeriods;
+  });
+
+  // Mark period as visited whenever it is selected
+  const handleSelectPeriod = (index: number) => {
+    setActivePeriodIndex(index);
+    setVisitedIndices((prev) => {
+      const updated = new Set(prev).add(index);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('dgrh_visited_periods', JSON.stringify(Array.from(updated)));
+      }
+      return updated;
+    });
+  };
+
+  // Open standalone photo lightbox modal (shows strictly the photo and its archival info)
+  const handleOpenPhoto = (photo: MilestonePhoto, period: HistoricalPeriod) => {
+    setSelectedPhoto(photo);
+    setSelectedPhotoPeriod(period);
+    handleSelectPeriod(period.index);
+  };
+
+  return (
+    <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
+      {/* Top Main Navigation Header */}
+      <Header
+        unlockedCount={visitedIndices.size}
+        totalCount={periods.length}
+        onOpenAchievements={() => setIsAchievementsOpen(true)}
+      />
+
+      {/* Main View Area: Continuous Timeline exclusively */}
+      <main className="flex-1 w-full relative pt-14">
+        <ContinuousTimeline
+          periods={periods}
+          activeIndex={activePeriodIndex}
+          onSelectPeriod={handleSelectPeriod}
+          onOpenPhoto={handleOpenPhoto}
+        />
+      </main>
+
+      {/* Standalone Fullscreen Photo Modal (Shows ONLY image, caption and credits) */}
+      <PhotoViewerModal
+        photo={selectedPhoto}
+        period={selectedPhotoPeriod}
+        isOpen={selectedPhoto !== null}
+        onClose={() => {
+          setSelectedPhoto(null);
+          setSelectedPhotoPeriod(null);
+        }}
+        onSelectPhoto={(ph) => setSelectedPhoto(ph)}
+      />
+
+      {/* Badges / Achievements Modal */}
+      <AchievementsModal
+        periods={periods}
+        visitedIndices={visitedIndices}
+        isOpen={isAchievementsOpen}
+        onClose={() => setIsAchievementsOpen(false)}
+        onSelectPeriod={(idx) => {
+          handleSelectPeriod(idx);
+        }}
+      />
+    </div>
+  );
+}
+
+export default App;
