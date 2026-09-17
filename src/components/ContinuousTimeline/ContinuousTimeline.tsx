@@ -373,11 +373,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             <button
               onClick={executeOpeningAnimation}
               className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
-              title="Iniciar abertura da linha do tempo"
+              title="Iniciar apresentação"
             >
-              <Sparkles className="w-5 h-5 text-[#e5a93a] group-hover:rotate-12 transition-transform" />
-              <span>Iniciar Abertura</span>
-              <Play className="w-4 h-4 fill-white text-white group-hover:translate-x-0.5 transition-transform" />
+              <Play className="w-5 h-5 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
+              <span>Iniciar apresentação</span>
             </button>
           </div>
         </div>
@@ -460,13 +459,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let currentZIndex = targetZIndex;
 
             if (isIntroActive) {
-              // 3D Fan Stack initial values
+              // 3D Fan Stack initial values (oldest periods on top, opened fan)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const fanAngle = (idx - 5.5) * (isMobile ? 3.8 : 4.8); // Fan tilt
-              const fanX = (idx - 5.5) * (isMobile ? 14 : 20); // Horizontal spread
-              const fanY = Math.pow(Math.abs(idx - 5.5), 1.4) * (isMobile ? 3.2 : 4.2) - (isMobile ? 8 : 12); // Gentle arc
+              const fanAngle = (idx - 5.5) * (isMobile ? 4.6 : 6.2); // Wider fan tilt
+              const fanX = (idx - 5.5) * (isMobile ? 18 : 28); // Wider horizontal spread
+              const fanY = Math.pow(Math.abs(idx - 5.5), 1.35) * (isMobile ? 3.8 : 5.0) - (isMobile ? 10 : 16); // Gentle natural arc
               const fanScale = isMobile ? 0.64 : 0.76;
-              const fanZ = 30 + idx;
+              const fanZ = 50 + (totalPeriods - 1 - idx); // Oldest cards (idx 0) on top
 
               // Staggered deal interpolation
               const staggerStart = idx * 0.042;
