@@ -3,7 +3,7 @@ import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { TimelineCard, pureBgColors } from './TimelineCard';
 import { soundFx } from '../../utils/soundEffects';
 import { 
-  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, FastForward 
+  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, FastForward, Volume2, VolumeX 
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -36,6 +36,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const isIntroActive = introStatus !== 'done';
   const isFanIdle = introStatus === 'idle_fan';
   const isAnimating = introStatus === 'animating';
+
+  const [soundActive, setSoundActive] = useState<boolean>(() => soundFx.isEnabled());
+
+  const handleToggleSound = () => {
+    const newState = soundFx.toggle();
+    setSoundActive(newState);
+  };
 
   const startXRef = useRef(0);
   const startPosRef = useRef(0);
@@ -660,6 +667,29 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           >
             <RotateCcw className="w-3 h-3" />
             <span>Início (1983)</span>
+          </button>
+
+          {/* Sound / Audio Toggle pill */}
+          <button
+            onClick={handleToggleSound}
+            className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer ${
+              soundActive
+                ? 'bg-white hover:bg-slate-100 text-slate-900'
+                : 'bg-slate-200 text-slate-500 hover:text-slate-700'
+            }`}
+            title={soundActive ? 'Efeitos sonoros ativados (Clique para silenciar)' : 'Efeitos sonoros desativados (Clique para ativar)'}
+          >
+            {soundActive ? (
+              <>
+                <Volume2 className="w-3 h-3 text-[#105e7b]" />
+                <span>Som</span>
+              </>
+            ) : (
+              <>
+                <VolumeX className="w-3 h-3 text-slate-500" />
+                <span>Mudo</span>
+              </>
+            )}
           </button>
 
           {/* Status Indicator */}

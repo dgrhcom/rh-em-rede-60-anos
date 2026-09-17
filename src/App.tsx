@@ -73,11 +73,7 @@ export function App() {
   return (
     <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
       {/* Top Main Navigation Header */}
-      <Header
-        unlockedCount={visitedIndices.size}
-        totalCount={periods.length}
-        onOpenAchievements={() => setIsAchievementsOpen(true)}
-      />
+      <Header />
 
       {/* Main View Area: Continuous Timeline exclusively */}
       <main className="flex-1 w-full relative pt-14">
