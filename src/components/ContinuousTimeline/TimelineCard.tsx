@@ -177,7 +177,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   return (
     <div
       onClick={handleNeighborClick}
-      className={`relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-2xl border-2.5 border-slate-950 ${cardBgClass} text-white cursor-pointer select-none transition-all duration-300 hover:opacity-95`}
+      className={`relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-2xl border-2.5 border-slate-950 ${cardBgClass} text-white cursor-pointer select-none transition-all duration-300 hover:opacity-95 hover:-translate-y-2 hover:brightness-105`}
     >
       {/* Top: Period Years */}
       <div className="text-center py-1">

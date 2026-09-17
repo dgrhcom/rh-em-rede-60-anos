@@ -29,9 +29,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [cardSpacing, setCardSpacing] = useState(320);
 
-  // Intro animation states
-  const [isIntroActive, setIsIntroActive] = useState<boolean>(true);
+  // Intro animation lifecycle: 'idle_fan' (waiting for user click) -> 'animating' (dealing out) -> 'done'
+  const [introStatus, setIntroStatus] = useState<'idle_fan' | 'animating' | 'done'>('idle_fan');
   const [introProgress, setIntroProgress] = useState<number>(0);
+
+  const isIntroActive = introStatus !== 'done';
+  const isFanIdle = introStatus === 'idle_fan';
+  const isAnimating = introStatus === 'animating';
 
   const startXRef = useRef(0);
   const startPosRef = useRef(0);
@@ -68,44 +72,6 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     return () => window.removeEventListener('resize', updateSpacing);
   }, [activeIndex]);
 
-  // Initial Intro Animation: Deal cards from 3D fan into horizontal timeline
-  const startIntroAnimation = useCallback(() => {
-    setIsIntroActive(true);
-    setIntroProgress(0);
-
-    if (introTweenRef.current) introTweenRef.current.kill();
-    soundFx.playCardTick();
-
-    const obj = { p: 0 };
-    introTweenRef.current = gsap.to(obj, {
-      p: 1,
-      duration: 2.2,
-      delay: 0.3,
-      ease: 'power3.inOut',
-      onUpdate: () => {
-        setIntroProgress(obj.p);
-      },
-      onComplete: () => {
-        setIsIntroActive(false);
-        soundFx.playCardTick();
-      },
-    });
-  }, []);
-
-  useEffect(() => {
-    startIntroAnimation();
-    return () => {
-      if (introTweenRef.current) introTweenRef.current.kill();
-    };
-  }, [startIntroAnimation]);
-
-  const skipIntro = () => {
-    if (introTweenRef.current) introTweenRef.current.kill();
-    setIsIntroActive(false);
-    setIntroProgress(1);
-    soundFx.playCardTick();
-  };
-
   // Smoothly slide to index using GSAP
   const slideToIndex = useCallback((index: number, duration = 0.6) => {
     const target = Math.max(0, Math.min(totalPeriods - 1, index));
@@ -127,6 +93,68 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       },
     });
   }, [currentPosition, onSelectPeriod, totalPeriods]);
+
+  // Execute Opening Animation: strictly guarantees all cards are unselected at start,
+  // animates cards dealing out from the 3D fan, and selects the first card (index 0) by default upon completion.
+  const executeOpeningAnimation = useCallback(() => {
+    if (introStatus === 'animating') return;
+
+    // 1. Strictly guarantee all cards are unselected before and during the opening
+    onSelectPeriod(null);
+    setCurrentPosition(0);
+    setIntroStatus('animating');
+    setIntroProgress(0);
+
+    if (introTweenRef.current) introTweenRef.current.kill();
+    soundFx.playCardTick();
+
+    const obj = { p: 0 };
+    introTweenRef.current = gsap.to(obj, {
+      p: 1,
+      duration: 2.2,
+      ease: 'power3.inOut',
+      onUpdate: () => {
+        setIntroProgress(obj.p);
+      },
+      onComplete: () => {
+        introTweenRef.current = null;
+        setIntroProgress(1);
+        setIntroStatus('done');
+        soundFx.playCardTick();
+        // 2. Select the first card (1983-1986) by default
+        slideToIndex(0);
+      },
+    });
+  }, [introStatus, onSelectPeriod, slideToIndex]);
+
+  // Skip Opening Animation: immediately complete and select the first card
+  const skipIntro = useCallback(() => {
+    if (introTweenRef.current) introTweenRef.current.kill();
+    introTweenRef.current = null;
+    setIntroProgress(1);
+    setIntroStatus('done');
+    soundFx.playCardTick();
+    // Select the first card by default
+    slideToIndex(0);
+  }, [slideToIndex]);
+
+  // Reset to initial 3D fan view (idle state with all cards unselected)
+  const handleReplayIntro = useCallback(() => {
+    if (introTweenRef.current) introTweenRef.current.kill();
+    if (tweenRef.current) tweenRef.current.kill();
+    onSelectPeriod(null);
+    setCurrentPosition(0);
+    setIntroProgress(0);
+    setIntroStatus('idle_fan');
+    soundFx.playCardTick();
+  }, [onSelectPeriod]);
+
+  // Cleanup tween on unmount
+  useEffect(() => {
+    return () => {
+      if (introTweenRef.current) introTweenRef.current.kill();
+    };
+  }, []);
 
   // Sync when activeIndex changes externally
   useEffect(() => {
@@ -151,7 +179,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isIntroActive) {
+      if (isFanIdle) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          executeOpeningAnimation();
+        } else if (e.key === 'Escape') {
+          skipIntro();
+        }
+        return;
+      }
+
+      if (isAnimating) {
         if (e.key === 'Escape' || e.key === 'Enter') {
           skipIntro();
         }
@@ -174,7 +212,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrev, handleNext, activeIndex, onOpenPhoto, periods, isIntroActive, currentPosition, onSelectPeriod]);
+  }, [isFanIdle, isAnimating, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod]);
 
   // Mouse wheel navigation
   useEffect(() => {
@@ -287,51 +325,75 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      {/* ================= INTRO ANIMATION OVERLAY ================= */}
+      {/* ================= 1. INTRO ANIMATION & 3D FAN OVERLAY ================= */}
       {isIntroActive && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-between p-6">
-          {/* Top Bar with Skip Button */}
-          <div className="w-full max-w-5xl flex items-center justify-between pointer-events-auto">
-            <span className="px-3 py-1 rounded-full bg-white text-slate-950 text-xs font-black shadow-md border border-slate-950 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#105e7b]" />
-              <span>Abertura Comemorativa 60 Anos</span>
-            </span>
+        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-between p-4 sm:p-6">
+          {/* Top Section: Top Bar & Commemorative Title */}
+          <div className="w-full flex flex-col items-center">
+            {/* Top Bar with Badge & Skip Button */}
+            <div className="w-full max-w-5xl flex items-center justify-between pointer-events-auto">
+              <span className="px-3.5 py-1 rounded-full bg-white text-slate-950 text-xs font-black shadow-md border border-slate-950 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#105e7b]" />
+                <span>Abertura Comemorativa • 60 Anos Unicamp</span>
+              </span>
 
-            <button
-              onClick={skipIntro}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-xs font-black border-2 border-slate-950 shadow-lg cursor-pointer transition-all hover:scale-105 active:scale-95"
-              title="Pular apresentação inicial"
-            >
-              <span>Pular</span>
-              <FastForward className="w-3.5 h-3.5 text-[#105e7b]" />
-            </button>
-          </div>
-
-          {/* Central Title Banner (Fades out as cards spread) */}
-          <div
-            className="text-center my-auto transition-opacity duration-300 pointer-events-none"
-            style={{
-              opacity: Math.max(0, 1 - introProgress * 2.2),
-              transform: `translateY(${-introProgress * 30}px)`,
-            }}
-          >
-            <div className="inline-block px-3 py-1 rounded-full bg-white/90 text-[#105e7b] text-xs font-black uppercase tracking-widest mb-2 border border-slate-900 shadow-sm">
-              1983 — 2025
+              <button
+                onClick={skipIntro}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-xs font-black border-2 border-slate-950 shadow-lg cursor-pointer transition-all hover:scale-105 active:scale-95"
+                title={isFanIdle ? "Ir direto para a linha do tempo" : "Pular apresentação"}
+              >
+                <span>Pular</span>
+                <FastForward className="w-3.5 h-3.5 text-[#105e7b]" />
+              </button>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-950 tracking-tight drop-shadow-xs">
-              A Gestão de Pessoas nos 60 Anos da Unicamp
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-800 font-bold mt-1">
-              Uma trajetória de pessoas, valorização e memória institucional
-            </p>
+
+            {/* Central Title Banner (Above the fan cards, fades out smoothly as cards deal out) */}
+            <div
+              className="text-center pt-3 sm:pt-4 transition-all duration-500 pointer-events-none"
+              style={{
+                opacity: isFanIdle ? 1 : Math.max(0, 1 - introProgress * 2.2),
+                transform: `translateY(${isFanIdle ? 0 : -introProgress * 30}px)`,
+              }}
+            >
+              <div className="inline-block px-3.5 py-0.5 rounded-full bg-white/95 text-[#105e7b] text-[11px] font-black uppercase tracking-widest mb-1.5 border border-slate-900 shadow-xs">
+                1983 — 2025
+              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight drop-shadow-xs leading-tight">
+                A Gestão de Pessoas nos 60 Anos da Unicamp
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-900 font-bold mt-1 max-w-xl mx-auto">
+                Uma trajetória de pessoas, valorização e memória institucional
+              </p>
+            </div>
           </div>
 
-          {/* Bottom subtle hint */}
-          <div
-            className="text-center text-xs font-bold text-slate-900/80 transition-opacity duration-300"
-            style={{ opacity: Math.max(0, 1 - introProgress * 2) }}
-          >
-            Distribuindo os 12 períodos históricos na linha do tempo...
+          {/* Center Spacer: ensures the cards in the 3D fan are clearly visible and unobstructed */}
+          <div className="flex-1 w-full" />
+
+          {/* Bottom Area: Prominent CTA button when idle in fan, or status message while dealing */}
+          <div className="w-full flex flex-col items-center pb-2">
+            {isFanIdle ? (
+              <div className="pointer-events-auto flex flex-col items-center gap-2.5">
+                <button
+                  onClick={executeOpeningAnimation}
+                  className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
+                >
+                  <Sparkles className="w-5 h-5 text-[#e5a93a] group-hover:rotate-12 transition-transform" />
+                  <span>Abrir Linha do Tempo</span>
+                  <Play className="w-4 h-4 fill-white text-white group-hover:translate-x-0.5 transition-transform" />
+                </button>
+                <span className="text-xs font-black text-slate-900 bg-white/85 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-950/20 shadow-xs animate-pulse">
+                  Clique no botão ou nos cards para abrir
+                </span>
+              </div>
+            ) : (
+              <div
+                className="text-center text-xs font-black text-slate-900 transition-opacity duration-300 pointer-events-none"
+                style={{ opacity: Math.max(0, 1 - introProgress * 2) }}
+              >
+                Distribuindo os 12 períodos históricos na linha do tempo...
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -351,9 +413,19 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         </div>
 
         {/* The Continuous Strip of Cards */}
-        <div className="relative z-10 w-full h-full flex items-center justify-center pointer-events-none">
+        <div
+          className={`relative z-10 w-full h-full flex items-center justify-center ${
+            isFanIdle ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'
+          }`}
+          onClick={() => {
+            if (isFanIdle) {
+              executeOpeningAnimation();
+            }
+          }}
+        >
           {periods.map((period, idx) => {
-            const isCardActive = activeIndex !== null && idx === activeIndex;
+            // Guarantee cards are strictly unselected during intro / fan / abertura
+            const isCardActive = !isIntroActive && activeIndex !== null && idx === activeIndex;
 
             // Target timeline transform coordinates
             const offset = idx - currentPosition;
@@ -366,7 +438,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let targetOpacity = 1;
             let targetZIndex = 50;
 
-            if (activeIndex !== null) {
+            if (activeIndex !== null && !isIntroActive) {
               // Mode A: ONE CARD IS SELECTED (Active 2-column center card + smaller neighbors)
               if (absOffset <= 1) {
                 targetX = sign * absOffset * cardSpacing;
@@ -404,10 +476,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
             if (isIntroActive) {
               // 3D Fan Stack initial values
-              const fanAngle = (idx - 5.5) * 4.8; // Fan tilt -26deg to +26deg
-              const fanX = (idx - 5.5) * 20; // Slight horizontal staggered spread
-              const fanY = Math.pow(Math.abs(idx - 5.5), 1.4) * 4.2 - 12; // Gentle arc
-              const fanScale = 0.76;
+              const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+              const fanAngle = (idx - 5.5) * (isMobile ? 3.8 : 4.8); // Fan tilt
+              const fanX = (idx - 5.5) * (isMobile ? 14 : 20); // Horizontal spread
+              const fanY = Math.pow(Math.abs(idx - 5.5), 1.4) * (isMobile ? 3.2 : 4.2) - (isMobile ? 8 : 12); // Gentle arc
+              const fanScale = isMobile ? 0.64 : 0.76;
               const fanZ = 30 + idx;
 
               // Staggered deal interpolation
@@ -431,7 +504,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             return (
               <div
                 key={period.id}
-                className="absolute transition-shadow duration-300 pointer-events-auto"
+                className={`absolute transition-shadow duration-300 pointer-events-auto ${
+                  isFanIdle ? 'cursor-pointer hover:scale-[1.03] transition-transform' : ''
+                }`}
+                onClick={(e) => {
+                  if (isFanIdle) {
+                    e.stopPropagation();
+                    executeOpeningAnimation();
+                  }
+                }}
                 style={{
                   left: '50%',
                   top: '50%',
@@ -444,7 +525,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 <TimelineCard
                   period={period}
                   isActive={isCardActive}
-                  onSelect={() => slideToIndex(idx)}
+                  onSelect={() => {
+                    if (isFanIdle) {
+                      executeOpeningAnimation();
+                    } else if (!isIntroActive) {
+                      slideToIndex(idx);
+                    }
+                  }}
                   onClose={() => onSelectPeriod(null)}
                   onOpenPhoto={onOpenPhoto}
                 />
@@ -531,9 +618,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         <div className="flex items-center justify-center gap-2">
           {/* Replay Intro Animation button */}
           <button
-            onClick={startIntroAnimation}
+            onClick={handleReplayIntro}
             className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
-            title="Rever apresentação e animação inicial"
+            title="Voltar para apresentação em leque e abertura"
           >
             <Sparkles className="w-3 h-3 text-[#105e7b]" />
             <span>Abertura</span>
