@@ -3,7 +3,7 @@ import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { TimelineCard, pureBgColors } from './TimelineCard';
 import { soundFx } from '../../utils/soundEffects';
 import { 
-  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, FastForward, Volume2, VolumeX 
+  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, Volume2, VolumeX 
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -332,75 +332,19 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      {/* ================= 1. INTRO ANIMATION & 3D FAN OVERLAY ================= */}
-      {isIntroActive && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-between p-4 sm:p-6">
-          {/* Top Section: Top Bar & Commemorative Title */}
-          <div className="w-full flex flex-col items-center">
-            {/* Top Bar with Badge & Skip Button */}
-            <div className="w-full max-w-5xl flex items-center justify-between pointer-events-auto">
-              <span className="px-3.5 py-1 rounded-full bg-white text-slate-950 text-xs font-black shadow-md border border-slate-950 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#105e7b]" />
-                <span>Abertura Comemorativa • 60 Anos Unicamp</span>
-              </span>
-
-              <button
-                onClick={skipIntro}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-950 text-xs font-black border-2 border-slate-950 shadow-lg cursor-pointer transition-all hover:scale-105 active:scale-95"
-                title={isFanIdle ? "Ir direto para a linha do tempo" : "Pular apresentação"}
-              >
-                <span>Pular</span>
-                <FastForward className="w-3.5 h-3.5 text-[#105e7b]" />
-              </button>
-            </div>
-
-            {/* Central Title Banner (Above the fan cards, fades out smoothly as cards deal out) */}
-            <div
-              className="text-center pt-3 sm:pt-4 transition-all duration-500 pointer-events-none"
-              style={{
-                opacity: isFanIdle ? 1 : Math.max(0, 1 - introProgress * 2.2),
-                transform: `translateY(${isFanIdle ? 0 : -introProgress * 30}px)`,
-              }}
+      {/* ================= 1. INTRO 3D FAN OVERLAY (Cards + Start Button Only) ================= */}
+      {isFanIdle && (
+        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12">
+          <div className="pointer-events-auto">
+            <button
+              onClick={executeOpeningAnimation}
+              className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
+              title="Iniciar abertura da linha do tempo"
             >
-              <div className="inline-block px-3.5 py-0.5 rounded-full bg-white/95 text-[#105e7b] text-[11px] font-black uppercase tracking-widest mb-1.5 border border-slate-900 shadow-xs">
-                1983 — 2025
-              </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight drop-shadow-xs leading-tight">
-                A Gestão de Pessoas nos 60 Anos da Unicamp
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-900 font-bold mt-1 max-w-xl mx-auto">
-                Uma trajetória de pessoas, valorização e memória institucional
-              </p>
-            </div>
-          </div>
-
-          {/* Center Spacer: ensures the cards in the 3D fan are clearly visible and unobstructed */}
-          <div className="flex-1 w-full" />
-
-          {/* Bottom Area: Prominent CTA button when idle in fan, or status message while dealing */}
-          <div className="w-full flex flex-col items-center pb-2">
-            {isFanIdle ? (
-              <div className="pointer-events-auto flex flex-col items-center gap-2.5">
-                <button
-                  onClick={executeOpeningAnimation}
-                  className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
-                >
-                  <Sparkles className="w-5 h-5 text-[#e5a93a] group-hover:rotate-12 transition-transform" />
-                  <span>Abrir Linha do Tempo</span>
-                  <Play className="w-4 h-4 fill-white text-white group-hover:translate-x-0.5 transition-transform" />
-                </button>
-                <span className="text-xs font-black text-slate-900 bg-white/85 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-950/20 shadow-xs animate-pulse">
-                  Clique no botão ou nos cards para abrir
-                </span>
-              </div>
-            ) : (
-              <div
-                className="text-center text-xs font-black text-slate-900 transition-opacity duration-300 pointer-events-none"
-                style={{ opacity: Math.max(0, 1 - introProgress * 2) }}
-              >
-                Distribuindo os 12 períodos históricos na linha do tempo...
-              </div>
-            )}
+              <Sparkles className="w-5 h-5 text-[#e5a93a] group-hover:rotate-12 transition-transform" />
+              <span>Iniciar Abertura</span>
+              <Play className="w-4 h-4 fill-white text-white group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         </div>
       )}
@@ -547,29 +491,33 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           })}
         </div>
 
-        {/* Floating Side Arrow Buttons */}
-        <button
-          onClick={handlePrev}
-          disabled={isIntroActive || (activeIndex !== null && activeIndex === 0) || (activeIndex === null && currentPosition <= 0)}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl disabled:opacity-20 flex items-center justify-center transition-all cursor-pointer group"
-          title="Período anterior"
-        >
-          <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
-        </button>
+        {/* Floating Side Arrow Buttons (Hidden during intro) */}
+        {!isIntroActive && (
+          <>
+            <button
+              onClick={handlePrev}
+              disabled={(activeIndex !== null && activeIndex === 0) || (activeIndex === null && currentPosition <= 0)}
+              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl disabled:opacity-20 flex items-center justify-center transition-all cursor-pointer group"
+              title="Período anterior"
+            >
+              <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+            </button>
 
-        <button
-          onClick={handleNext}
-          disabled={isIntroActive || (activeIndex !== null && activeIndex === totalPeriods - 1) || (activeIndex === null && currentPosition >= totalPeriods - 1)}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl disabled:opacity-20 flex items-center justify-center transition-all cursor-pointer group"
-          title="Próximo período"
-        >
-          <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+            <button
+              onClick={handleNext}
+              disabled={(activeIndex !== null && activeIndex === totalPeriods - 1) || (activeIndex === null && currentPosition >= totalPeriods - 1)}
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl disabled:opacity-20 flex items-center justify-center transition-all cursor-pointer group"
+              title="Próximo período"
+            >
+              <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* ================= 3. COMPACT BOTTOM TIMELINE RULER & CONTROLS ================= */}
       <div 
-        className="relative z-20 pb-2 px-3 max-w-4xl mx-auto w-full flex flex-col items-center gap-1.5 transition-all duration-700"
+        className={`relative z-20 pb-2 px-3 max-w-4xl mx-auto w-full flex flex-col items-center gap-1.5 transition-all duration-700 ${isIntroActive ? 'pointer-events-none' : ''}`}
         style={{
           opacity: isIntroActive ? Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55)) : 1,
           transform: `translateY(${isIntroActive ? (1 - Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55))) * 35 : 0}px)`,
