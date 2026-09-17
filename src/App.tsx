@@ -11,6 +11,7 @@ export function App() {
   const [selectedPhoto, setSelectedPhoto] = useState<MilestonePhoto | null>(null);
   const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
+  const [isFanIdle, setIsFanIdle] = useState<boolean>(true);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -73,7 +74,7 @@ export function App() {
   return (
     <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
       {/* Top Main Navigation Header */}
-      <Header />
+      <Header isCentered={isFanIdle} />
 
       {/* Main View Area: Continuous Timeline exclusively */}
       <main className="flex-1 w-full relative pt-14">
@@ -82,6 +83,7 @@ export function App() {
           activeIndex={activePeriodIndex}
           onSelectPeriod={handleSelectPeriod}
           onOpenPhoto={handleOpenPhoto}
+          onFanIdleChange={setIsFanIdle}
         />
       </main>
 

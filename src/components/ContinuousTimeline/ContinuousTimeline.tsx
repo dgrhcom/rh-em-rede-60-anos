@@ -12,6 +12,7 @@ interface ContinuousTimelineProps {
   activeIndex: number | null;
   onSelectPeriod: (index: number | null) => void;
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
+  onFanIdleChange?: (isIdle: boolean) => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -19,6 +20,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   activeIndex,
   onSelectPeriod,
   onOpenPhoto,
+  onFanIdleChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -36,6 +38,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const isIntroActive = introStatus !== 'done';
   const isFanIdle = introStatus === 'idle_fan';
   const isAnimating = introStatus === 'animating';
+
+  // Notify parent component about fan idle status
+  useEffect(() => {
+    onFanIdleChange?.(isFanIdle);
+  }, [isFanIdle, onFanIdleChange]);
 
   const [soundActive, setSoundActive] = useState<boolean>(() => soundFx.isEnabled());
 
