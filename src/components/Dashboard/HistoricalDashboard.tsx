@@ -12,14 +12,12 @@ import { soundFx } from '../../utils/soundEffects';
 import {
   SERVIDORES_POR_AREA,
   DESTAQUE_FAIXA_ETARIA,
-  RACA_COR_DATA,
 } from '../../data/hrStatsData';
 import {
   AreasStackedBarChart,
   GeneroCharts,
   FaixaEtariaBarChart,
-  RacaCorBarChart,
-  RacaCorTabela2BarChart,
+  RacaCorCharts,
   EscolaridadeEvolucaoLineChart,
   EscolaridadeZoomLineChart,
   GrandesAreasLineChart,
@@ -58,16 +56,10 @@ const SLIDES: SlideDefinition[] = [
     subtitle: 'Distribuição por faixas etárias diferenciando Docentes, Pesquisadores e Técnicos-Administrativos',
   },
   {
-    id: 'racaCorGeral',
+    id: 'racaCor',
     category: 'Inclusão & Equidade',
-    title: 'Distribuição Étnico-Racial (Visão Geral)',
-    subtitle: 'Tabela 1: Autodeclaração de raça e cor consolidada entre todos os servidores da Universidade',
-  },
-  {
-    id: 'racaCorTabela2',
-    category: 'Inclusão & Equidade',
-    title: 'Distribuição Étnico-Racial por Categoria',
-    subtitle: 'Tabela 2: Detalhamento por Docentes, Pesquisadores, Técnicos-Administrativos e Extra-Quadro',
+    title: 'Distribuição Étnico-Racial dos Servidores',
+    subtitle: 'Autodeclaração geral de raça/cor e detalhamento por carreira funcional na Universidade',
   },
   {
     id: 'escolaridadeGeral',
@@ -90,8 +82,8 @@ const SLIDES: SlideDefinition[] = [
   {
     id: 'cargos',
     category: 'Quadro Funcional',
-    title: 'Ranking dos Maiores Cargos em 2026',
-    subtitle: 'As funções e carreiras com maior número de profissionais em atividade',
+    title: 'Ranking dos 20 Maiores Cargos em 2026',
+    subtitle: 'As 20 funções e carreiras com maior número de profissionais em atividade',
   },
   {
     id: 'nacionalidade',
@@ -218,46 +210,15 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 4: RAÇA / COR (TABELA 1 - GERAL) ================= */}
+          {/* ================= SLIDE 4: RAÇA / COR (INTEGRADO) ================= */}
           {currentSlideIndex === 3 && (
             <div className="space-y-3 flex-1 flex flex-col justify-center">
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 mb-1">
-                {RACA_COR_DATA.map((item) => (
-                  <div key={item.raca} className="p-2.5 rounded-2xl bg-slate-50 border border-black/10 text-center">
-                    <div className="text-base sm:text-lg font-black text-slate-950">{item.total.toLocaleString('pt-BR')}</div>
-                    <div className="text-xs font-black text-amber-700">{item.pct.toFixed(1)}%</div>
-                    <div className="text-[10px] font-bold text-slate-600 truncate mt-0.5">{item.raca}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Raça/Cor Chart */}
-              <RacaCorBarChart />
+              <RacaCorCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 5: RAÇA / COR (TABELA 2 - DETALHAMENTO) ================= */}
+          {/* ================= SLIDE 5: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
           {currentSlideIndex === 4 && (
-            <div className="space-y-3 flex-1 flex flex-col justify-center">
-              {/* Tabela 2 Header Badge & Information Callout */}
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <span className="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-xs font-black tracking-wider uppercase shadow-xs">
-                    Tabela 2
-                  </span>
-                  <div className="text-xs sm:text-sm font-bold">
-                    Autodeclaração Étnico-Racial discriminada por categoria (Docentes, Pesquisadores, PAEPE e Extra-Quadro)
-                  </div>
-                </div>
-              </div>
-
-              {/* Tabela 2 Stacked Bar Chart */}
-              <RacaCorTabela2BarChart />
-            </div>
-          )}
-
-          {/* ================= SLIDE 6: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
-          {currentSlideIndex === 5 && (
             <div className="space-y-3 flex-1 flex flex-col justify-center">
               {/* Highlight callout box */}
               <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3">
@@ -272,8 +233,8 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 7: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
-          {currentSlideIndex === 6 && (
+          {/* ================= SLIDE 6: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlideIndex === 5 && (
             <div className="space-y-3 flex-1 flex flex-col justify-center">
               {/* Highlight callout box */}
               <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3">
@@ -288,22 +249,22 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 8: GRANDES ÁREAS ================= */}
-          {currentSlideIndex === 7 && (
+          {/* ================= SLIDE 7: GRANDES ÁREAS ================= */}
+          {currentSlideIndex === 6 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <GrandesAreasLineChart />
             </div>
           )}
 
-          {/* ================= SLIDE 9: MAIORES CARGOS ================= */}
-          {currentSlideIndex === 8 && (
+          {/* ================= SLIDE 8: MAIORES CARGOS ================= */}
+          {currentSlideIndex === 7 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <TopCargosBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 10: NACIONALIDADES ================= */}
-          {currentSlideIndex === 9 && (
+          {/* ================= SLIDE 9: NACIONALIDADES ================= */}
+          {currentSlideIndex === 8 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <NacionalidadesCharts />
             </div>

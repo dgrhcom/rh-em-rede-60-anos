@@ -467,6 +467,193 @@ export const RacaCorBarChart: React.FC = () => {
 };
 
 /* =========================================================================
+   4. RAÇA / COR INTEGRADO: Pizza Geral (Esq) + Barras por Categoria (Dir)
+   ========================================================================= */
+export const RacaCorCharts: React.FC = () => {
+  const pieRef = useRef<HTMLCanvasElement | null>(null);
+  const barRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let pieChart: any = null;
+    let barChart: any = null;
+    let active = true;
+
+    getChartJS().then((Chart) => {
+      if (!active || !Chart) return;
+
+      // 1. Pizza / Donut - Visão Geral
+      if (pieRef.current) {
+        const ctx1 = pieRef.current.getContext('2d');
+        if (ctx1) {
+          const colors = ['#0284c7', '#d97706', '#334155', '#ca8a04', '#94a3b8', '#16a34a'];
+          pieChart = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+              labels: RACA_COR_DATA.map((r) => r.raca),
+              datasets: [
+                {
+                  data: RACA_COR_DATA.map((r) => r.total),
+                  backgroundColor: colors,
+                  borderWidth: 2,
+                  borderColor: '#ffffff',
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '55%',
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    boxWidth: 10,
+                    boxHeight: 10,
+                    font: { weight: 'bold', size: 10 },
+                    color: '#1e293b',
+                    padding: 6,
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx: any) => {
+                      const item = RACA_COR_DATA[ctx.dataIndex];
+                      return ` ${item.raca}: ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1)}%)`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+      }
+
+      // 2. Barras Empilhadas - Detalhamento por Carreira
+      if (barRef.current) {
+        const ctx2 = barRef.current.getContext('2d');
+        if (ctx2) {
+          barChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+              labels: RACA_COR_TABELA_2.map((r) => r.raca),
+              datasets: [
+                {
+                  label: 'Docentes',
+                  data: RACA_COR_TABELA_2.map((r) => r.docentes),
+                  backgroundColor: '#b43a2b',
+                  borderRadius: 3,
+                },
+                {
+                  label: 'Pesquisadores',
+                  data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
+                  backgroundColor: '#047857',
+                  borderRadius: 3,
+                },
+                {
+                  label: 'PAEPE',
+                  data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
+                  backgroundColor: '#105e7b',
+                  borderRadius: 3,
+                },
+                {
+                  label: 'Extra-quadro',
+                  data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
+                  backgroundColor: '#d97706',
+                  borderRadius: 3,
+                },
+              ],
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  stacked: true,
+                  grid: { color: 'rgba(0,0,0,0.05)' },
+                  ticks: {
+                    font: { weight: 'bold', size: 10 },
+                    color: '#64748b',
+                    callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+                  },
+                },
+                y: {
+                  stacked: true,
+                  grid: { display: false },
+                  ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+                },
+              },
+              plugins: {
+                legend: {
+                  position: 'top',
+                  labels: {
+                    boxWidth: 10,
+                    boxHeight: 10,
+                    font: { weight: 'bold', size: 10 },
+                    color: '#1e293b',
+                  },
+                },
+                tooltip: {
+                  padding: 10,
+                  callbacks: {
+                    label: (ctx: any) => {
+                      const val = Number(ctx.raw);
+                      const item = RACA_COR_TABELA_2[ctx.dataIndex];
+                      const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                      return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
+                    },
+                    footer: (items: any[]) => {
+                      if (!items.length) return '';
+                      const item = RACA_COR_TABELA_2[items[0].dataIndex];
+                      return `Total no grupo: ${item.total.toLocaleString('pt-BR')} servidores`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+      }
+    });
+
+    return () => {
+      active = false;
+      pieChart?.destroy();
+      barChart?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+      {/* Left Column: Donut/Pizza Visão Geral */}
+      <div className="md:col-span-5 flex flex-col items-center justify-center">
+        <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
+          Visão Geral (Autodeclaração)
+        </div>
+        <div className="w-[190px] h-[190px] sm:w-[210px] sm:h-[210px] relative">
+          <canvas ref={pieRef} />
+        </div>
+        <div className="text-center mt-1">
+          <span className="text-[11px] font-bold text-slate-500">
+            Total Geral: <strong>13.554</strong> servidores cadastrados
+          </span>
+        </div>
+      </div>
+
+      {/* Right Column: Barras Empilhadas por Categoria */}
+      <div className="md:col-span-7 flex flex-col justify-center">
+        <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center sm:text-left">
+          Composição por Carreira Funcional
+        </div>
+        <div className="w-full h-[250px] sm:h-[270px]">
+          <canvas ref={barRef} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================================
    4b. RAÇA / COR: Tabela 2 (Detalhamento por Categoria)
    ========================================================================= */
 export const RacaCorTabela2BarChart: React.FC = () => {
@@ -923,18 +1110,23 @@ export const TopCargosBarChart: React.FC = () => {
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
 
-      const top10 = TOP_CARGOS_2026.slice(0, 10).reverse();
+      const top20 = TOP_CARGOS_2026.slice(0, 20);
 
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: top10.map((c) => c.cargo),
+          labels: top20.map((c, i) => `${i + 1}º ${c.cargo}`),
           datasets: [
             {
               label: 'Total de Profissionais',
-              data: top10.map((c) => c.quantidade),
-              backgroundColor: top10.map((c) => (c.categoria === 'Docente' ? '#b43a2b' : '#105e7b')),
-              borderRadius: 6,
+              data: top20.map((c) => c.quantidade),
+              backgroundColor: top20.map((c) => {
+                if (c.categoria === 'Docente') return '#b43a2b';
+                if (c.categoria === 'Saúde') return '#047857';
+                if (c.categoria === 'Tecnologia') return '#0284c7';
+                return '#105e7b';
+              }),
+              borderRadius: 3,
             },
           ],
         },
@@ -946,14 +1138,17 @@ export const TopCargosBarChart: React.FC = () => {
             x: {
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
+                font: { weight: 'bold', size: 10 },
                 color: '#64748b',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             y: {
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+              ticks: {
+                font: { weight: 'bold', size: 9 },
+                color: '#0f172a',
+              },
             },
           },
           plugins: {
@@ -961,7 +1156,7 @@ export const TopCargosBarChart: React.FC = () => {
             tooltip: {
               callbacks: {
                 label: (ctx: any) => {
-                  const cargo = top10[ctx.dataIndex];
+                  const cargo = top20[ctx.dataIndex];
                   return ` ${cargo.quantidade.toLocaleString('pt-BR')} servidores (${cargo.categoria})`;
                 },
               },
@@ -978,7 +1173,7 @@ export const TopCargosBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[320px]">
+    <div className="w-full h-[330px] sm:h-[350px]">
       <canvas ref={canvasRef} />
     </div>
   );
