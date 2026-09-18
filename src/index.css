@@ -63,6 +63,21 @@ h1, h2, h3, h4, h5, h6 {
   image-rendering: -webkit-optimize-contrast;
 }
 
+@keyframes cardGrowIn {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-card-grow {
+  animation: cardGrowIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* 3D Perspective and Card Flipping Utilities */
 .preserve-3d {
   transform-style: preserve-3d;

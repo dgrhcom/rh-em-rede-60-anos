@@ -220,11 +220,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     soundFx.playCardTick();
   }, [onLogoPositionChange, onLogoVisibilityChange]);
 
-  // Execute Opening Animation: sequentially deals cards out one by one from oldest to newest from the bottom of the deck
+  // Execute Opening Animation:
+  // 1. Capa lifts and dissolves
+  // 2. Cards deal sequentially from the top of the deck (card 11) down to the bottom (card 0)
+  // 3. All 12 cards land small and side-by-side in an Overview Row within screen width
+  // 4. After all cards are visible at rest, the first card (card 0) is selected and opens with a growth transition
   const executeOpeningAnimation = useCallback(() => {
     if (introStatus === 'animating') return;
 
-    // Strictly guarantee all cards are unselected before and during the opening
+    // Strictly guarantee all cards are unselected before the opening
     setHoveredCardIndex(null);
     prevActiveIndexRef.current = null;
     currentPositionRef.current = 0;
@@ -238,21 +242,29 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
     const obj = { p: 0 };
     const dealTicked = new Set<number>();
+    let finalGrowthTicked = false;
 
     introTweenRef.current = gsap.to(obj, {
       p: 1,
-      duration: 3.0,
+      duration: 3.5,
       ease: 'none',
       onUpdate: () => {
         setIntroProgress(obj.p);
 
-        // Sound tick as each card arrives at its slot in the horizontal timeline
+        // Sound tick as each card arrives at its overview slot (dealing from top card 11 down to 0)
         for (let i = 0; i < totalPeriods; i++) {
-          const arrival = (i / Math.max(1, totalPeriods - 1)) * 0.58 + 0.36;
+          const dealOrder = (totalPeriods - 1) - i; // 11 is 0, 0 is 11
+          const arrival = 0.04 + (dealOrder / Math.max(1, totalPeriods - 1)) * 0.44 + 0.17;
           if (obj.p >= arrival && !dealTicked.has(i)) {
             dealTicked.add(i);
             soundFx.playCardTick();
           }
+        }
+
+        // Sound tick when card 0 finishes growth transition and opens
+        if (obj.p >= 0.98 && !finalGrowthTicked) {
+          finalGrowthTicked = true;
+          soundFx.playCardTick();
         }
       },
       onComplete: () => {
@@ -260,7 +272,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         setIntroProgress(1);
         setIntroStatus('done');
         soundFx.playCardTick();
-        // Select the first card (1983-1986) by default
+        // Automatically select the first card (1983-1986)
         slideToIndex(0);
       },
     });
@@ -611,6 +623,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             if (isIntroActive) {
               // 3D Fan Stack initial values (13 items total: 12 cards + cover, centered symmetrically at 6.0)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+              const isTablet = typeof window !== 'undefined' && window.innerWidth >= 640 && window.innerWidth < 1024;
+              const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
               const angleStep = isMobile ? 1.5 : 2.0; // Tighter fan tilt
               const spreadStep = isMobile ? 6.5 : 9.0;  // Tighter horizontal spread
               const arcStep = isMobile ? 1.2 : 1.6;   // Gentle natural arc
@@ -671,12 +685,35 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentZIndex = fanZ;
                 }
               } else if (introStatus === 'animating') {
-                // DEAL ANIMATION: cards dealt one by one, from oldest (idx 0) to newest (idx 11) from bottom of deck
-                const dealStart = (idx / 11) * 0.58;
-                const dealDur = 0.36;
+                // Overview Row coordinates: all 12 cards arranged small side-by-side within screen width
+                const overviewStepX = isMobile
+                  ? Math.min(42, Math.max(26, (winW * 0.90) / 11))
+                  : isTablet
+                  ? Math.min(72, Math.max(48, (winW * 0.88) / 11))
+                  : Math.min(100, Math.max(70, (winW * 0.86) / 11));
 
-                if (introProgress < dealStart) {
-                  // Card is still waiting in the fan
+                const overviewScale = isMobile ? 0.26 : isTablet ? 0.33 : 0.40;
+                const overviewX = (idx - 5.5) * overviewStepX;
+                // Cards dealt top (11) to bottom (0), so each lands on top of previous:
+                const overviewZ = 20 + (11 - idx);
+
+                // Target timeline coordinates when card 0 is selected
+                const finalTimelineX = idx === 0 ? 0 :
+                  (idx === 1 ? cardSpacing :
+                  (idx === 2 ? cardSpacing * 1.52 : cardSpacing * (1.52 + (idx - 2) * 0.42)));
+                const finalTimelineScale = idx === 0 ? 1.0 :
+                  (idx === 1 ? 0.65 :
+                  (idx === 2 ? 0.42 : Math.max(0.20, 0.42 - (idx - 2) * 0.16)));
+                const finalTimelineOpacity = idx > 2 ? Math.max(0.15, 1 - (idx - 2.3) * 0.75) : 1;
+                const finalTimelineZ = Math.round(50 - idx * 10);
+
+                // Dealing order: from card 11 down to card 0
+                const dealOrder = 11 - idx; // 0 for card 11, 11 for card 0
+                const cardStart = 0.04 + (dealOrder / 11) * 0.44; // 0.04 to 0.48
+                const cardDur = 0.17; // lands by cardStart + 0.17 (card 0 lands by 0.65)
+
+                if (introProgress < cardStart) {
+                  // Phase A: Waiting in fan
                   currentX = finalFanX;
                   currentY = finalFanY;
                   currentRot = finalFanAngle;
@@ -684,48 +721,87 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentScale = fanScale;
                   currentOpacity = 1;
                   currentZIndex = fanZ;
-                } else if (introProgress < dealStart + dealDur) {
-                  // Card is dealing out to its position in the horizontal timeline
-                  const rawP = (introProgress - dealStart) / dealDur;
-                  const p = 1 - Math.pow(1 - rawP, 3);
-                  currentX = finalFanX + (targetX - finalFanX) * p;
-                  currentY = finalFanY + (0 - finalFanY) * p;
-                  currentRot = finalFanAngle * (1 - p);
+                } else if (introProgress < cardStart + cardDur) {
+                  // Phase B: Dealing flight from fan into overview row
+                  const rawFlight = (introProgress - cardStart) / cardDur;
+                  const flightP = 1 - Math.pow(1 - rawFlight, 3);
+                  currentX = finalFanX + (overviewX - finalFanX) * flightP;
+                  currentY = finalFanY + (0 - finalFanY) * flightP;
+                  currentRot = finalFanAngle * (1 - flightP);
                   currentRotX = 0;
-                  currentScale = fanScale + (targetScale - fanScale) * p;
+                  currentScale = fanScale + (overviewScale - fanScale) * flightP;
                   currentOpacity = 1;
-                  currentZIndex = Math.round(fanZ + (targetZIndex - fanZ) * p);
-                } else {
-                  // Card has arrived at its timeline slot
-                  currentX = targetX;
+                  currentZIndex = overviewZ;
+                } else if (introProgress < 0.74) {
+                  // Phase C: Resting in overview row across screen width (all 12 cards small, side by side, visible)
+                  currentX = overviewX;
                   currentY = 0;
                   currentRot = 0;
                   currentRotX = 0;
-                  currentScale = targetScale;
+                  currentScale = overviewScale;
                   currentOpacity = 1;
-                  currentZIndex = targetZIndex;
+                  currentZIndex = overviewZ;
+                } else {
+                  // Phase D: Card 0 is selected and opens with growth transition; other cards ease into timeline
+                  const growRaw = (introProgress - 0.74) / (1.00 - 0.74);
+                  const growP = 1 - Math.pow(1 - growRaw, 3);
+
+                  if (idx === 0) {
+                    currentX = overviewX + (0 - overviewX) * growP;
+                    currentY = 0;
+                    currentRot = 0;
+                    currentRotX = 0;
+                    currentScale = overviewScale + (1.0 - overviewScale) * growP;
+                    currentOpacity = 1;
+                    currentZIndex = 85;
+                  } else {
+                    currentX = overviewX + (finalTimelineX - overviewX) * growP;
+                    currentY = 0;
+                    currentRot = 0;
+                    currentRotX = 0;
+                    currentScale = overviewScale + (finalTimelineScale - overviewScale) * growP;
+                    currentOpacity = 1 + (finalTimelineOpacity - 1) * growP;
+                    currentZIndex = Math.round(overviewZ + (finalTimelineZ - overviewZ) * growP);
+                  }
                 }
               } else {
-                // idle_fan: apply interactive hover offsets so cards "abrem um pouquinho"
+                // idle_fan: apply interactive hover offsets so cards "abrem um pouco o leque, sem subir nem mostrar tudo"
                 let hoverOffsetY = 0;
                 let hoverOffsetX = 0;
                 let hoverOffsetRot = 0;
-                let hoverScaleMult = 1;
+                let hoverScaleMult = 1.0;
                 let hoverZ = fanZ;
 
                 if (hoveredCardIndex !== null) {
                   if (idx === hoveredCardIndex) {
-                    hoverOffsetY = -34;
-                    hoverScaleMult = 1.06;
-                    hoverZ = 95;
+                    // Hovered card stays in place, does not lift up, does not jump over others
+                    hoverOffsetY = 0;
+                    hoverScaleMult = 1.0;
+                    hoverZ = fanZ;
                   } else if (idx < hoveredCardIndex) {
                     const dist = hoveredCardIndex - idx;
-                    hoverOffsetX = -Math.max(4, 16 - dist * 2);
-                    hoverOffsetRot = -1.5;
+                    if (dist === 1) {
+                      hoverOffsetX = -20;
+                      hoverOffsetRot = -2.5;
+                    } else if (dist === 2) {
+                      hoverOffsetX = -10;
+                      hoverOffsetRot = -1.2;
+                    } else if (dist === 3) {
+                      hoverOffsetX = -5;
+                      hoverOffsetRot = -0.6;
+                    }
                   } else {
                     const dist = idx - hoveredCardIndex;
-                    hoverOffsetX = Math.max(4, 16 - dist * 2);
-                    hoverOffsetRot = 1.5;
+                    if (dist === 1) {
+                      hoverOffsetX = 20;
+                      hoverOffsetRot = 2.5;
+                    } else if (dist === 2) {
+                      hoverOffsetX = 10;
+                      hoverOffsetRot = 1.2;
+                    } else if (dist === 3) {
+                      hoverOffsetX = 5;
+                      hoverOffsetRot = 0.6;
+                    }
                   }
                 }
 
@@ -867,30 +943,39 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   coverOpacity = 1;
                 }
               } else if (introStatus === 'animating') {
-                // Smooth fade-out and slide as cards deal out from underneath
-                coverOpacity = Math.max(0, 1 - introProgress * 2.4);
-                const p = 1 - Math.pow(1 - Math.min(1, introProgress * 1.5), 3);
-                coverCurrentX = finalFanX + p * 30;
-                coverCurrentY = finalFanY - introProgress * 40;
-                coverCurrentRot = finalFanAngle * (1 - introProgress * 0.4);
-                coverCurrentRotX = 0;
-                coverCurrentScale = fanScale + introProgress * 0.06;
+                // Capa lifts gently and fades out cleanly as dealing starts
+                const pFade = Math.min(1, introProgress / 0.16);
+                coverOpacity = Math.max(0, 1 - pFade);
+                const easeFade = 1 - Math.pow(1 - pFade, 3);
+                coverCurrentX = finalFanX + easeFade * 20;
+                coverCurrentY = finalFanY - easeFade * 45;
+                coverCurrentRot = finalFanAngle + easeFade * 1.5;
+                coverCurrentScale = fanScale * (1 + easeFade * 0.05);
+                coverCurrentZ = 55;
               } else {
-                // idle_fan: apply interactive hover offsets!
+                // idle_fan: apply interactive hover offsets without lifting or jumping
                 let hoverOffsetY = 0;
                 let hoverOffsetX = 0;
                 let hoverOffsetRot = 0;
-                let hoverScaleMult = 1;
+                let hoverScaleMult = 1.0;
 
                 if (hoveredCardIndex !== null) {
                   if (hoveredCardIndex === 12) {
-                    hoverOffsetY = -34;
-                    hoverScaleMult = 1.06;
-                    coverCurrentZ = 95;
+                    hoverOffsetY = 0;
+                    hoverScaleMult = 1.0;
+                    coverCurrentZ = 55;
                   } else {
-                    // Capa is at index 12, so any card to its left parts to the left and Capa pushes right
-                    hoverOffsetX = 12;
-                    hoverOffsetRot = 1.5;
+                    const dist = 12 - hoveredCardIndex;
+                    if (dist === 1) {
+                      hoverOffsetX = 20;
+                      hoverOffsetRot = 2.5;
+                    } else if (dist === 2) {
+                      hoverOffsetX = 10;
+                      hoverOffsetRot = 1.2;
+                    } else if (dist === 3) {
+                      hoverOffsetX = 5;
+                      hoverOffsetRot = 0.6;
+                    }
                   }
                 }
 
