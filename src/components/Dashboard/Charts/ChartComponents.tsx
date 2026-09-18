@@ -12,6 +12,65 @@ import {
   NACIONALIDADES_DATA,
 } from '../../../data/hrStatsData';
 
+/* =========================================================================
+   DESIGN SYSTEM OFFICIAL COLOR TOKENS (DGRH / UNICAMP 60 ANOS)
+   ========================================================================= */
+export const DS_COLORS = {
+  primary: '#105e7b',       // Azul DGRH Primária
+  primaryHover: '#187fa1',
+  primarySurface: '#f2f5f9',
+  secondary: '#e5a93a',     // Dourado Unicamp 60 Anos Secundária
+  secondaryHover: '#b8801a',
+  secondarySurface: '#fffaec',
+  aux1: '#477b2f',          // Verde DGRH Auxiliar 1
+  aux2: '#5e2a6b',          // Roxo DGRH Auxiliar 2
+  aux3: '#d67b27',          // Laranja/Terracota DGRH Auxiliar 3
+  // Cores harmônicas complementares do Design System
+  cobalt: '#1a508b',        // Azul Cobalto
+  wine: '#6b213b',          // Vinho DGRH
+  slate: '#475569',         // Slate Neutro
+  slateLight: '#94a3b8',    // Slate Claro
+  teal: '#0d6e8a',          // Azul Petróleo / Oceano
+};
+
+// Canvas drawing helper for high-contrast rounded badge / pill
+function drawBadge(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  bgColor: string = 'rgba(15, 23, 42, 0.85)',
+  textColor: string = '#ffffff',
+  fontSize: number = 10,
+  paddingX: number = 6,
+  paddingY: number = 3,
+  radius: number = 4
+) {
+  ctx.save();
+  ctx.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const metrics = ctx.measureText(text);
+  const width = metrics.width + paddingX * 2;
+  const height = fontSize + paddingY * 2;
+  const rx = x - width / 2;
+  const ry = y - height / 2;
+
+  ctx.fillStyle = bgColor;
+  ctx.beginPath();
+  if ((ctx as any).roundRect) {
+    (ctx as any).roundRect(rx, ry, width, height, radius);
+  } else {
+    ctx.rect(rx, ry, width, height);
+  }
+  ctx.fill();
+
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
 // Helper to safely load Chart.js from window or CDN
 async function getChartJS() {
   if (typeof window !== 'undefined' && (window as any).Chart) {
@@ -35,7 +94,7 @@ async function getChartJS() {
 }
 
 /* =========================================================================
-   2. GÊNERO: Doughnut Chart Geral + Bar Chart por Carreira
+   1. GÊNERO: Doughnut Chart Geral + Bar Chart por Carreira
    ========================================================================= */
 export const GeneroCharts: React.FC = () => {
   const donutRef = useRef<HTMLCanvasElement | null>(null);
@@ -49,10 +108,26 @@ export const GeneroCharts: React.FC = () => {
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      // Donut Chart
+      // 1. Donut Chart com rótulo percentual nas fatias
       if (donutRef.current) {
         const ctx1 = donutRef.current.getContext('2d');
         if (ctx1) {
+          const doughnutPlugin = {
+            id: 'donutPercentageBadges',
+            afterDatasetsDraw(chart: any) {
+              const { ctx } = chart;
+              const meta = chart.getDatasetMeta(0);
+              const pcts = [GENERO_DATA.total.pctFeminino, GENERO_DATA.total.pctMasculino];
+
+              meta.data.forEach((element: any, i: number) => {
+                const pos = element.tooltipPosition();
+                if (!pos) return;
+                const text = `${pcts[i].toFixed(1).replace('.', ',')}%`;
+                drawBadge(ctx, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+              });
+            },
+          };
+
           donutChart = new Chart(ctx1, {
             type: 'doughnut',
             data: {
@@ -60,8 +135,8 @@ export const GeneroCharts: React.FC = () => {
               datasets: [
                 {
                   data: [GENERO_DATA.total.feminino, GENERO_DATA.total.masculino],
-                  backgroundColor: ['#ec4899', '#4338ca'],
-                  hoverBackgroundColor: ['#db2777', '#3730a3'],
+                  backgroundColor: [DS_COLORS.primary, DS_COLORS.secondary],
+                  hoverBackgroundColor: [DS_COLORS.primaryHover, DS_COLORS.secondaryHover],
                   borderWidth: 3,
                   borderColor: '#ffffff',
                 },
@@ -70,7 +145,7 @@ export const GeneroCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '70%',
+              cutout: '68%',
               plugins: {
                 legend: {
                   position: 'bottom',
@@ -86,20 +161,42 @@ export const GeneroCharts: React.FC = () => {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
                       const pct = ctx.dataIndex === 0 ? GENERO_DATA.total.pctFeminino : GENERO_DATA.total.pctMasculino;
-                      return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
+                      return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct.toFixed(1).replace('.', ',')}%)`;
                     },
                   },
                 },
               },
             },
+            plugins: [doughnutPlugin],
           });
         }
       }
 
-      // Bar Chart by Career
+      // 2. Bar Chart por Carreira com rótulos de porcentagem
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
+          const barLabelPlugin = {
+            id: 'groupedBarPercentageLabels',
+            afterDatasetsDraw(chart: any) {
+              const { ctx } = chart;
+              chart.data.datasets.forEach((dataset: any, dIdx: number) => {
+                const meta = chart.getDatasetMeta(dIdx);
+                meta.data.forEach((element: any, index: number) => {
+                  const val = dataset.data[index];
+                  const text = `${Number(val).toFixed(1).replace('.', ',')}%`;
+                  ctx.save();
+                  ctx.font = 'bold 10.5px Inter, -apple-system, sans-serif';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+                  ctx.fillStyle = dIdx === 0 ? DS_COLORS.primary : '#855807';
+                  ctx.fillText(text, element.x, element.y - 4);
+                  ctx.restore();
+                });
+              });
+            },
+          };
+
           barChart = new Chart(ctx2, {
             type: 'bar',
             data: {
@@ -108,13 +205,13 @@ export const GeneroCharts: React.FC = () => {
                 {
                   label: 'Feminino (%)',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctFeminino),
-                  backgroundColor: '#ec4899',
+                  backgroundColor: DS_COLORS.primary,
                   borderRadius: 6,
                 },
                 {
                   label: 'Masculino (%)',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctMasculino),
-                  backgroundColor: '#4338ca',
+                  backgroundColor: DS_COLORS.secondary,
                   borderRadius: 6,
                 },
               ],
@@ -124,7 +221,7 @@ export const GeneroCharts: React.FC = () => {
               maintainAspectRatio: false,
               scales: {
                 y: {
-                  max: 100,
+                  max: 108,
                   ticks: {
                     callback: (val: any) => `${val}%`,
                     font: { weight: 'bold', size: 11 },
@@ -152,12 +249,13 @@ export const GeneroCharts: React.FC = () => {
                       const careerIdx = ctx.dataIndex;
                       const career = GENERO_DATA.porCarreira[careerIdx];
                       const count = ctx.datasetIndex === 0 ? career.feminino : career.masculino;
-                      return ` ${ctx.dataset.label}: ${ctx.raw}% (${count.toLocaleString('pt-BR')} servidores)`;
+                      return ` ${ctx.dataset.label}: ${Number(ctx.raw).toFixed(1).replace('.', ',')}% (${count.toLocaleString('pt-BR')} servidores)`;
                     },
                   },
                 },
               },
             },
+            plugins: [barLabelPlugin],
           });
         }
       }
@@ -176,8 +274,8 @@ export const GeneroCharts: React.FC = () => {
         <div className="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-3xl font-black text-slate-950">55,9%</span>
-            <span className="text-[10px] font-black uppercase tracking-wider text-pink-600">Mulheres</span>
+            <span className="text-3xl font-black text-[#105e7b]">55,9%</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 font-sans">Mulheres</span>
           </div>
         </div>
         <div className="text-center mt-1">
@@ -198,7 +296,7 @@ export const GeneroCharts: React.FC = () => {
 };
 
 /* =========================================================================
-   3. FAIXA ETÁRIA: Histogram Bar Chart with Highlight
+   2. FAIXA ETÁRIA: Histogram Bar Chart with Highlight & Percentage Badges
    ========================================================================= */
 export const FaixaEtariaBarChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -212,6 +310,24 @@ export const FaixaEtariaBarChart: React.FC = () => {
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
 
+      const topStackPercentagePlugin = {
+        id: 'topStackPercentageBadges',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
+
+          FAIXA_ETARIA_DATA.forEach((item, index) => {
+            const element = metaLast.data[index];
+            if (!element) return;
+            const x = element.x;
+            const y = element.y - 12;
+            const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
+
+            drawBadge(c, text, x, y, DS_COLORS.primary, '#ffffff', 10, 6, 2.5, 4);
+          });
+        },
+      };
+
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -220,19 +336,19 @@ export const FaixaEtariaBarChart: React.FC = () => {
             {
               label: 'Docentes',
               data: FAIXA_ETARIA_DATA.map((f) => f.docentes),
-              backgroundColor: '#b43a2b',
+              backgroundColor: DS_COLORS.aux2, // Roxo DGRH
               borderRadius: 4,
             },
             {
               label: 'Pesquisadores (PQ)',
               data: FAIXA_ETARIA_DATA.map((f) => f.pesquisadores),
-              backgroundColor: '#047857',
+              backgroundColor: DS_COLORS.aux1, // Verde DGRH
               borderRadius: 4,
             },
             {
               label: 'Técnicos-administrativos (PAEPE)',
               data: FAIXA_ETARIA_DATA.map((f) => f.tecnicos),
-              backgroundColor: '#105e7b',
+              backgroundColor: DS_COLORS.primary, // Azul Primário DGRH
               borderRadius: 4,
             },
           ],
@@ -240,6 +356,9 @@ export const FaixaEtariaBarChart: React.FC = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { top: 22 },
+          },
           scales: {
             x: {
               stacked: true,
@@ -248,6 +367,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
             },
             y: {
               stacked: true,
+              suggestedMax: 3450,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 font: { weight: 'bold', size: 11 },
@@ -272,18 +392,19 @@ export const FaixaEtariaBarChart: React.FC = () => {
                 label: (ctx: any) => {
                   const val = Number(ctx.raw);
                   const item = FAIXA_ETARIA_DATA[ctx.dataIndex];
-                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1).replace('.', ',') : '0';
                   return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}% da faixa)`;
                 },
                 footer: (items: any[]) => {
                   if (!items.length) return '';
                   const item = FAIXA_ETARIA_DATA[items[0].dataIndex];
-                  return `Total da faixa: ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1)}% do quadro)`;
+                  return `Total da faixa: ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1).replace('.', ',')}% do quadro)`;
                 },
               },
             },
           },
         },
+        plugins: [topStackPercentagePlugin],
       });
     });
 
@@ -301,83 +422,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
 };
 
 /* =========================================================================
-   4. RAÇA / COR: Horizontal Bar Chart
-   ========================================================================= */
-export const RacaCorBarChart: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    let chart: any = null;
-    let active = true;
-
-    getChartJS().then((Chart) => {
-      if (!active || !canvasRef.current || !Chart) return;
-      const ctx = canvasRef.current.getContext('2d');
-      if (!ctx) return;
-
-      const colors = ['#0284c7', '#d97706', '#475569', '#ca8a04', '#94a3b8', '#16a34a'];
-
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: RACA_COR_DATA.map((r) => r.raca),
-          datasets: [
-            {
-              label: 'Servidores',
-              data: RACA_COR_DATA.map((r) => r.total),
-              backgroundColor: colors,
-              borderRadius: 6,
-            },
-          ],
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              grid: { color: 'rgba(0,0,0,0.05)' },
-              ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
-                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
-              },
-            },
-            y: {
-              grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
-            },
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx: any) => {
-                  const item = RACA_COR_DATA[ctx.dataIndex];
-                  return ` ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1)}%)`;
-                },
-              },
-            },
-          },
-        },
-      });
-    });
-
-    return () => {
-      active = false;
-      chart?.destroy();
-    };
-  }, []);
-
-  return (
-    <div className="w-full h-[280px]">
-      <canvas ref={canvasRef} />
-    </div>
-  );
-};
-
-/* =========================================================================
-   4. RAÇA / COR INTEGRADO: Pizza Geral (Esq) + Barras por Categoria (Dir)
+   3. RAÇA / COR INTEGRADO: Pizza Geral (Esq) + Barras por Categoria (Dir)
    ========================================================================= */
 export const RacaCorCharts: React.FC = () => {
   const pieRef = useRef<HTMLCanvasElement | null>(null);
@@ -391,11 +436,36 @@ export const RacaCorCharts: React.FC = () => {
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
+      const palette = [
+        DS_COLORS.primary,   // Branca (71.9%)
+        DS_COLORS.secondary, // Parda (18.3%)
+        DS_COLORS.aux3,      // Preta (5.6%)
+        DS_COLORS.aux1,      // Amarela (1.3%)
+        DS_COLORS.slate,     // Não Informado (2.7%)
+        DS_COLORS.aux2,      // Indígena (0.3%)
+      ];
+
       // 1. Pizza / Donut - Visão Geral
       if (pieRef.current) {
         const ctx1 = pieRef.current.getContext('2d');
         if (ctx1) {
-          const colors = ['#0284c7', '#d97706', '#334155', '#ca8a04', '#94a3b8', '#16a34a'];
+          const donutSliceLabelsPlugin = {
+            id: 'donutSlicePercentageLabels',
+            afterDatasetsDraw(chartInstance: any) {
+              const c = chartInstance.ctx;
+              const meta = chartInstance.getDatasetMeta(0);
+              RACA_COR_DATA.forEach((item, i) => {
+                if (item.pct < 4.0) return; // evitar sobreposição em fatias milimétricas
+                const element = meta.data[i];
+                if (!element) return;
+                const pos = element.tooltipPosition();
+                if (!pos) return;
+                const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
+                drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 10, 6, 2.5, 4);
+              });
+            },
+          };
+
           pieChart = new Chart(ctx1, {
             type: 'doughnut',
             data: {
@@ -403,8 +473,8 @@ export const RacaCorCharts: React.FC = () => {
               datasets: [
                 {
                   data: RACA_COR_DATA.map((r) => r.total),
-                  backgroundColor: colors,
-                  borderWidth: 2,
+                  backgroundColor: palette,
+                  borderWidth: 2.5,
                   borderColor: '#ffffff',
                 },
               ],
@@ -412,7 +482,7 @@ export const RacaCorCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '55%',
+              cutout: '52%',
               plugins: {
                 legend: {
                   position: 'bottom',
@@ -428,12 +498,13 @@ export const RacaCorCharts: React.FC = () => {
                   callbacks: {
                     label: (ctx: any) => {
                       const item = RACA_COR_DATA[ctx.dataIndex];
-                      return ` ${item.raca}: ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1)}%)`;
+                      return ` ${item.raca}: ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1).replace('.', ',')}%)`;
                     },
                   },
                 },
               },
             },
+            plugins: [donutSliceLabelsPlugin],
           });
         }
       }
@@ -442,6 +513,30 @@ export const RacaCorCharts: React.FC = () => {
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
+          const horizontalStackLabelsPlugin = {
+            id: 'horizontalStackPercentageLabels',
+            afterDatasetsDraw(chartInstance: any) {
+              const c = chartInstance.ctx;
+              const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
+
+              RACA_COR_TABELA_2.forEach((item, index) => {
+                const element = metaLast.data[index];
+                if (!element) return;
+                const racaGeral = RACA_COR_DATA.find((r) => r.raca === item.raca);
+                const pct = racaGeral ? racaGeral.pct.toFixed(1).replace('.', ',') : '0';
+                const text = `${pct}% (${item.total.toLocaleString('pt-BR')})`;
+
+                c.save();
+                c.font = 'bold 10px Inter, -apple-system, sans-serif';
+                c.textAlign = 'left';
+                c.textBaseline = 'middle';
+                c.fillStyle = '#1e293b';
+                c.fillText(text, element.x + 6, element.y);
+                c.restore();
+              });
+            },
+          };
+
           barChart = new Chart(ctx2, {
             type: 'bar',
             data: {
@@ -450,25 +545,25 @@ export const RacaCorCharts: React.FC = () => {
                 {
                   label: 'Docentes',
                   data: RACA_COR_TABELA_2.map((r) => r.docentes),
-                  backgroundColor: '#b43a2b',
+                  backgroundColor: DS_COLORS.aux2, // Roxo DGRH
                   borderRadius: 3,
                 },
                 {
                   label: 'Pesquisadores',
                   data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
-                  backgroundColor: '#047857',
+                  backgroundColor: DS_COLORS.aux1, // Verde DGRH
                   borderRadius: 3,
                 },
                 {
                   label: 'PAEPE',
                   data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
-                  backgroundColor: '#105e7b',
+                  backgroundColor: DS_COLORS.primary, // Azul Primário
                   borderRadius: 3,
                 },
                 {
                   label: 'Extra-quadro',
                   data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
-                  backgroundColor: '#d97706',
+                  backgroundColor: DS_COLORS.secondary, // Dourado Secundário
                   borderRadius: 3,
                 },
               ],
@@ -477,9 +572,13 @@ export const RacaCorCharts: React.FC = () => {
               indexAxis: 'y',
               responsive: true,
               maintainAspectRatio: false,
+              layout: {
+                padding: { right: 80 },
+              },
               scales: {
                 x: {
                   stacked: true,
+                  suggestedMax: 11800,
                   grid: { color: 'rgba(0,0,0,0.05)' },
                   ticks: {
                     font: { weight: 'bold', size: 10 },
@@ -509,7 +608,7 @@ export const RacaCorCharts: React.FC = () => {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
                       const item = RACA_COR_TABELA_2[ctx.dataIndex];
-                      const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                      const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1).replace('.', ',') : '0';
                       return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
                     },
                     footer: (items: any[]) => {
@@ -521,6 +620,7 @@ export const RacaCorCharts: React.FC = () => {
                 },
               },
             },
+            plugins: [horizontalStackLabelsPlugin],
           });
         }
       }
@@ -564,7 +664,7 @@ export const RacaCorCharts: React.FC = () => {
 };
 
 /* =========================================================================
-   4b. RAÇA / COR: Tabela 2 (Detalhamento por Categoria)
+   3b. RAÇA / COR: Tabela 2 Individual (Legado / Suporte)
    ========================================================================= */
 export const RacaCorTabela2BarChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -586,25 +686,25 @@ export const RacaCorTabela2BarChart: React.FC = () => {
             {
               label: 'Docentes',
               data: RACA_COR_TABELA_2.map((r) => r.docentes),
-              backgroundColor: '#b43a2b',
+              backgroundColor: DS_COLORS.aux2,
               borderRadius: 4,
             },
             {
               label: 'Pesquisadores (PQ)',
               data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
-              backgroundColor: '#047857',
+              backgroundColor: DS_COLORS.aux1,
               borderRadius: 4,
             },
             {
               label: 'Técnicos-administrativos (PAEPE)',
               data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
-              backgroundColor: '#105e7b',
+              backgroundColor: DS_COLORS.primary,
               borderRadius: 4,
             },
             {
               label: 'Extra-quadro',
               data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
-              backgroundColor: '#d97706',
+              backgroundColor: DS_COLORS.secondary,
               borderRadius: 4,
             },
           ],
@@ -645,7 +745,7 @@ export const RacaCorTabela2BarChart: React.FC = () => {
                 label: (ctx: any) => {
                   const val = Number(ctx.raw);
                   const item = RACA_COR_TABELA_2[ctx.dataIndex];
-                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1).replace('.', ',') : '0';
                   return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
                 },
                 footer: (items: any[]) => {
@@ -674,7 +774,90 @@ export const RacaCorTabela2BarChart: React.FC = () => {
 };
 
 /* =========================================================================
-   5a. ESCOLARIDADE: Evolução Completa em Linhas (Todas as Categorias)
+   3c. RAÇA / COR: Gráfico de Barras Simples (Legado / Suporte)
+   ========================================================================= */
+export const RacaCorBarChart: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let chart: any = null;
+    let active = true;
+
+    getChartJS().then((Chart) => {
+      if (!active || !canvasRef.current || !Chart) return;
+      const ctx = canvasRef.current.getContext('2d');
+      if (!ctx) return;
+
+      const colors = [
+        DS_COLORS.primary,
+        DS_COLORS.secondary,
+        DS_COLORS.aux3,
+        DS_COLORS.aux1,
+        DS_COLORS.slate,
+        DS_COLORS.aux2,
+      ];
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: RACA_COR_DATA.map((r) => r.raca),
+          datasets: [
+            {
+              label: 'Servidores',
+              data: RACA_COR_DATA.map((r) => r.total),
+              backgroundColor: colors,
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                font: { weight: 'bold', size: 11 },
+                color: '#64748b',
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+              },
+            },
+            y: {
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx: any) => {
+                  const item = RACA_COR_DATA[ctx.dataIndex];
+                  return ` ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1).replace('.', ',')}%)`;
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    return () => {
+      active = false;
+      chart?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-[280px]">
+      <canvas ref={canvasRef} />
+    </div>
+  );
+};
+
+/* =========================================================================
+   4. ESCOLARIDADE: Evolução Completa em Linhas (Todas as Categorias)
    ========================================================================= */
 export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -687,6 +870,25 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
       if (!active || !canvasRef.current || !Chart) return;
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
+
+      const totalPAEPE2026 = 7333; // Soma total dos servidores PAEPE em 2026
+
+      const lineEndPercentageBadgesPlugin = {
+        id: 'lineEndPercentageBadges',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
+            const meta = chartInstance.getDatasetMeta(dIdx);
+            const lastElement = meta.data[meta.data.length - 1];
+            if (!lastElement) return;
+
+            const lastVal = Number(dataset.data[dataset.data.length - 1]);
+            const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
+
+            drawBadge(c, pct, lastElement.x + 23, lastElement.y, dataset.borderColor, '#ffffff', 9, 5, 2, 4);
+          });
+        },
+      };
 
       chart = new Chart(ctx, {
         type: 'line',
@@ -706,6 +908,9 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { right: 52 },
+          },
           scales: {
             y: {
               grid: { color: 'rgba(0,0,0,0.05)' },
@@ -733,11 +938,16 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             tooltip: {
               padding: 10,
               callbacks: {
-                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+                label: (ctx: any) => {
+                  const val = Number(ctx.raw);
+                  const pct = ((val / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
+                  return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}% do quadro PAEPE em 2026)`;
+                },
               },
             },
           },
         },
+        plugins: [lineEndPercentageBadgesPlugin],
       });
     });
 
@@ -755,7 +965,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
 };
 
 /* =========================================================================
-   5b. ESCOLARIDADE: Zoom em Linha (Mestrado, Fundamental, Doutorado, Fund. Incompleto e Maior que Doutorado)
+   5. ESCOLARIDADE: Zoom em Linha (Mestrado, Doutorado, Fundamental...)
    ========================================================================= */
 export const EscolaridadeZoomLineChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -768,6 +978,25 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
       if (!active || !canvasRef.current || !Chart) return;
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
+
+      const totalPAEPE2026 = 7333;
+
+      const zoomLineEndPercentagePlugin = {
+        id: 'zoomLineEndPercentages',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
+            const meta = chartInstance.getDatasetMeta(dIdx);
+            const lastElement = meta.data[meta.data.length - 1];
+            if (!lastElement) return;
+
+            const lastVal = Number(dataset.data[dataset.data.length - 1]);
+            const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
+
+            drawBadge(c, pct, lastElement.x + 23, lastElement.y, dataset.borderColor, '#ffffff', 9.5, 5, 2, 4);
+          });
+        },
+      };
 
       chart = new Chart(ctx, {
         type: 'line',
@@ -787,6 +1016,9 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { right: 54 },
+          },
           scales: {
             y: {
               min: 0,
@@ -816,11 +1048,16 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             tooltip: {
               padding: 10,
               callbacks: {
-                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+                label: (ctx: any) => {
+                  const val = Number(ctx.raw);
+                  const pct = ((val / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
+                  return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} servidores (${pct}%)`;
+                },
               },
             },
           },
         },
+        plugins: [zoomLineEndPercentagePlugin],
       });
     });
 
@@ -838,7 +1075,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
 };
 
 /* =========================================================================
-   5c. ESCOLARIDADE: Comparison Bar Chart (2016 vs 2026 - legado)
+   5b. ESCOLARIDADE: Comparison Bar Chart (Legado / Suporte)
    ========================================================================= */
 export const EscolaridadeComparisonChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -864,13 +1101,13 @@ export const EscolaridadeComparisonChart: React.FC = () => {
             {
               label: 'Ano 2016',
               data: data2016,
-              backgroundColor: '#94a3b8',
+              backgroundColor: DS_COLORS.slateLight,
               borderRadius: 6,
             },
             {
               label: 'Ano 2026',
               data: data2026,
-              backgroundColor: '#105e7b',
+              backgroundColor: DS_COLORS.primary,
               borderRadius: 6,
             },
           ],
@@ -939,10 +1176,26 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
 
+      const pieSliceBadgePlugin = {
+        id: 'pieSliceBadges',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          const meta = chartInstance.getDatasetMeta(0);
+          SERVIDORES_POR_AREA.forEach((area, i) => {
+            const element = meta.data[i];
+            if (!element) return;
+            const pos = element.tooltipPosition();
+            if (!pos) return;
+            const text = `${area.percentual.toFixed(1).replace('.', ',')}%`;
+            drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+          });
+        },
+      };
+
       chart = new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: SERVIDORES_POR_AREA.map((a) => `${a.tipoOrgao} (${a.percentual.toFixed(1)}%)`),
+          labels: SERVIDORES_POR_AREA.map((a) => `${a.tipoOrgao} (${a.percentual.toFixed(1).replace('.', ',')}%)`),
           datasets: [
             {
               data: SERVIDORES_POR_AREA.map((a) => a.total),
@@ -972,7 +1225,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
               callbacks: {
                 label: (ctx: any) => {
                   const area = SERVIDORES_POR_AREA[ctx.dataIndex];
-                  return ` ${area.tipoOrgao}: ${area.total.toLocaleString('pt-BR')} servidores (${area.percentual.toFixed(1)}%)`;
+                  return ` ${area.tipoOrgao}: ${area.total.toLocaleString('pt-BR')} servidores (${area.percentual.toFixed(1).replace('.', ',')}%)`;
                 },
                 afterLabel: (ctx: any) => {
                   const area = SERVIDORES_POR_AREA[ctx.dataIndex];
@@ -982,6 +1235,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
             },
           },
         },
+        plugins: [pieSliceBadgePlugin],
       });
     });
 
@@ -993,7 +1247,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full">
-      {/* Left Column: Official Pie Chart */}
+      {/* Left Column: Official Pie Chart with Data Labels */}
       <div className="lg:col-span-5 flex flex-col items-center justify-center relative h-[330px] sm:h-[370px]">
         <canvas ref={canvasRef} />
       </div>
@@ -1026,7 +1280,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
                 className="px-2.5 py-1 rounded-lg text-xs font-black text-white shrink-0"
                 style={{ backgroundColor: item.cor }}
               >
-                {item.percentual.toFixed(1)}%
+                {item.percentual.toFixed(1).replace('.', ',')}%
               </div>
             </div>
           ))}
@@ -1042,7 +1296,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
 };
 
 /* =========================================================================
-   7. TOP CARGOS: Ranked Horizontal Bar Chart
+   7. TOP 20 CARGOS: Ranked Horizontal Bar Chart com Rótulos de Porcentagem
    ========================================================================= */
 export const TopCargosBarChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -1057,6 +1311,47 @@ export const TopCargosBarChart: React.FC = () => {
       if (!ctx) return;
 
       const top20 = TOP_CARGOS_2026.slice(0, 20);
+      const totalGeral = 9416;
+
+      const cargoCategoryColor = (categoria: string) => {
+        switch (categoria) {
+          case 'Docente':
+            return DS_COLORS.aux2;     // Roxo DGRH
+          case 'Saúde':
+            return DS_COLORS.aux3;     // Laranja/Terracota DGRH
+          case 'Tecnologia':
+            return DS_COLORS.cobalt;   // Azul Cobalto
+          case 'Educação':
+            return DS_COLORS.aux1;     // Verde DGRH
+          case 'Pesquisa':
+            return DS_COLORS.secondary;// Dourado 60 Anos
+          default:
+            return DS_COLORS.primary;  // Técnico-Administrativo (PAEPE)
+        }
+      };
+
+      const horizontalPercentageLabelsPlugin = {
+        id: 'horizontalBarPercentageLabels',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          const meta = chartInstance.getDatasetMeta(0);
+
+          top20.forEach((cargo, index) => {
+            const element = meta.data[index];
+            if (!element) return;
+            const pct = ((cargo.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
+            const text = `${cargo.quantidade.toLocaleString('pt-BR')} (${pct}%)`;
+
+            c.save();
+            c.font = 'bold 9.5px Inter, -apple-system, sans-serif';
+            c.textAlign = 'left';
+            c.textBaseline = 'middle';
+            c.fillStyle = '#0f172a';
+            c.fillText(text, element.x + 5, element.y);
+            c.restore();
+          });
+        },
+      };
 
       chart = new Chart(ctx, {
         type: 'bar',
@@ -1066,12 +1361,7 @@ export const TopCargosBarChart: React.FC = () => {
             {
               label: 'Total de Profissionais',
               data: top20.map((c) => c.quantidade),
-              backgroundColor: top20.map((c) => {
-                if (c.categoria === 'Docente') return '#b43a2b';
-                if (c.categoria === 'Saúde') return '#047857';
-                if (c.categoria === 'Tecnologia') return '#0284c7';
-                return '#105e7b';
-              }),
+              backgroundColor: top20.map((c) => cargoCategoryColor(c.categoria)),
               borderRadius: 3,
             },
           ],
@@ -1080,8 +1370,12 @@ export const TopCargosBarChart: React.FC = () => {
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { right: 85 },
+          },
           scales: {
             x: {
+              suggestedMax: 1650,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 font: { weight: 'bold', size: 10 },
@@ -1103,12 +1397,14 @@ export const TopCargosBarChart: React.FC = () => {
               callbacks: {
                 label: (ctx: any) => {
                   const cargo = top20[ctx.dataIndex];
-                  return ` ${cargo.quantidade.toLocaleString('pt-BR')} servidores (${cargo.categoria})`;
+                  const pct = ((cargo.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
+                  return ` ${cargo.quantidade.toLocaleString('pt-BR')} servidores (${pct}% do quadro total) • ${cargo.categoria}`;
                 },
               },
             },
           },
         },
+        plugins: [horizontalPercentageLabelsPlugin],
       });
     });
 
@@ -1119,14 +1415,44 @@ export const TopCargosBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[370px] sm:h-[400px]">
-      <canvas ref={canvasRef} />
+    <div className="w-full flex flex-col justify-center h-full">
+      {/* Visual Category Legend with Design System Colors */}
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-2 text-[11px] font-bold text-slate-600">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.primary }} />
+          PAEPE
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux3 }} />
+          Saúde
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux2 }} />
+          Docente
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.cobalt }} />
+          Tecnologia
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux1 }} />
+          Educação
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.secondary }} />
+          Pesquisa
+        </span>
+      </div>
+
+      <div className="w-full h-[350px] sm:h-[370px]">
+        <canvas ref={canvasRef} />
+      </div>
     </div>
   );
 };
 
 /* =========================================================================
-   8. NACIONALIDADES: Doughnut + Continental Bar Chart
+   8. NACIONALIDADES: Doughnut + Continental Bar Chart com Porcentagens
    ========================================================================= */
 export const NacionalidadesCharts: React.FC = () => {
   const donutRef = useRef<HTMLCanvasElement | null>(null);
@@ -1140,10 +1466,25 @@ export const NacionalidadesCharts: React.FC = () => {
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      // Donut (Brasileiros vs Estrangeiros)
+      // 1. Donut (Brasileiros vs Estrangeiros)
       if (donutRef.current) {
         const ctx1 = donutRef.current.getContext('2d');
         if (ctx1) {
+          const donutLabelsPlugin = {
+            id: 'donutNacionalidadeBadges',
+            afterDatasetsDraw(chartInstance: any) {
+              const c = chartInstance.ctx;
+              const meta = chartInstance.getDatasetMeta(0);
+              const pcts = ['94,9%', '5,1%'];
+
+              meta.data.forEach((element: any, i: number) => {
+                const pos = element.tooltipPosition();
+                if (!pos) return;
+                drawBadge(c, pcts[i], pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+              });
+            },
+          };
+
           donutChart = new Chart(ctx1, {
             type: 'doughnut',
             data: {
@@ -1154,8 +1495,8 @@ export const NacionalidadesCharts: React.FC = () => {
                     NACIONALIDADES_DATA.totalNatoOuNaturalizado,
                     NACIONALIDADES_DATA.totalEstrangeiro,
                   ],
-                  backgroundColor: ['#047857', '#105e7b'],
-                  hoverBackgroundColor: ['#065f46', '#0e4a60'],
+                  backgroundColor: [DS_COLORS.primary, DS_COLORS.secondary],
+                  hoverBackgroundColor: [DS_COLORS.primaryHover, DS_COLORS.secondaryHover],
                   borderWidth: 3,
                   borderColor: '#ffffff',
                 },
@@ -1164,7 +1505,7 @@ export const NacionalidadesCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '70%',
+              cutout: '68%',
               plugins: {
                 legend: {
                   position: 'bottom',
@@ -1185,14 +1526,45 @@ export const NacionalidadesCharts: React.FC = () => {
                 },
               },
             },
+            plugins: [donutLabelsPlugin],
           });
         }
       }
 
-      // Bar (Origem dos Estrangeiros)
+      // 2. Bar (Origem dos Estrangeiros) com cores DS e rótulos
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
+          const continentColors = [
+            DS_COLORS.primary,   // América Latina
+            DS_COLORS.secondary, // Europa
+            DS_COLORS.aux1,      // América do Norte
+            DS_COLORS.aux2,      // Ásia
+            DS_COLORS.aux3,      // Outros
+          ];
+
+          const barPercentageLabelsPlugin = {
+            id: 'continentBarPercentageLabels',
+            afterDatasetsDraw(chartInstance: any) {
+              const c = chartInstance.ctx;
+              const meta = chartInstance.getDatasetMeta(0);
+
+              NACIONALIDADES_DATA.regioesEstrangeiros.forEach((item, index) => {
+                const element = meta.data[index];
+                if (!element) return;
+                const text = `${item.pct.toFixed(1).replace('.', ',')}% (${item.total})`;
+
+                c.save();
+                c.font = 'bold 10px Inter, -apple-system, sans-serif';
+                c.textAlign = 'center';
+                c.textBaseline = 'bottom';
+                c.fillStyle = '#0f172a';
+                c.fillText(text, element.x, element.y - 5);
+                c.restore();
+              });
+            },
+          };
+
           barChart = new Chart(ctx2, {
             type: 'bar',
             data: {
@@ -1201,7 +1573,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 {
                   label: 'Estrangeiros por Continente',
                   data: NACIONALIDADES_DATA.regioesEstrangeiros.map((r) => r.total),
-                  backgroundColor: '#105e7b',
+                  backgroundColor: continentColors,
                   borderRadius: 6,
                 },
               ],
@@ -1209,8 +1581,12 @@ export const NacionalidadesCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              layout: {
+                padding: { top: 20 },
+              },
               scales: {
                 y: {
+                  suggestedMax: 56,
                   grid: { color: 'rgba(0,0,0,0.05)' },
                   ticks: { font: { weight: 'bold', size: 11 }, color: '#64748b' },
                 },
@@ -1225,12 +1601,13 @@ export const NacionalidadesCharts: React.FC = () => {
                   callbacks: {
                     label: (ctx: any) => {
                       const item = NACIONALIDADES_DATA.regioesEstrangeiros[ctx.dataIndex];
-                      return ` ${item.total} pesquisadores/docentes (${item.pct.toFixed(1)}%)`;
+                      return ` ${item.total} pesquisadores/docentes (${item.pct.toFixed(1).replace('.', ',')}%)`;
                     },
                   },
                 },
               },
             },
+            plugins: [barPercentageLabelsPlugin],
           });
         }
       }
@@ -1249,8 +1626,8 @@ export const NacionalidadesCharts: React.FC = () => {
         <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-3xl font-black text-slate-950">94,9%</span>
-            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">Brasileiros</span>
+            <span className="text-3xl font-black text-[#105e7b]">94,9%</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 font-sans">Brasileiros</span>
           </div>
         </div>
       </div>
