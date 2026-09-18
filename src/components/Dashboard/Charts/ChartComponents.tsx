@@ -1267,7 +1267,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
           {SERVIDORES_POR_AREA.map((item) => (
             <div
               key={item.tipoOrgao}
-              className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-between"
+              className="p-3 rounded-xl bg-white/[0.96] border border-slate-200 shadow-sm flex items-center justify-between"
               style={{ borderLeftWidth: '4px', borderLeftColor: item.cor }}
             >
               <div className="min-w-0 pr-2">

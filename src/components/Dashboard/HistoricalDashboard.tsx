@@ -276,9 +276,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
           </div>
         </div>
       ) : (
-        /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO BRANCO) ================= */
+        /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO COM 96% DE OPACIDADE) ================= */
         <div className="w-full flex flex-col justify-center my-auto items-center">
-          <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between">
+          <div
+            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.96)' }}
+          >
             {/* Header of the Current Slide */}
             <div className="border-b border-black/10 pb-2 mb-2 shrink-0 flex items-center justify-between">
               <div>
