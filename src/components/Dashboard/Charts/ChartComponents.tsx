@@ -1315,18 +1315,15 @@ export const TopCargosBarChart: React.FC = () => {
 
       const cargoCategoryColor = (categoria: string) => {
         switch (categoria) {
-          case 'Docente':
-            return DS_COLORS.aux2;     // Roxo DGRH
           case 'Saúde':
-            return DS_COLORS.aux3;     // Laranja/Terracota DGRH
-          case 'Tecnologia':
-            return DS_COLORS.cobalt;   // Azul Cobalto
-          case 'Educação':
-            return DS_COLORS.aux1;     // Verde DGRH
-          case 'Pesquisa':
-            return DS_COLORS.secondary;// Dourado 60 Anos
+            return DS_COLORS.aux3;     // Laranja/Terracota Saúde (#d67b27)
+          case 'Educação, Pesquisa e Ciência':
+            return DS_COLORS.aux1;     // Verde DGRH (#477b2f)
+          case 'Tecnologia da Informação (TI)':
+            return DS_COLORS.secondary;// Dourado 60 Anos (#e5a93a)
+          case 'Administração e RH':
           default:
-            return DS_COLORS.primary;  // Técnico-Administrativo (PAEPE)
+            return DS_COLORS.primary;  // Azul Primário DGRH (#105e7b)
         }
       };
 
@@ -1416,31 +1413,23 @@ export const TopCargosBarChart: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col justify-center h-full">
-      {/* Visual Category Legend with Design System Colors */}
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-2 text-[11px] font-bold text-slate-600">
+      {/* Legenda Oficial por Classificação da Universidade */}
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-2 text-[11px] font-bold text-slate-700">
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.primary }} />
-          PAEPE
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.primary }} />
+          Administração e RH
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux3 }} />
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.aux3 }} />
           Saúde
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux2 }} />
-          Docente
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.aux1 }} />
+          Educação, Pesquisa e Ciência
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.cobalt }} />
-          Tecnologia
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.aux1 }} />
-          Educação
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DS_COLORS.secondary }} />
-          Pesquisa
+          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.secondary }} />
+          Tecnologia da Informação (TI)
         </span>
       </div>
 
