@@ -15,6 +15,7 @@ interface ContinuousTimelineProps {
   onFanIdleChange?: (isIdle: boolean) => void;
   onOpenDashboard?: () => void;
   onLogoVisibilityChange?: (visible: boolean) => void;
+  onPreAnimatingChange?: (isPreAnimating: boolean) => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -25,6 +26,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   onFanIdleChange,
   onOpenDashboard,
   onLogoVisibilityChange,
+  onPreAnimatingChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -53,6 +55,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   useEffect(() => {
     onFanIdleChange?.(isFanIdle);
   }, [isFanIdle, onFanIdleChange]);
+
+  useEffect(() => {
+    onPreAnimatingChange?.(isPreAnimating);
+  }, [isPreAnimating, onPreAnimatingChange]);
 
   const [soundActive, setSoundActive] = useState<boolean>(() => soundFx.isEnabled());
 
@@ -130,39 +136,39 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   }, [onSelectPeriod, totalPeriods]);
 
   // Entrance Pre-Animation Sequence:
-  // 1. Logo appears gradually in the center (0.0s -> 0.6s)
-  // 2. Cards rise up from below the screen forming a stacked deck ("monte no centro") (0.6s -> 1.6s)
-  // 3. Deck pauses briefly then fans out into the curved fan (1.6s -> 2.5s)
-  // 4. "Iniciar apresentação" button appears gracefully (2.5s -> 2.8s)
+  // 1. Logo appears gradually in the center with bottom-up mask reveal (~4s)
+  // 2. Cards rise individually from below, rotating from horizontal (deitados) to vertical (do monte) in the center
+  // 3. Stacked deck pauses briefly, then fans out into an extra-tight curved fan
+  // 4. "Iniciar apresentação" button appears gracefully
   const startPreAnimation = useCallback(() => {
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (introTweenRef.current) introTweenRef.current.kill();
 
     setIntroStatus('pre_animating');
     setPreAnimProgress(0);
-    onLogoVisibilityChange?.(false);
-
-    // 1. Logo fades in gradually in center
-    const timerLogo = setTimeout(() => {
-      onLogoVisibilityChange?.(true);
-    }, 60);
+    onLogoVisibilityChange?.(true);
 
     const obj = { p: 0 };
-    let tickDeckPlayed = false;
+    const cardsTicked = new Set<number>();
     let tickFanPlayed = false;
 
     preAnimTweenRef.current = gsap.to(obj, {
       p: 1,
-      duration: 2.8,
+      duration: 7.8,
       ease: 'none',
       onUpdate: () => {
         setPreAnimProgress(obj.p);
-        // Play subtle sound at arrival of deck in center and fan opening
-        if (obj.p >= 0.58 && !tickDeckPlayed) {
-          tickDeckPlayed = true;
-          soundFx.playCardTick();
+
+        // Sound cadence as cards snap individually into the central deck
+        for (let i = 0; i <= 12; i++) {
+          const cardArrival = 0.28 + (i / 12) * 0.28 + 0.12;
+          if (obj.p >= cardArrival && !cardsTicked.has(i)) {
+            cardsTicked.add(i);
+            soundFx.playCardTick();
+          }
         }
-        if (obj.p >= 0.65 && !tickFanPlayed) {
+
+        if (obj.p >= 0.74 && !tickFanPlayed) {
           tickFanPlayed = true;
           soundFx.playCardTick();
         }
@@ -177,7 +183,6 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     });
 
     return () => {
-      clearTimeout(timerLogo);
       if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     };
   }, [onLogoVisibilityChange]);
@@ -471,9 +476,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         <div
           className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-[136px] sm:pb-[152px] md:pb-[168px] transition-all duration-300"
           style={{
-            opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, (preAnimProgress - 0.90) / 0.10),
-            transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, (preAnimProgress - 0.90) / 0.10)) * 18}px)`,
-            pointerEvents: introStatus === 'idle_fan' || preAnimProgress >= 0.95 ? 'auto' : 'none',
+            opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, (preAnimProgress - 0.93) / 0.07),
+            transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, (preAnimProgress - 0.93) / 0.07)) * 18}px)`,
+            pointerEvents: introStatus === 'idle_fan' || preAnimProgress >= 0.96 ? 'auto' : 'none',
           }}
         >
           <div className="pointer-events-auto">
@@ -508,6 +513,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           className={`relative z-10 w-full h-full flex items-center justify-center ${
             isFanIdle ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'
           }`}
+          style={{
+            perspective: '1200px',
+            transformStyle: 'preserve-3d',
+          }}
           onClick={() => {
             if (introStatus === 'pre_animating') {
               skipPreAnim();
@@ -563,6 +572,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let currentX = targetX;
             let currentY = 0;
             let currentRot = 0;
+            let currentRotX = 0;
             let currentScale = targetScale;
             let currentOpacity = targetOpacity;
             let currentZIndex = targetZIndex;
@@ -570,10 +580,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             if (isIntroActive) {
               // 3D Fan Stack initial values (13 items total: 12 cards + cover, centered symmetrically at 6.0)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const angleStep = isMobile ? 2.4 : 3.2; // Closed fan tilt (cards closer together)
-              const spreadStep = isMobile ? 10 : 14;  // Closed horizontal spread (cards closer together)
-              const arcStep = isMobile ? 2.2 : 2.8;   // Gentle natural arc
-              const arcBase = isMobile ? 6 : 8;
+              const angleStep = isMobile ? 1.5 : 2.0; // Even tighter fan tilt
+              const spreadStep = isMobile ? 6.5 : 9.0;  // Even tighter horizontal spread
+              const arcStep = isMobile ? 1.2 : 1.6;   // Gentle natural arc
+              const arcBase = isMobile ? 3 : 4;
 
               const fanDelta = idx - 6.0; // Symmetrical around 6.0 for 13 items (0..12)
               const finalFanAngle = fanDelta * angleStep;
@@ -584,39 +594,47 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
               if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
-                if (p < 0.20) {
-                  // Phase 1: Logo fades in in center, cards hidden below screen
-                  currentY = 750;
+                // Staggered arrival: 13 items (0..12). Card 0 starts at 0.28, Card 12 starts at 0.56.
+                const cardStart = 0.28 + (idx / 12) * 0.28;
+                const cardDur = 0.12;
+
+                if (p < cardStart) {
+                  // Phase 1: Waiting below screen, horizontal (deitado), hidden
+                  currentY = 850;
                   currentX = 0;
-                  currentRot = 0;
+                  currentRot = -90;
+                  currentRotX = 55;
                   currentScale = fanScale * 0.85;
                   currentOpacity = 0;
                   currentZIndex = fanZ;
-                } else if (p < 0.58) {
-                  // Phase 2: Cards rise from below to form a deck in the center ("monte no centro")
-                  const riseRaw = (p - 0.20) / (0.58 - 0.20);
-                  const riseP = 1 - Math.pow(1 - riseRaw, 3);
-                  currentY = 750 * (1 - riseP) + (idx - 6) * -0.4;
+                } else if (p < cardStart + cardDur) {
+                  // Phase 2: Rising individually from horizontal to vertical into the deck
+                  const rawRise = (p - cardStart) / cardDur;
+                  const riseP = 1 - Math.pow(1 - rawRise, 3);
+                  currentY = 850 * (1 - riseP) + (idx - 6) * -0.5;
                   currentX = 0;
-                  currentRot = 0;
+                  currentRot = -90 * (1 - riseP);
+                  currentRotX = 55 * (1 - riseP);
                   currentScale = (fanScale * 0.85) + (fanScale * 0.15) * riseP;
-                  currentOpacity = Math.min(1, riseRaw * 3);
+                  currentOpacity = Math.min(1, rawRise * 2.5);
                   currentZIndex = fanZ;
-                } else if (p < 0.64) {
-                  // Phase 3: Hold stacked deck in center
-                  currentY = (idx - 6) * -0.4;
+                } else if (p < 0.74) {
+                  // Phase 3: Resting in central stacked deck ("monte no centro")
+                  currentY = (idx - 6) * -0.5;
                   currentX = 0;
                   currentRot = 0;
+                  currentRotX = 0;
                   currentScale = fanScale;
                   currentOpacity = 1;
                   currentZIndex = fanZ;
                 } else {
-                  // Phase 4: Deck opens in fan
-                  const fanRaw = Math.min(1, (p - 0.64) / (0.92 - 0.64));
+                  // Phase 4: Deck opens into tight curved fan
+                  const fanRaw = Math.min(1, (p - 0.74) / (0.93 - 0.74));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   currentX = finalFanX * fanP;
-                  currentY = finalFanY * fanP + (1 - fanP) * ((idx - 6) * -0.4);
+                  currentY = finalFanY * fanP + (1 - fanP) * ((idx - 6) * -0.5);
                   currentRot = finalFanAngle * fanP;
+                  currentRotX = 0;
                   currentScale = fanScale;
                   currentOpacity = 1;
                   currentZIndex = fanZ;
@@ -631,6 +649,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 currentX = finalFanX + (targetX - finalFanX) * p;
                 currentY = finalFanY + (0 - finalFanY) * p;
                 currentRot = finalFanAngle * (1 - p);
+                currentRotX = 0;
                 currentScale = fanScale + (targetScale - fanScale) * p;
                 currentOpacity = 1;
                 currentZIndex = Math.round(fanZ + (targetZIndex - fanZ) * p);
@@ -639,6 +658,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 currentX = finalFanX;
                 currentY = finalFanY;
                 currentRot = finalFanAngle;
+                currentRotX = 0;
                 currentScale = fanScale;
                 currentOpacity = 1;
                 currentZIndex = fanZ;
@@ -666,7 +686,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 style={{
                   left: '50%',
                   top: '50%',
-                  transform: `translate3d(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px), 0) scale(${currentScale}) rotate(${currentRot}deg)`,
+                  transform: `translate3d(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px), 0) scale(${currentScale}) rotate(${currentRot}deg) rotateX(${currentRotX}deg)`,
                   transformOrigin: 'center center',
                   opacity: currentOpacity,
                   zIndex: currentZIndex,
@@ -697,10 +717,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           {isIntroActive && (
             (() => {
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const angleStep = isMobile ? 2.4 : 3.2; // Closed fan tilt
-              const spreadStep = isMobile ? 10 : 14;  // Closed horizontal spread
-              const arcStep = isMobile ? 2.2 : 2.8;   // Gentle natural arc
-              const arcBase = isMobile ? 6 : 8;
+              const angleStep = isMobile ? 1.5 : 2.0; // Even tighter fan tilt
+              const spreadStep = isMobile ? 6.5 : 9.0;  // Even tighter horizontal spread
+              const arcStep = isMobile ? 1.2 : 1.6;   // Gentle natural arc
+              const arcBase = isMobile ? 3 : 4;
 
               // Virtual index 12: comes right after card 11 (the last card)
               const fanDelta = 12 - 6.0; // +6.0
@@ -713,41 +733,50 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               let coverCurrentX = finalFanX;
               let coverCurrentY = finalFanY;
               let coverCurrentRot = finalFanAngle;
+              let coverCurrentRotX = 0;
               let coverCurrentScale = fanScale;
               let coverOpacity = 1;
 
               if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
-                if (p < 0.20) {
-                  // Phase 1: Logo fades in in center, cover hidden below screen
-                  coverCurrentY = 750;
+                // Capa is idx 12 (last card to rise and land on top of the central deck)
+                const cardStart = 0.28 + (12 / 12) * 0.28; // 0.56
+                const cardDur = 0.12;
+
+                if (p < cardStart) {
+                  // Phase 1: Waiting below screen, horizontal (deitado), hidden
+                  coverCurrentY = 850;
                   coverCurrentX = 0;
-                  coverCurrentRot = 0;
+                  coverCurrentRot = -90;
+                  coverCurrentRotX = 55;
                   coverCurrentScale = fanScale * 0.85;
                   coverOpacity = 0;
-                } else if (p < 0.58) {
-                  // Phase 2: Cover rises as top card of the deck
-                  const riseRaw = (p - 0.20) / (0.58 - 0.20);
+                } else if (p < cardStart + cardDur) {
+                  // Phase 2: Cover rises as top card of the deck, rotating from horizontal to vertical
+                  const riseRaw = (p - cardStart) / cardDur;
                   const riseP = 1 - Math.pow(1 - riseRaw, 3);
-                  coverCurrentY = 750 * (1 - riseP) + (12 - 6) * -0.4;
+                  coverCurrentY = 850 * (1 - riseP) + (12 - 6) * -0.5;
                   coverCurrentX = 0;
-                  coverCurrentRot = 0;
+                  coverCurrentRot = -90 * (1 - riseP);
+                  coverCurrentRotX = 55 * (1 - riseP);
                   coverCurrentScale = (fanScale * 0.85) + (fanScale * 0.15) * riseP;
-                  coverOpacity = Math.min(1, riseRaw * 3);
-                } else if (p < 0.64) {
+                  coverOpacity = Math.min(1, riseRaw * 2.5);
+                } else if (p < 0.74) {
                   // Phase 3: Hold top of deck in center
-                  coverCurrentY = (12 - 6) * -0.4;
+                  coverCurrentY = (12 - 6) * -0.5;
                   coverCurrentX = 0;
                   coverCurrentRot = 0;
+                  coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
                   coverOpacity = 1;
                 } else {
                   // Phase 4: Fans out to index 12
-                  const fanRaw = Math.min(1, (p - 0.64) / (0.92 - 0.64));
+                  const fanRaw = Math.min(1, (p - 0.74) / (0.93 - 0.74));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   coverCurrentX = finalFanX * fanP;
-                  coverCurrentY = finalFanY * fanP + (1 - fanP) * ((12 - 6) * -0.4);
+                  coverCurrentY = finalFanY * fanP + (1 - fanP) * ((12 - 6) * -0.5);
                   coverCurrentRot = finalFanAngle * fanP;
+                  coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
                   coverOpacity = 1;
                 }
@@ -758,6 +787,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 coverCurrentX = finalFanX + p * 40;
                 coverCurrentY = finalFanY - introProgress * 50;
                 coverCurrentRot = finalFanAngle * (1 - introProgress * 0.4);
+                coverCurrentRotX = 0;
                 coverCurrentScale = fanScale + introProgress * 0.08;
               }
 
@@ -780,7 +810,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   style={{
                     left: '50%',
                     top: '50%',
-                    transform: `translate3d(calc(-50% + ${coverCurrentX}px), calc(-50% + ${coverCurrentY}px), 0) scale(${coverCurrentScale}) rotate(${coverCurrentRot}deg)`,
+                    transform: `translate3d(calc(-50% + ${coverCurrentX}px), calc(-50% + ${coverCurrentY}px), 0) scale(${coverCurrentScale}) rotate(${coverCurrentRot}deg) rotateX(${coverCurrentRotX}deg)`,
                     transformOrigin: 'center center',
                     opacity: coverOpacity,
                     zIndex: coverZIndex,

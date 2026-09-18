@@ -7,6 +7,7 @@ interface HeaderProps {
   currentView?: 'timeline' | 'dashboard';
   onNavigate?: (view: 'timeline' | 'dashboard') => void;
   logoVisible?: boolean;
+  isPreAnimating?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentView = 'timeline',
   onNavigate,
   logoVisible = true,
+  isPreAnimating = false,
 }) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
@@ -30,8 +32,12 @@ export const Header: React.FC<HeaderProps> = ({
         <img
           src="/logo_dgrh.svg"
           alt="DGRH - Diretoria Geral de Recursos Humanos"
-          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-1000 ease-out ${
-            logoVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-700 ease-in-out ${
+            isPreAnimating && isCentered
+              ? 'animate-logo-reveal-bottom-up'
+              : logoVisible
+              ? 'opacity-100 scale-100'
+              : 'opacity-0 scale-90'
           } ${
             isCentered
               ? 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'

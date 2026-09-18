@@ -24,6 +24,7 @@ export function App() {
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
   const [isFanIdle, setIsFanIdle] = useState<boolean>(true);
   const [isLogoVisible, setIsLogoVisible] = useState<boolean>(false);
+  const [isPreAnimating, setIsPreAnimating] = useState<boolean>(true);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -99,6 +100,7 @@ export function App() {
         currentView={currentView}
         onNavigate={(view) => setCurrentView(view)}
         logoVisible={isLogoVisible || currentView === 'dashboard' || !isFanIdle}
+        isPreAnimating={isPreAnimating && currentView === 'timeline'}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
@@ -111,6 +113,7 @@ export function App() {
             onOpenPhoto={handleOpenPhoto}
             onFanIdleChange={setIsFanIdle}
             onLogoVisibilityChange={setIsLogoVisible}
+            onPreAnimatingChange={setIsPreAnimating}
             onOpenDashboard={() => {
               if (typeof window !== 'undefined') {
                 const url = new URL(window.location.href);

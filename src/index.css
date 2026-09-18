@@ -134,4 +134,34 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 36px 36px;
 }
 
+/* Logo entrance: 4s gradual opacity increase from bottom to top */
+@keyframes logoMaskReveal {
+  0% {
+    opacity: 0;
+    -webkit-mask-position: 0% 100%;
+    mask-position: 0% 100%;
+    transform: translateY(22px) scale(0.94);
+  }
+  15% {
+    opacity: 0.45;
+  }
+  40% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+    -webkit-mask-position: 0% 0%;
+    mask-position: 0% 0%;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-logo-reveal-bottom-up {
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, transparent 22%, rgba(0, 0, 0, 0.35) 42%, black 65%, black 100%);
+  mask-image: linear-gradient(to top, transparent 0%, transparent 22%, rgba(0, 0, 0, 0.35) 42%, black 65%, black 100%);
+  -webkit-mask-size: 100% 300%;
+  mask-size: 100% 300%;
+  animation: logoMaskReveal 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 
