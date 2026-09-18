@@ -236,10 +236,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         return;
       }
 
-      if (e.key === 'ArrowLeft') {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
         handlePrev();
-      } else if (e.key === 'ArrowRight') {
-        handleNext();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+        const current = activeIndex ?? Math.round(currentPositionRef.current);
+        if (current >= totalPeriods - 1) {
+          e.preventDefault();
+          soundFx.playCardTick();
+          onOpenDashboard?.();
+        } else {
+          handleNext();
+        }
       } else if (e.key === 'Enter') {
         const currentIdx = activeIndex ?? Math.round(currentPosition);
         const currentPeriod = periods[currentIdx];
@@ -252,7 +259,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFanIdle, isAnimating, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod]);
+  }, [isFanIdle, isAnimating, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod, onOpenDashboard, totalPeriods]);
 
   // Mouse wheel navigation
   useEffect(() => {
@@ -630,10 +637,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             </button>
 
             <button
-              onClick={handleNext}
-              disabled={(activeIndex !== null && activeIndex === totalPeriods - 1) || (activeIndex === null && currentPosition >= totalPeriods - 1)}
-              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl disabled:opacity-20 flex items-center justify-center transition-all cursor-pointer group"
-              title="Próximo período"
+              onClick={() => {
+                const current = activeIndex ?? Math.round(currentPositionRef.current);
+                if (current >= totalPeriods - 1) {
+                  soundFx.playCardTick();
+                  onOpenDashboard?.();
+                } else {
+                  handleNext();
+                }
+              }}
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-white hover:bg-slate-50 text-slate-950 border-2 border-slate-950 shadow-2xl flex items-center justify-center transition-all cursor-pointer group"
+              title={((activeIndex !== null && activeIndex >= totalPeriods - 1) || (activeIndex === null && currentPosition >= totalPeriods - 1)) ? "Avançar para o Índice de Gráficos" : "Próximo período"}
             >
               <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
             </button>

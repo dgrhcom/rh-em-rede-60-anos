@@ -108,10 +108,28 @@ export function App() {
             onSelectPeriod={handleSelectPeriod}
             onOpenPhoto={handleOpenPhoto}
             onFanIdleChange={setIsFanIdle}
-            onOpenDashboard={() => setCurrentView('dashboard')}
+            onOpenDashboard={() => {
+              if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                url.searchParams.set('view', 'dashboard');
+                url.searchParams.set('slide', 'index');
+                window.history.replaceState(null, '', url.toString());
+              }
+              setCurrentView('dashboard');
+            }}
           />
         ) : (
-          <HistoricalDashboard onBackToTimeline={() => setCurrentView('timeline')} />
+          <HistoricalDashboard
+            onBackToTimeline={() => {
+              if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('slide');
+                url.searchParams.set('view', 'timeline');
+                window.history.replaceState(null, '', url.toString());
+              }
+              setCurrentView('timeline');
+            }}
+          />
         )}
       </main>
 

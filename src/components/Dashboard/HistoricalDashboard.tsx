@@ -174,7 +174,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
         handleNextSlide();
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
-        handlePrevSlide();
+        if (currentSlideIndex === -1) {
+          soundFx.playCardTick();
+          onBackToTimeline();
+        } else {
+          handlePrevSlide();
+        }
       } else if (e.key === 'Escape') {
         e.preventDefault();
         soundFx.playCardTick();
