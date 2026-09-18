@@ -26,6 +26,7 @@ export function App() {
   const [isLogoVisible, setIsLogoVisible] = useState<boolean>(false);
   const [isPreAnimating, setIsPreAnimating] = useState<boolean>(true);
   const [isLogoInCenterScreen, setIsLogoInCenterScreen] = useState<boolean>(true);
+  const [hasIntroCompleted, setHasIntroCompleted] = useState<boolean>(false);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -97,17 +98,17 @@ export function App() {
 
       {/* Top Main Navigation Header (Maintains DGRH logo and page selector on all views) */}
       <Header
-        isCentered={isFanIdle && currentView === 'timeline'}
+        isCentered={!hasIntroCompleted && isFanIdle && currentView === 'timeline'}
         currentView={currentView}
         onNavigate={(view) => setCurrentView(view)}
-        logoVisible={isLogoVisible || currentView === 'dashboard' || !isFanIdle}
-        isPreAnimating={isPreAnimating && currentView === 'timeline'}
-        isLogoInCenterScreen={isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
+        logoVisible={hasIntroCompleted || isLogoVisible || currentView === 'dashboard' || !isFanIdle}
+        isPreAnimating={!hasIntroCompleted && isPreAnimating && currentView === 'timeline'}
+        isLogoInCenterScreen={!hasIntroCompleted && isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
-      <main className={`w-full relative z-10 ${currentView === 'timeline' ? 'flex-1 pt-14' : 'min-h-screen pt-20 sm:pt-24 pb-4 flex flex-col justify-center'}`}>
-        {currentView === 'timeline' ? (
+      <main className="w-full relative z-10 flex-1 flex flex-col">
+        <div className={`w-full flex-1 flex flex-col pt-14 ${currentView === 'timeline' ? 'block' : 'hidden'}`}>
           <ContinuousTimeline
             periods={periods}
             activeIndex={activePeriodIndex}
@@ -117,6 +118,8 @@ export function App() {
             onLogoVisibilityChange={setIsLogoVisible}
             onPreAnimatingChange={setIsPreAnimating}
             onLogoPositionChange={setIsLogoInCenterScreen}
+            initialIntroDone={hasIntroCompleted}
+            onIntroDoneChange={setHasIntroCompleted}
             onOpenDashboard={() => {
               if (typeof window !== 'undefined') {
                 const url = new URL(window.location.href);
@@ -127,18 +130,21 @@ export function App() {
               setCurrentView('dashboard');
             }}
           />
-        ) : (
-          <HistoricalDashboard
-            onBackToTimeline={() => {
-              if (typeof window !== 'undefined') {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('slide');
-                url.searchParams.set('view', 'timeline');
-                window.history.replaceState(null, '', url.toString());
-              }
-              setCurrentView('timeline');
-            }}
-          />
+        </div>
+        {currentView === 'dashboard' && (
+          <div className="w-full min-h-screen pt-20 sm:pt-24 pb-4 flex flex-col justify-center">
+            <HistoricalDashboard
+              onBackToTimeline={() => {
+                if (typeof window !== 'undefined') {
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('slide');
+                  url.searchParams.set('view', 'timeline');
+                  window.history.replaceState(null, '', url.toString());
+                }
+                setCurrentView('timeline');
+              }}
+            />
+          </div>
         )}
       </main>
 

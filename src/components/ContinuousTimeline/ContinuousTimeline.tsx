@@ -17,6 +17,8 @@ interface ContinuousTimelineProps {
   onLogoVisibilityChange?: (visible: boolean) => void;
   onPreAnimatingChange?: (isPreAnimating: boolean) => void;
   onLogoPositionChange?: (inCenterScreen: boolean) => void;
+  initialIntroDone?: boolean;
+  onIntroDoneChange?: (done: boolean) => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -29,6 +31,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   onLogoVisibilityChange,
   onPreAnimatingChange,
   onLogoPositionChange,
+  initialIntroDone = false,
+  onIntroDoneChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -44,9 +48,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   // 'idle_fan': resting fan state with button visible, waiting for user click
   // 'animating': dealing out cards into horizontal timeline
   // 'done': in continuous timeline mode
-  const [introStatus, setIntroStatus] = useState<'pre_animating' | 'idle_fan' | 'animating' | 'done'>('pre_animating');
-  const [preAnimProgress, setPreAnimProgress] = useState<number>(0);
-  const [introProgress, setIntroProgress] = useState<number>(0);
+  const [introStatus, setIntroStatus] = useState<'pre_animating' | 'idle_fan' | 'animating' | 'done'>(() => {
+    return initialIntroDone ? 'done' : 'pre_animating';
+  });
+  const [preAnimProgress, setPreAnimProgress] = useState<number>(() => {
+    return initialIntroDone ? 1 : 0;
+  });
+  const [introProgress, setIntroProgress] = useState<number>(() => {
+    return initialIntroDone ? 1 : 0;
+  });
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
 
   const isIntroActive = introStatus !== 'done';
@@ -201,13 +211,23 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
   }, [onLogoPositionChange, onLogoVisibilityChange]);
 
-  // Run pre-animation on mount
+  // Run pre-animation on mount only if intro hasn't already been completed
   useEffect(() => {
+    if (initialIntroDone) {
+      onLogoVisibilityChange?.(true);
+      onLogoPositionChange?.(false);
+      onFanIdleChange?.(false);
+      onPreAnimatingChange?.(false);
+      if (activeIndex === null) {
+        slideToIndex(0);
+      }
+      return;
+    }
     const cleanup = startPreAnimation();
     return () => {
       cleanup?.();
     };
-  }, [startPreAnimation]);
+  }, [initialIntroDone, startPreAnimation, onLogoVisibilityChange, onLogoPositionChange, onFanIdleChange, onPreAnimatingChange, activeIndex, slideToIndex]);
 
   // Skip pre-animation immediately to resting fan state
   const skipPreAnim = useCallback(() => {
@@ -275,12 +295,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         introTweenRef.current = null;
         setIntroProgress(1);
         setIntroStatus('done');
+        onIntroDoneChange?.(true);
         soundFx.playCardTick();
         // Automatically select the chosen target card
         slideToIndex(target);
       },
     });
-  }, [introStatus, onSelectPeriod, slideToIndex, totalPeriods]);
+  }, [introStatus, onIntroDoneChange, onSelectPeriod, slideToIndex, totalPeriods]);
 
   // Skip Opening Animation: immediately complete and select the target card
   const skipIntro = useCallback(() => {
@@ -289,16 +310,18 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setHoveredCardIndex(null);
     setIntroProgress(1);
     setIntroStatus('done');
+    onIntroDoneChange?.(true);
     soundFx.playCardTick();
     // Select the target card
     slideToIndex(introTargetIndexRef.current);
-  }, [slideToIndex]);
+  }, [onIntroDoneChange, slideToIndex]);
 
   // Reset to initial 3D fan view (re-runs the entrance sequence)
   const handleReplayIntro = useCallback(() => {
     if (introTweenRef.current) introTweenRef.current.kill();
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (tweenRef.current) tweenRef.current.kill();
+    onIntroDoneChange?.(false);
     setHoveredCardIndex(null);
     prevActiveIndexRef.current = null;
     currentPositionRef.current = 0;
@@ -307,7 +330,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setIntroProgress(0);
     startPreAnimation();
     soundFx.playCardTick();
-  }, [onSelectPeriod, startPreAnimation]);
+  }, [onIntroDoneChange, onSelectPeriod, startPreAnimation]);
 
   // Cleanup tweens on unmount
   useEffect(() => {
@@ -394,7 +417,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           onOpenPhoto(currentPeriod.photos[0], currentPeriod);
         }
       } else if (e.key === 'Escape' && activeIndex !== null) {
-        onSelectPeriod(null);
+        slideToIndex(0);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -889,7 +912,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                       slideToIndex(idx);
                     }
                   }}
-                  onClose={() => onSelectPeriod(null)}
+                  onClose={() => slideToIndex(0)}
                   onOpenPhoto={onOpenPhoto}
                 />
               </div>
@@ -1225,10 +1248,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           <button
             onClick={() => {
               slideToIndex(0);
-              onSelectPeriod(null);
             }}
             className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
-            title="Voltar ao início (1983) em visão geral"
+            title="Voltar ao card inicial (1983)"
           >
             <RotateCcw className="w-3 h-3" />
             <span>Início (1983)</span>
@@ -1276,17 +1298,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           {activePeriod ? (
             <span className="text-[11px] font-black text-slate-900 bg-white/95 border border-slate-950 px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5">
               <span>{activePeriod.period} ({activePeriod.index + 1}/{totalPeriods})</span>
-              <button
-                onClick={() => onSelectPeriod(null)}
-                className="text-slate-500 hover:text-slate-950 font-bold ml-1 cursor-pointer"
-                title="Recolher e voltar à visão geral"
-              >
-                ✕
-              </button>
             </span>
           ) : (
             <span className="text-[11px] font-black text-slate-900 bg-white/95 border border-slate-950 px-3 py-0.5 rounded-full shadow-xs">
-              1983 — 2025 • Selecione um período
+              1983 — 2025
             </span>
           )}
         </div>
