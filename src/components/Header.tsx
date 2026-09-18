@@ -19,10 +19,12 @@ export const Header: React.FC<HeaderProps> = ({
         className={`fixed z-40 pointer-events-none transition-all duration-700 ease-in-out ${
           isCentered
             ? 'top-[14vh] sm:top-[16vh] md:top-[18vh] left-1/2 -translate-x-1/2'
+            : currentView === 'dashboard'
+            ? 'top-4 left-4 sm:top-5 sm:left-8 translate-x-0'
             : 'top-0 left-0 translate-x-0'
         }`}
         style={{
-          padding: isCentered ? '0px' : '48px',
+          padding: isCentered ? '0px' : currentView === 'dashboard' ? '0px' : '48px',
         }}
       >
         <img
@@ -31,6 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
           className={`w-auto object-contain select-none pointer-events-auto transition-all duration-700 ease-in-out ${
             isCentered
               ? 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'
+              : currentView === 'dashboard'
+              ? 'h-8 sm:h-9 md:h-10 max-w-[200px] sm:max-w-[240px] drop-shadow-xs'
               : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
           }`}
         />
@@ -38,7 +42,11 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Top-Right Navigation Pill (Visible only after opening is completed or on dashboard) */}
       {(!isCentered || currentView === 'dashboard') && onNavigate && (
-        <div className="fixed top-6 right-6 sm:top-8 sm:right-10 z-40 pointer-events-auto flex items-center gap-1 bg-white/90 backdrop-blur-md p-1 rounded-full border-2 border-slate-950 shadow-xl transition-all duration-500">
+        <div className={`fixed z-40 pointer-events-auto flex items-center gap-1 bg-white/90 backdrop-blur-md p-1 rounded-full border-2 border-slate-950 shadow-xl transition-all duration-500 ${
+          currentView === 'dashboard'
+            ? 'top-4 right-4 sm:top-5 sm:right-8'
+            : 'top-6 right-6 sm:top-8 sm:right-10'
+        }`}>
           <button
             onClick={() => {
               soundFx.playCardTick();

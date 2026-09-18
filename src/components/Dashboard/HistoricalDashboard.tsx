@@ -149,16 +149,16 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-2rem)] text-slate-900 pb-12 px-3 sm:px-6 md:px-8 max-w-6xl mx-auto flex flex-col justify-center select-none">
+    <div className="w-full text-slate-900 px-3 sm:px-6 md:px-8 max-w-6xl mx-auto flex flex-col justify-center select-none py-1">
       {/* ================= PRESENTATION SLIDE STAGE ================= */}
-      <div className="flex-1 my-2 sm:my-4 flex flex-col justify-center">
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-8 md:p-10 shadow-2xl transition-all duration-300 relative overflow-hidden min-h-[540px] flex flex-col justify-between">
+      <div className="w-full flex flex-col justify-center my-auto">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-5 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden min-h-[480px] sm:min-h-[510px] flex flex-col justify-between">
           {/* Header of the Current Slide */}
-          <div className="border-b border-black/10 pb-3 mb-4">
+          <div className="border-b border-black/10 pb-2.5 mb-3">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
               {currentSlide.title}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
+            <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
               {currentSlide.subtitle}
             </p>
           </div>
@@ -260,7 +260,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
           )}
 
           {/* Slide Footer with Dots Navigation */}
-          <div className="pt-4 mt-4 border-t border-black/10 flex items-center justify-between">
+          <div className="pt-3 mt-3 border-t border-black/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrevSlide}

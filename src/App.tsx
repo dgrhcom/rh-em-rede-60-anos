@@ -91,7 +91,7 @@ export function App() {
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
-      <main className={`flex-1 w-full relative z-10 ${currentView === 'timeline' ? 'pt-14' : 'pt-24 sm:pt-28'}`}>
+      <main className={`w-full relative z-10 ${currentView === 'timeline' ? 'flex-1 pt-14' : 'min-h-screen pt-14 sm:pt-16 pb-4 flex flex-col justify-center'}`}>
         {currentView === 'timeline' ? (
           <ContinuousTimeline
             periods={periods}
