@@ -7,14 +7,15 @@ export interface AreaDistribution {
   tecnicos: number;
   total: number;
   percentual: number;
+  cor: string;
 }
 
 export const SERVIDORES_POR_AREA: AreaDistribution[] = [
-  { tipoOrgao: 'Faculdades e Institutos', docentes: 1792, pesquisadores: 4, tecnicos: 1829, total: 3625, percentual: 38.5 },
-  { tipoOrgao: 'Área da Saúde', docentes: 0, pesquisadores: 1, tecnicos: 3022, total: 3023, percentual: 32.1 },
-  { tipoOrgao: 'Administração Central', docentes: 19, pesquisadores: 0, tecnicos: 2069, total: 2088, percentual: 22.2 },
-  { tipoOrgao: 'Centros e Núcleos', docentes: 0, pesquisadores: 87, tecnicos: 350, total: 437, percentual: 4.6 },
-  { tipoOrgao: 'Colégios', docentes: 181, pesquisadores: 0, tecnicos: 62, total: 243, percentual: 2.6 },
+  { tipoOrgao: 'Faculdades e Institutos', docentes: 1792, pesquisadores: 4, tecnicos: 1829, total: 3625, percentual: 38.5, cor: '#2e7d32' },
+  { tipoOrgao: 'Área da Saúde', docentes: 0, pesquisadores: 1, tecnicos: 3022, total: 3023, percentual: 32.1, cor: '#ea580c' },
+  { tipoOrgao: 'Administração Central', docentes: 19, pesquisadores: 0, tecnicos: 2069, total: 2088, percentual: 22.2, cor: '#0284c7' },
+  { tipoOrgao: 'Centros e Núcleos', docentes: 0, pesquisadores: 87, tecnicos: 350, total: 437, percentual: 4.6, cor: '#eab308' },
+  { tipoOrgao: 'Colégios', docentes: 181, pesquisadores: 0, tecnicos: 62, total: 243, percentual: 2.6, cor: '#7e22ce' },
 ];
 
 export const TOTAL_SERVIDORES_ATIVOS = 9416;

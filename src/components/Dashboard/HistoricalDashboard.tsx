@@ -10,17 +10,15 @@ import {
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundEffects';
 import {
-  SERVIDORES_POR_AREA,
   DESTAQUE_FAIXA_ETARIA,
 } from '../../data/hrStatsData';
 import {
-  AreasStackedBarChart,
   GeneroCharts,
   FaixaEtariaBarChart,
   RacaCorCharts,
   EscolaridadeEvolucaoLineChart,
   EscolaridadeZoomLineChart,
-  GrandesAreasLineChart,
+  ServidoresPorAreaPieChart,
   TopCargosBarChart,
   NacionalidadesCharts,
 } from './Charts/ChartComponents';
@@ -37,12 +35,6 @@ interface SlideDefinition {
 }
 
 const SLIDES: SlideDefinition[] = [
-  {
-    id: 'areas',
-    category: 'Estrutura Institucional',
-    title: 'Servidores Ativos por Área da Universidade',
-    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração, Centros e Colégios',
-  },
   {
     id: 'genero',
     category: 'Diversidade & Perfil',
@@ -74,10 +66,10 @@ const SLIDES: SlideDefinition[] = [
     subtitle: 'Foco ampliado em Mestrado, Fundamental, Doutorado, Fundamental Incompleto e Maior que Doutorado',
   },
   {
-    id: 'grandesAreas',
-    category: 'Campos de Atuação',
-    title: 'Evolução por Grandes Áreas (2022 - 2026)',
-    subtitle: 'Trajetória dos 8 grandes campos de atuação profissional na Universidade',
+    id: 'areas',
+    category: 'Estrutura Institucional',
+    title: 'Servidores Ativos por Área da Universidade',
+    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração, Centros e Colégios',
   },
   {
     id: 'cargos',
@@ -94,7 +86,19 @@ const SLIDES: SlideDefinition[] = [
 ];
 
 export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBackToTimeline }) => {
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const search = new URLSearchParams(window.location.search);
+      const slideParam = search.get('slide');
+      if (slideParam) {
+        const s = parseInt(slideParam, 10);
+        if (!isNaN(s) && s >= 1 && s <= SLIDES.length) {
+          return s - 1;
+        }
+      }
+    }
+    return 0;
+  });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const totalSlides = SLIDES.length;
@@ -155,12 +159,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
   };
 
   return (
-    <div className="w-full text-slate-900 px-3 sm:px-6 md:px-8 max-w-6xl mx-auto flex flex-col justify-center select-none py-1">
+    <div className="w-full text-slate-900 px-2 sm:px-4 max-w-[1400px] mx-auto flex flex-col items-center justify-center select-none py-1">
       {/* ================= PRESENTATION SLIDE STAGE ================= */}
-      <div className="w-full flex flex-col justify-center my-auto">
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-5 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden min-h-[480px] sm:min-h-[510px] flex flex-col justify-between">
+      <div className="w-full flex flex-col justify-center my-auto items-center">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between">
           {/* Header of the Current Slide */}
-          <div className="border-b border-black/10 pb-2.5 mb-3">
+          <div className="border-b border-black/10 pb-2.5 mb-2 shrink-0">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
               {currentSlide.title}
             </h2>
@@ -169,36 +173,18 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </p>
           </div>
 
-          {/* ================= SLIDE 1: SERVIDORES POR ÁREA ================= */}
+          {/* ================= SLIDE 1: GÊNERO ================= */}
           {currentSlideIndex === 0 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-1">
-                {SERVIDORES_POR_AREA.map((item) => (
-                  <div key={item.tipoOrgao} className="p-2.5 rounded-2xl bg-slate-50 border border-black/10 text-center">
-                    <div className="text-base sm:text-xl font-black text-slate-950">{item.total.toLocaleString('pt-BR')}</div>
-                    <div className="text-[11px] font-black text-[#105e7b]">{item.percentual.toFixed(1)}%</div>
-                    <div className="text-[10px] font-bold text-slate-600 truncate mt-0.5">{item.tipoOrgao}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Stacked Horizontal Bar Chart */}
-              <AreasStackedBarChart />
-            </div>
-          )}
-
-          {/* ================= SLIDE 2: GÊNERO ================= */}
-          {currentSlideIndex === 1 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <GeneroCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 3: FAIXA ETÁRIA ================= */}
-          {currentSlideIndex === 2 && (
-            <div className="space-y-3 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 2: FAIXA ETÁRIA ================= */}
+          {currentSlideIndex === 1 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3 shrink-0">
                 <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
                 <div className="text-xs sm:text-sm font-bold leading-relaxed">
                   📌 <strong>Destaque Demográfico:</strong> "{DESTAQUE_FAIXA_ETARIA.jovem}" e "{DESTAQUE_FAIXA_ETARIA.velho}".
@@ -210,18 +196,18 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 4: RAÇA / COR (INTEGRADO) ================= */}
-          {currentSlideIndex === 3 && (
-            <div className="space-y-3 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 3: RAÇA / COR (INTEGRADO) ================= */}
+          {currentSlideIndex === 2 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <RacaCorCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 5: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
-          {currentSlideIndex === 4 && (
-            <div className="space-y-3 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 4: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
+          {currentSlideIndex === 3 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3 shrink-0">
                 <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0" />
                 <div className="text-xs sm:text-sm">
                   <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
@@ -233,11 +219,11 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 6: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
-          {currentSlideIndex === 5 && (
-            <div className="space-y-3 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 5: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlideIndex === 4 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3 shrink-0">
                 <Sparkles className="w-5 h-5 text-sky-700 shrink-0" />
                 <div className="text-xs sm:text-sm">
                   <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
@@ -249,29 +235,29 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 7: GRANDES ÁREAS ================= */}
-          {currentSlideIndex === 6 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
-              <GrandesAreasLineChart />
+          {/* ================= SLIDE 6: SERVIDORES ATIVOS POR ÁREA (PIE DA PLANILHA) ================= */}
+          {currentSlideIndex === 5 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <ServidoresPorAreaPieChart />
             </div>
           )}
 
-          {/* ================= SLIDE 8: MAIORES CARGOS ================= */}
-          {currentSlideIndex === 7 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 7: MAIORES CARGOS ================= */}
+          {currentSlideIndex === 6 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <TopCargosBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 9: NACIONALIDADES ================= */}
-          {currentSlideIndex === 8 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
+          {/* ================= SLIDE 8: NACIONALIDADES ================= */}
+          {currentSlideIndex === 7 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <NacionalidadesCharts />
             </div>
           )}
 
           {/* Slide Footer with Dots Navigation */}
-          <div className="pt-3 mt-3 border-t border-black/10 flex items-center justify-between">
+          <div className="pt-2.5 mt-2 border-t border-black/10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrevSlide}

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Sparkles } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
   GENERO_DATA,
@@ -7,7 +8,6 @@ import {
   RACA_COR_TABELA_2,
   ESCOLARIDADE_EVOLUCAO,
   ESCOLARIDADE_ZOOM_SERIES,
-  GRANDES_AREAS_EVOLUCAO,
   TOP_CARGOS_2026,
   NACIONALIDADES_DATA,
 } from '../../../data/hrStatsData';
@@ -263,7 +263,7 @@ export const GeneroCharts: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] relative">
+        <div className="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
             <span className="text-3xl font-black text-slate-950">55,9%</span>
@@ -277,7 +277,7 @@ export const GeneroCharts: React.FC = () => {
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[260px]">
+      <div className="md:col-span-7 h-[300px] sm:h-[330px]">
         <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
           Distribuição Percentual por Carreira
         </h4>
@@ -384,7 +384,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[280px] sm:h-[300px]">
+    <div className="w-full h-[330px] sm:h-[360px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -630,7 +630,7 @@ export const RacaCorCharts: React.FC = () => {
         <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
           Visão Geral (Autodeclaração)
         </div>
-        <div className="w-[190px] h-[190px] sm:w-[210px] sm:h-[210px] relative">
+        <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] relative">
           <canvas ref={pieRef} />
         </div>
         <div className="text-center mt-1">
@@ -645,7 +645,7 @@ export const RacaCorCharts: React.FC = () => {
         <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center sm:text-left">
           Composição por Carreira Funcional
         </div>
-        <div className="w-full h-[250px] sm:h-[270px]">
+        <div className="w-full h-[300px] sm:h-[330px]">
           <canvas ref={barRef} />
         </div>
       </div>
@@ -838,7 +838,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[280px] sm:h-[300px]">
+    <div className="w-full h-[330px] sm:h-[360px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -921,7 +921,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[280px] sm:h-[300px]">
+    <div className="w-full h-[330px] sm:h-[360px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -1015,9 +1015,9 @@ export const EscolaridadeComparisonChart: React.FC = () => {
 };
 
 /* =========================================================================
-   6. GRANDES ÁREAS: Multi-Line Evolution Chart (2022 - 2026)
+   6. SERVIDORES ATIVOS: Gráfico de Pizza Oficial da Planilha (Por Área)
    ========================================================================= */
-export const GrandesAreasLineChart: React.FC = () => {
+export const ServidoresPorAreaPieChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -1030,51 +1030,44 @@ export const GrandesAreasLineChart: React.FC = () => {
       if (!ctx) return;
 
       chart = new Chart(ctx, {
-        type: 'line',
+        type: 'pie',
         data: {
-          labels: GRANDES_AREAS_EVOLUCAO.anos,
-          datasets: GRANDES_AREAS_EVOLUCAO.areas.map((area) => ({
-            label: area.area,
-            data: area.valores,
-            borderColor: area.cor,
-            backgroundColor: area.cor,
-            tension: 0.3,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            borderWidth: 2.5,
-          })),
+          labels: SERVIDORES_POR_AREA.map((a) => `${a.tipoOrgao} (${a.percentual.toFixed(1)}%)`),
+          datasets: [
+            {
+              data: SERVIDORES_POR_AREA.map((a) => a.total),
+              backgroundColor: SERVIDORES_POR_AREA.map((a) => a.cor),
+              hoverBackgroundColor: SERVIDORES_POR_AREA.map((a) => a.cor),
+              borderColor: '#ffffff',
+              borderWidth: 2.5,
+            },
+          ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          scales: {
-            y: {
-              grid: { color: 'rgba(0,0,0,0.05)' },
-              ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
-                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
-              },
-            },
-            x: {
-              grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
-            },
-          },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
-                boxWidth: 10,
-                boxHeight: 10,
-                font: { weight: 'bold', size: 10 },
+                boxWidth: 12,
+                boxHeight: 12,
+                padding: 10,
+                font: { weight: 'bold', size: 11 },
                 color: '#1e293b',
               },
             },
             tooltip: {
-              padding: 10,
+              padding: 12,
               callbacks: {
-                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')}`,
+                label: (ctx: any) => {
+                  const area = SERVIDORES_POR_AREA[ctx.dataIndex];
+                  return ` ${area.tipoOrgao}: ${area.total.toLocaleString('pt-BR')} servidores (${area.percentual.toFixed(1)}%)`;
+                },
+                afterLabel: (ctx: any) => {
+                  const area = SERVIDORES_POR_AREA[ctx.dataIndex];
+                  return ` Docentes: ${area.docentes.toLocaleString('pt-BR')} | Pesquisadores: ${area.pesquisadores} | PAEPE: ${area.tecnicos.toLocaleString('pt-BR')}`;
+                },
               },
             },
           },
@@ -1089,8 +1082,51 @@ export const GrandesAreasLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[310px]">
-      <canvas ref={canvasRef} />
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full">
+      {/* Left Column: Official Pie Chart */}
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative h-[330px] sm:h-[370px]">
+        <canvas ref={canvasRef} />
+      </div>
+
+      {/* Right Column: Highlights & Cards with Exact Percentages */}
+      <div className="lg:col-span-7 flex flex-col justify-center gap-3">
+        {/* Callout box for highlighted percentages */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm leading-relaxed">
+            <strong>Concentração Funcional:</strong> <strong>70,6%</strong> de todo o quadro funcional concentra-se em <strong>Faculdades e Institutos (38,5%)</strong> e na <strong>Área da Saúde (32,1%)</strong>, com representação integral na Administração Central (<strong>22,2%</strong>), Centros e Núcleos (<strong>4,6%</strong>) e Colégios Técnicos (<strong>2,6%</strong>).
+          </div>
+        </div>
+
+        {/* 5 Area Breakdown Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {SERVIDORES_POR_AREA.map((item) => (
+            <div
+              key={item.tipoOrgao}
+              className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-between"
+              style={{ borderLeftWidth: '4px', borderLeftColor: item.cor }}
+            >
+              <div className="min-w-0 pr-2">
+                <div className="text-xs font-bold text-slate-800 truncate">{item.tipoOrgao}</div>
+                <div className="text-[11px] text-slate-500 font-medium">
+                  {item.total.toLocaleString('pt-BR')} servidores
+                </div>
+              </div>
+              <div
+                className="px-2.5 py-1 rounded-lg text-xs font-black text-white shrink-0"
+                style={{ backgroundColor: item.cor }}
+              >
+                {item.percentual.toFixed(1)}%
+              </div>
+            </div>
+          ))}
+          {/* Total summary banner */}
+          <div className="p-2.5 rounded-xl bg-slate-900 text-white flex items-center justify-between col-span-1 sm:col-span-2">
+            <span className="text-xs font-bold">Total Geral da Universidade</span>
+            <span className="text-sm font-black text-amber-400">9.416 servidores ativos</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1173,7 +1209,7 @@ export const TopCargosBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[350px]">
+    <div className="w-full h-[370px] sm:h-[400px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -1300,7 +1336,7 @@ export const NacionalidadesCharts: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[190px] h-[190px] sm:w-[210px] sm:h-[210px] relative">
+        <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
             <span className="text-3xl font-black text-slate-950">94,9%</span>
@@ -1309,7 +1345,7 @@ export const NacionalidadesCharts: React.FC = () => {
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[250px]">
+      <div className="md:col-span-7 h-[300px] sm:h-[330px]">
         <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
           Distribuição dos 110 Estrangeiros por Região
         </h4>

@@ -8,7 +8,16 @@ import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
 import { AchievementsModal } from './components/GameBoard/AchievementsModal';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'timeline' | 'dashboard'>('timeline');
+  const [currentView, setCurrentView] = useState<'timeline' | 'dashboard'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const search = new URLSearchParams(window.location.search);
+      if (hash === '#dashboard' || search.get('view') === 'dashboard') {
+        return 'dashboard';
+      }
+    }
+    return 'timeline';
+  });
   const [activePeriodIndex, setActivePeriodIndex] = useState<number | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<MilestonePhoto | null>(null);
   const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
