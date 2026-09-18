@@ -99,16 +99,17 @@ export const ESCOLARIDADE_EVOLUCAO = {
     { nivel: 'Doutorado', valores: [221, 219, 230, 225, 232, 242, 262, 263, 276, 302, 325], cor: '#7c3aed' },
     { nivel: 'Fundamental', valores: [312, 270, 246, 218, 195, 185, 164, 144, 122, 114, 110], cor: '#475569' },
     { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#d97706' },
-    { nivel: 'Pós-Doutorado (Maior que Doutorado)', valores: [9, 8, 9, 10, 10, 14, 20, 25, 23, 26, 28], cor: '#0ea5e9' },
+    { nivel: 'Maior que Doutorado', valores: [9, 8, 9, 10, 10, 14, 20, 25, 23, 26, 28], cor: '#0ea5e9' },
   ],
 };
 
-// Séries com zoom específico: Mestrado, Fundamental, Doutorado e Fundamental Incompleto
+// Séries com zoom específico: Mestrado, Fundamental, Doutorado, Fundamental Incompleto e Maior que Doutorado
 export const ESCOLARIDADE_ZOOM_SERIES = [
   { nivel: 'Mestrado', valores: [396, 374, 382, 382, 388, 390, 407, 429, 430, 446, 463], cor: '#b43a2b' },
   { nivel: 'Doutorado', valores: [221, 219, 230, 225, 232, 242, 262, 263, 276, 302, 325], cor: '#7c3aed' },
   { nivel: 'Fundamental', valores: [312, 270, 246, 218, 195, 185, 164, 144, 122, 114, 110], cor: '#475569' },
   { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#d97706' },
+  { nivel: 'Maior que Doutorado', valores: [9, 8, 9, 10, 10, 14, 20, 25, 23, 26, 28], cor: '#0ea5e9' },
 ];
 
 export const GRANDES_AREAS_EVOLUCAO = {

@@ -845,7 +845,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
 };
 
 /* =========================================================================
-   5b. ESCOLARIDADE: Zoom em Linha (Mestrado, Fundamental, Doutorado e Fund. Incompleto)
+   5b. ESCOLARIDADE: Zoom em Linha (Mestrado, Fundamental, Doutorado, Fund. Incompleto e Maior que Doutorado)
    ========================================================================= */
 export const EscolaridadeZoomLineChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

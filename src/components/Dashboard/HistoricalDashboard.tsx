@@ -71,7 +71,7 @@ const SLIDES: SlideDefinition[] = [
     id: 'escolaridadeZoom',
     category: 'Desenvolvimento Profissional',
     title: 'Evolução da Escolaridade PAEPE (Zoom em Detalhe)',
-    subtitle: 'Foco ampliado em Mestrado, Fundamental, Doutorado e Fundamental Incompleto',
+    subtitle: 'Foco ampliado em Mestrado, Fundamental, Doutorado, Fundamental Incompleto e Maior que Doutorado',
   },
   {
     id: 'grandesAreas',
@@ -240,7 +240,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
               <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-sky-700 shrink-0" />
                 <div className="text-xs sm:text-sm">
-                  <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong> e <strong>Doutorado (+47%)</strong>, com queda nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
+                  <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
                 </div>
               </div>
 
