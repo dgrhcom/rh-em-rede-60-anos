@@ -40,26 +40,48 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
 }) => {
   const cardBgClass = pureBgColors[period.index % pureBgColors.length];
 
-  // ================= 1. ACTIVE SELECTED CARD: EXPANDED 2-COLUMN DISPLAY =================
-  if (isActive) {
-    return (
+  const handleNeighborClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
+  return (
+    <div
+      onClick={!isActive ? handleNeighborClick : undefined}
+      className={`relative rounded-3xl overflow-hidden border-2.5 border-slate-950 ${cardBgClass} text-white select-none
+        transition-[width,height,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
+        ${
+          isActive
+            ? 'w-[94vw] sm:w-[780px] md:w-[920px] lg:w-[1040px] xl:w-[1140px] max-w-[1160px] h-[calc(100vh-11.5rem)] min-h-[480px] max-h-[670px] shadow-2xl shadow-slate-950/40 ring-2 ring-white cursor-default'
+            : 'w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] shadow-lg hover:shadow-2xl cursor-pointer hover:opacity-95 hover:brightness-105'
+        }
+      `}
+    >
+      {/* Top-Right Collapse Button to return to unselected timeline */}
+      {onClose && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            soundFx.playCardTick();
+            onClose();
+          }}
+          className={`absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/20 hover:bg-white text-white hover:text-slate-950 border border-white/30 transition-all duration-300 cursor-pointer z-30 shadow-md ${
+            isActive ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-75 pointer-events-none'
+          }`}
+          title="Recolher card e voltar à visão geral"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+
+      {/* ================= 1. ACTIVE SELECTED CARD: EXPANDED 2-COLUMN DISPLAY ================= */}
       <div
-        className={`relative w-[94vw] sm:w-[780px] md:w-[920px] lg:w-[1040px] xl:w-[1140px] max-w-[1160px] h-[calc(100vh-11.5rem)] min-h-[480px] max-h-[670px] rounded-3xl p-4 sm:p-5 lg:p-6 shadow-2xl shadow-slate-950/40 ring-2 ring-white border-2.5 border-slate-950 ${cardBgClass} text-white transition-shadow duration-300 select-none animate-card-grow`}
+        className={`absolute inset-0 p-4 sm:p-5 lg:p-6 transition-all duration-400 ease-out ${
+          isActive
+            ? 'opacity-100 pointer-events-auto delay-150 transform translate-y-0 scale-100'
+            : 'opacity-0 pointer-events-none transform translate-y-2 scale-98'
+        }`}
       >
-        {/* Top-Right Collapse Button to return to unselected timeline */}
-        {onClose && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              soundFx.playCardTick();
-              onClose();
-            }}
-            className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/20 hover:bg-white text-white hover:text-slate-950 border border-white/30 transition-all cursor-pointer z-30 shadow-md"
-            title="Recolher card e voltar à visão geral"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 h-full items-stretch overflow-hidden">
           {/* ================= COLUNA 1: FOTOS HISTÓRICAS DO PERÍODO ================= */}
           <div className="flex flex-col justify-between h-full min-w-0">
@@ -143,7 +165,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               </span>
             </div>
 
-            {/* Lista de Marcos com Fonte Aumentada (Inicia diretamente abaixo do header, sem resumo) */}
+            {/* Lista de Marcos com Fonte Aumentada */}
             <div className="flex-1 overflow-y-auto py-2 space-y-3 pr-1.5 my-1">
               {period.milestones.map((m) => (
                 <div
@@ -164,55 +186,51 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
           </div>
         </div>
       </div>
-    );
-  }
 
-  // ================= 2. UNSELECTED NEIGHBOR CARD: COMPACT 1-COLUMN PREVIEW =================
-  const handleNeighborClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect();
-  };
-
-  return (
-    <div
-      onClick={handleNeighborClick}
-      className={`relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-2xl border-2.5 border-slate-950 ${cardBgClass} text-white cursor-pointer select-none transition-[transform,box-shadow,filter] duration-200 hover:opacity-95 hover:brightness-105`}
-    >
-      {/* Top: Period Years */}
-      <div className="text-center py-1">
-        <div className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
-          {period.period}
-        </div>
-      </div>
-
-      {/* Center: Square Archival Photo */}
-      <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-white/25 bg-slate-950 shadow-md my-auto group shrink-0">
-        {period.coverImage ? (
-          <img
-            src={period.coverImage}
-            alt={period.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-800">
-            <ImageIcon className="w-8 h-8 text-white/50" />
+      {/* ================= 2. UNSELECTED NEIGHBOR CARD: COMPACT 1-COLUMN PREVIEW ================= */}
+      <div
+        className={`absolute inset-0 p-4 w-full max-w-[280px] mx-auto flex flex-col justify-between overflow-hidden transition-all duration-300 ${
+          isActive
+            ? 'opacity-0 pointer-events-none transform -translate-y-2 scale-95'
+            : 'opacity-100 pointer-events-auto delay-100 transform translate-y-0 scale-100'
+        }`}
+      >
+        {/* Top: Period Years */}
+        <div className="text-center py-1 shrink-0">
+          <div className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
+            {period.period}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Bottom: Number & Title */}
-      <div className="pt-2 border-t border-white/20 flex items-center justify-between text-left gap-2 shrink-0">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="w-6 h-6 rounded-lg bg-white text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
-            {period.index + 1}
-          </span>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-xs sm:text-sm font-black text-white tracking-tight truncate leading-snug">
-              {period.title}
-            </h3>
-            <span className="text-[10px] text-white/80 font-bold block truncate mt-0.5">
-              {period.photos.length} fotos no acervo
+        {/* Center: Square Archival Photo */}
+        <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-white/25 bg-slate-950 shadow-md my-auto group shrink-0">
+          {period.coverImage ? (
+            <img
+              src={period.coverImage}
+              alt={period.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-slate-800">
+              <ImageIcon className="w-8 h-8 text-white/50" />
+            </div>
+          )}
+        </div>
+
+        {/* Bottom: Number & Title */}
+        <div className="pt-2 border-t border-white/20 flex items-center justify-between text-left gap-2 shrink-0">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="w-6 h-6 rounded-lg bg-white text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
+              {period.index + 1}
             </span>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs sm:text-sm font-black text-white tracking-tight truncate leading-snug">
+                {period.title}
+              </h3>
+              <span className="text-[10px] text-white/80 font-bold block truncate mt-0.5">
+                {period.photos.length} fotos no acervo
+              </span>
+            </div>
           </div>
         </div>
       </div>

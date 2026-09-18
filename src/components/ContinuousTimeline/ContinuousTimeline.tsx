@@ -685,14 +685,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentZIndex = fanZ;
                 }
               } else if (introStatus === 'animating') {
-                // Overview Row coordinates: all 12 cards arranged small side-by-side within screen width
+                // Overview Row coordinates: all 12 cards arranged small side-by-side with clear spacing and zero overlap
                 const overviewStepX = isMobile
-                  ? Math.min(42, Math.max(26, (winW * 0.90) / 11))
+                  ? Math.min(32, Math.max(25, (winW * 0.90) / 11))
                   : isTablet
-                  ? Math.min(72, Math.max(48, (winW * 0.88) / 11))
-                  : Math.min(100, Math.max(70, (winW * 0.86) / 11));
+                  ? Math.min(68, Math.max(50, (winW * 0.86) / 11))
+                  : Math.min(115, Math.max(86, (winW * 0.88) / 11));
 
-                const overviewScale = isMobile ? 0.26 : isTablet ? 0.33 : 0.40;
+                const overviewScale = isMobile ? 0.09 : isTablet ? 0.16 : 0.25;
                 const overviewX = (idx - 5.5) * overviewStepX;
                 // Cards dealt top (11) to bottom (0), so each lands on top of previous:
                 const overviewZ = 20 + (11 - idx);
@@ -850,7 +850,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   transformOrigin: 'center center',
                   opacity: currentOpacity,
                   zIndex: currentZIndex,
-                  transition: introStatus === 'idle_fan' ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease' : 'none',
+                  transition: isDragging
+                    ? 'none'
+                    : isIntroActive
+                    ? (introStatus === 'idle_fan' ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease' : 'none')
+                    : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease',
                   willChange: 'transform, opacity',
                   backfaceVisibility: 'hidden',
                 }}
