@@ -3,10 +3,12 @@ import type { HistoricalPeriod, MilestonePhoto } from './types/timeline';
 import { timelinePeriods } from './data/timelineData';
 import { Header } from './components/Header';
 import { ContinuousTimeline } from './components/ContinuousTimeline/ContinuousTimeline';
+import { HistoricalDashboard } from './components/Dashboard/HistoricalDashboard';
 import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
 import { AchievementsModal } from './components/GameBoard/AchievementsModal';
 
 export function App() {
+  const [currentView, setCurrentView] = useState<'timeline' | 'dashboard'>('timeline');
   const [activePeriodIndex, setActivePeriodIndex] = useState<number | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<MilestonePhoto | null>(null);
   const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
@@ -73,18 +75,35 @@ export function App() {
 
   return (
     <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
-      {/* Top Main Navigation Header */}
-      <Header isCentered={isFanIdle} />
+      {/* Background Texture Overlay with Multiply Blend Mode over yellow background */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 mix-blend-multiply opacity-25 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
+        style={{
+          backgroundImage: "url('/bg_60_anos.jpg')",
+        }}
+      />
 
-      {/* Main View Area: Continuous Timeline exclusively */}
-      <main className="flex-1 w-full relative pt-14">
-        <ContinuousTimeline
-          periods={periods}
-          activeIndex={activePeriodIndex}
-          onSelectPeriod={handleSelectPeriod}
-          onOpenPhoto={handleOpenPhoto}
-          onFanIdleChange={setIsFanIdle}
-        />
+      {/* Top Main Navigation Header */}
+      <Header
+        isCentered={isFanIdle && currentView === 'timeline'}
+        currentView={currentView}
+        onNavigate={(view) => setCurrentView(view)}
+      />
+
+      {/* Main View Area: Continuous Timeline or Historical Dashboard */}
+      <main className="flex-1 w-full relative pt-14 z-10">
+        {currentView === 'timeline' ? (
+          <ContinuousTimeline
+            periods={periods}
+            activeIndex={activePeriodIndex}
+            onSelectPeriod={handleSelectPeriod}
+            onOpenPhoto={handleOpenPhoto}
+            onFanIdleChange={setIsFanIdle}
+            onOpenDashboard={() => setCurrentView('dashboard')}
+          />
+        ) : (
+          <HistoricalDashboard onBackToTimeline={() => setCurrentView('timeline')} />
+        )}
       </main>
 
       {/* Standalone Fullscreen Photo Modal (Shows ONLY image, caption and credits) */}

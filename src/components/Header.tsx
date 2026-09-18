@@ -1,10 +1,18 @@
 import React from 'react';
+import { BarChart3, Clock } from 'lucide-react';
+import { soundFx } from '../utils/soundEffects';
 
 interface HeaderProps {
   isCentered?: boolean;
+  currentView?: 'timeline' | 'dashboard';
+  onNavigate?: (view: 'timeline' | 'dashboard') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isCentered = true }) => {
+export const Header: React.FC<HeaderProps> = ({
+  isCentered = true,
+  currentView = 'timeline',
+  onNavigate,
+}) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
       <div
@@ -27,6 +35,43 @@ export const Header: React.FC<HeaderProps> = ({ isCentered = true }) => {
           }`}
         />
       </div>
+
+      {/* Top-Right Navigation Pill (Visible only after opening is completed or on dashboard) */}
+      {(!isCentered || currentView === 'dashboard') && onNavigate && (
+        <div className="fixed top-6 right-6 sm:top-8 sm:right-10 z-40 pointer-events-auto flex items-center gap-1 bg-white/90 backdrop-blur-md p-1 rounded-full border-2 border-slate-950 shadow-xl transition-all duration-500">
+          <button
+            onClick={() => {
+              soundFx.playCardTick();
+              onNavigate('timeline');
+            }}
+            className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+              currentView === 'timeline'
+                ? 'bg-slate-950 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
+            }`}
+            title="Ver Linha do Tempo contínua"
+          >
+            <Clock className="w-3.5 h-3.5 text-[#e5a93a]" />
+            <span>Linha do Tempo</span>
+          </button>
+
+          <button
+            onClick={() => {
+              soundFx.playCardTick();
+              onNavigate('dashboard');
+            }}
+            className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+              currentView === 'dashboard'
+                ? 'bg-[#105e7b] text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
+            }`}
+            title="Apresentação de Indicadores e Estatísticas"
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-[#e5a93a]" />
+            <span>Indicadores & Gráficos</span>
+          </button>
+        </div>
+      )}
     </header>
   );
 };

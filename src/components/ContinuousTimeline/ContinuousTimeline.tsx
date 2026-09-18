@@ -3,7 +3,7 @@ import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { TimelineCard, pureBgColors } from './TimelineCard';
 import { soundFx } from '../../utils/soundEffects';
 import { 
-  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, Volume2, VolumeX 
+  ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, Volume2, VolumeX, BarChart3 
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -13,6 +13,7 @@ interface ContinuousTimelineProps {
   onSelectPeriod: (index: number | null) => void;
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
   onFanIdleChange?: (isIdle: boolean) => void;
+  onOpenDashboard?: () => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -21,6 +22,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   onSelectPeriod,
   onOpenPhoto,
   onFanIdleChange,
+  onOpenDashboard,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -360,7 +362,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-3.5rem)] overflow-hidden bg-[#e5a93a] text-slate-900 flex flex-col justify-between select-none"
+      className="relative w-full h-[calc(100vh-3.5rem)] overflow-hidden bg-transparent text-slate-900 flex flex-col justify-between select-none"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -368,7 +370,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     >
       {/* ================= 1. INTRO 3D FAN OVERLAY (Cards + Start Button Only) ================= */}
       {isFanIdle && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12">
+        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-24 sm:pb-28 md:pb-32">
           <div className="pointer-events-auto">
             <button
               onClick={executeOpeningAnimation}
@@ -459,13 +461,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let currentZIndex = targetZIndex;
 
             if (isIntroActive) {
-              // 3D Fan Stack initial values (oldest periods on top, opened fan)
+              // 3D Fan Stack initial values (restored previous stacking order, opened fan)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
               const fanAngle = (idx - 5.5) * (isMobile ? 4.6 : 6.2); // Wider fan tilt
               const fanX = (idx - 5.5) * (isMobile ? 18 : 28); // Wider horizontal spread
               const fanY = Math.pow(Math.abs(idx - 5.5), 1.35) * (isMobile ? 3.8 : 5.0) - (isMobile ? 10 : 16); // Gentle natural arc
               const fanScale = isMobile ? 0.64 : 0.76;
-              const fanZ = 50 + (totalPeriods - 1 - idx); // Oldest cards (idx 0) on top
+              const fanZ = 30 + idx; // Restored previous stacking order
 
               // Staggered deal interpolation
               const staggerStart = idx * 0.042;
@@ -524,6 +526,95 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               </div>
             );
           })}
+
+          {/* ================= 2.1. CAPA DOS CARDS (Some após a abertura) ================= */}
+          {isIntroActive && (
+            (() => {
+              const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+              const coverBaseScale = isMobile ? 0.68 : 0.80;
+              // Diminui a opacidade e eleva suavemente durante a abertura, sumindo completamente
+              const coverOpacity = Math.max(0, 1 - introProgress * 2.2);
+              const coverScale = coverBaseScale + introProgress * 0.12;
+              const coverY = -introProgress * 45;
+              const coverZIndex = 65; // Sobreposto a todos os cards do leque
+
+              if (coverOpacity <= 0) return null;
+
+              return (
+                <div
+                  className={`absolute pointer-events-auto transition-transform duration-300 ${
+                    isFanIdle ? 'cursor-pointer hover:scale-[1.03]' : ''
+                  }`}
+                  onClick={(e) => {
+                    if (isFanIdle) {
+                      e.stopPropagation();
+                      executeOpeningAnimation();
+                    }
+                  }}
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: `translate3d(-50%, calc(-50% + ${coverY}px), 0) scale(${coverScale})`,
+                    transformOrigin: 'center center',
+                    opacity: coverOpacity,
+                    zIndex: coverZIndex,
+                    willChange: 'transform, opacity',
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  <div className="relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-2xl border-2.5 border-slate-950 bg-[#105e7b] text-white select-none ring-2 ring-white/60">
+                    {/* Topo: Identificação e Título */}
+                    <div className="text-center py-1 flex flex-col items-center">
+                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-white/30 mb-1 shadow-xs">
+                        DGRH • UNICAMP
+                      </span>
+                      <div className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
+                        60 Anos Unicamp
+                      </div>
+                      <span className="text-[11px] text-white/85 font-bold mt-0.5">
+                        A Gestão de Pessoas (1983 - 2026)
+                      </span>
+                    </div>
+
+                    {/* Centro: Foto do Prédio da DGRH */}
+                    <div className="relative w-full aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-md my-auto group shrink-0">
+                      <img
+                        src="/capa.jpg"
+                        alt="Prédio da DGRH - Reitoria IV"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-2 left-2 right-2 text-left">
+                        <span className="text-[11px] font-bold text-white drop-shadow-md">
+                          Prédio da Reitoria IV
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Rodapé: Selo Comemorativo */}
+                    <div className="pt-2 border-t border-white/20 flex items-center justify-between text-left gap-2 shrink-0">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="w-6 h-6 rounded-lg bg-[#e5a93a] text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
+                          ★
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xs sm:text-sm font-black text-white tracking-tight truncate leading-snug">
+                            Linha do Tempo
+                          </h3>
+                          <span className="text-[10px] text-white/80 font-bold block truncate mt-0.5">
+                            Memória & Transformação
+                          </span>
+                        </div>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-[10px] tracking-wide shadow-xs border border-white/30">
+                        CAPA
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          )}
         </div>
 
         {/* Floating Side Arrow Buttons (Hidden during intro) */}
@@ -552,7 +643,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
       {/* ================= 3. COMPACT BOTTOM TIMELINE RULER & CONTROLS ================= */}
       <div 
-        className={`relative z-20 pb-2 px-3 max-w-4xl mx-auto w-full flex flex-col items-center gap-1.5 transition-all duration-700 ${isIntroActive ? 'pointer-events-none' : ''}`}
+        className={`relative z-20 pb-8 sm:pb-12 px-3 max-w-4xl mx-auto w-full flex flex-col items-center gap-2 transition-all duration-700 ${isIntroActive ? 'pointer-events-none' : ''}`}
         style={{
           opacity: isIntroActive ? Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55)) : 1,
           transform: `translateY(${isIntroActive ? (1 - Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55))) * 35 : 0}px)`,
@@ -674,6 +765,21 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               </>
             )}
           </button>
+
+          {/* Indicadores & Gráficos Link pill */}
+          {onOpenDashboard && (
+            <button
+              onClick={() => {
+                soundFx.playCardTick();
+                onOpenDashboard();
+              }}
+              className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#105e7b] hover:bg-[#187fa1] text-white text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
+              title="Apresentação de Indicadores e Estatísticas dos 60 Anos"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-[#e5a93a]" />
+              <span>Indicadores & Gráficos</span>
+            </button>
+          )}
 
           {/* Status Indicator */}
           {activePeriod ? (
