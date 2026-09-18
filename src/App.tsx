@@ -25,6 +25,7 @@ export function App() {
   const [isFanIdle, setIsFanIdle] = useState<boolean>(true);
   const [isLogoVisible, setIsLogoVisible] = useState<boolean>(false);
   const [isPreAnimating, setIsPreAnimating] = useState<boolean>(true);
+  const [isLogoInCenterScreen, setIsLogoInCenterScreen] = useState<boolean>(true);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -101,6 +102,7 @@ export function App() {
         onNavigate={(view) => setCurrentView(view)}
         logoVisible={isLogoVisible || currentView === 'dashboard' || !isFanIdle}
         isPreAnimating={isPreAnimating && currentView === 'timeline'}
+        isLogoInCenterScreen={isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
@@ -114,6 +116,7 @@ export function App() {
             onFanIdleChange={setIsFanIdle}
             onLogoVisibilityChange={setIsLogoVisible}
             onPreAnimatingChange={setIsPreAnimating}
+            onLogoPositionChange={setIsLogoInCenterScreen}
             onOpenDashboard={() => {
               if (typeof window !== 'undefined') {
                 const url = new URL(window.location.href);

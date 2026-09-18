@@ -8,6 +8,7 @@ interface HeaderProps {
   onNavigate?: (view: 'timeline' | 'dashboard') => void;
   logoVisible?: boolean;
   isPreAnimating?: boolean;
+  isLogoInCenterScreen?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,14 +17,17 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   logoVisible = true,
   isPreAnimating = false,
+  isLogoInCenterScreen = false,
 }) => {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
       <div
-        className={`fixed z-40 pointer-events-none transition-all duration-700 ease-in-out ${
+        className={`fixed z-40 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isCentered
-            ? 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2'
-            : 'top-0 left-0 translate-x-0'
+            ? isLogoInCenterScreen
+              ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+              : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2 translate-y-0'
+            : 'top-0 left-0 translate-x-0 translate-y-0'
         }`}
         style={{
           padding: isCentered ? '0px' : '48px',
@@ -32,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
         <img
           src="/logo_dgrh.svg"
           alt="DGRH - Diretoria Geral de Recursos Humanos"
-          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-700 ease-in-out ${
+          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isPreAnimating && isCentered
               ? 'animate-logo-reveal-bottom-up'
               : logoVisible
@@ -40,7 +44,9 @@ export const Header: React.FC<HeaderProps> = ({
               : 'opacity-0 scale-90'
           } ${
             isCentered
-              ? 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'
+              ? isLogoInCenterScreen
+                ? 'h-12 sm:h-16 md:h-20 max-w-[85vw] drop-shadow-xl'
+                : 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'
               : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
           }`}
         />
