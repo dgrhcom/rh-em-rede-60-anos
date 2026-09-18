@@ -13,20 +13,20 @@ interface TimelineCardProps {
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
 }
 
-// Pure, deep, saturated DGRH colors for the 12 periods
+// Deep, saturated DGRH colors for the 12 periods (Secondary and Auxiliaries only - Primary reserved strictly for Cover)
 export const pureBgColors = [
-  'bg-[#105e7b]', // 0: 1983-1986 (Azul DGRH)
-  'bg-[#477b2f]', // 1: 1989 (Verde DGRH)
-  'bg-[#5e2a6b]', // 2: 1990-1993 (Roxo DGRH)
-  'bg-[#d67b27]', // 3: 1995-1997 (Laranja DGRH)
-  'bg-[#0a4155]', // 4: 1998 (Azul Petróleo)
-  'bg-[#366023]', // 5: 1999-2000 (Verde Floresta)
-  'bg-[#6b213b]', // 6: 2001-2003 (Vinho Profundo)
-  'bg-[#1a508b]', // 7: 2004-2006 (Azul Cobalto)
-  'bg-[#4c1d95]', // 8: 2008-2011 (Roxo Escuro)
-  'bg-[#c05621]', // 9: 2014-2015 (Terracota)
-  'bg-[#0d6e8a]', // 10: 2017-2019 (Azul Oceano)
-  'bg-[#105e7b]', // 11: 2022-2025 (Azul DGRH 60 Anos)
+  'bg-[#477b2f]', // 0: 1983-1986 (Aux 1 - Verde DGRH)
+  'bg-[#5e2a6b]', // 1: 1989 (Aux 2 - Roxo DGRH)
+  'bg-[#d67b27]', // 2: 1990-1993 (Aux 3 - Laranja DGRH)
+  'bg-[#b8801a]', // 3: 1995-1997 (Secundária - Dourado Profundo Unicamp 60 Anos)
+  'bg-[#366023]', // 4: 1998 (Aux 1 - Verde Floresta)
+  'bg-[#6b213b]', // 5: 1999-2000 (Aux 2 - Vinho Profundo)
+  'bg-[#c05621]', // 6: 2001-2003 (Aux 3 - Terracota)
+  'bg-[#a16207]', // 7: 2004-2006 (Secundária - Âmbar Ouro)
+  'bg-[#2d5a27]', // 8: 2008-2011 (Aux 1 - Verde Escuro)
+  'bg-[#4c1d95]', // 9: 2014-2015 (Aux 2 - Roxo Profundo)
+  'bg-[#b44318]', // 10: 2017-2019 (Aux 3 - Terracota Queimado)
+  'bg-[#701a75]', // 11: 2022-2025 (Aux 2 - Ameixa DGRH)
 ];
 
 const cleanPhotoText = (text: string) => text.replace(/^Foto\s+(do\s+|da\s+|dos\s+|das\s+|de\s+)?/i, '');

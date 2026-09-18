@@ -377,7 +377,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     >
       {/* ================= 1. INTRO 3D FAN OVERLAY (Cards + Start Button Only) ================= */}
       {isFanIdle && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-24 sm:pb-28 md:pb-32">
+        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-[136px] sm:pb-[152px] md:pb-[168px]">
           <div className="pointer-events-auto">
             <button
               onClick={executeOpeningAnimation}
@@ -468,13 +468,19 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let currentZIndex = targetZIndex;
 
             if (isIntroActive) {
-              // 3D Fan Stack initial values (restored previous stacking order, opened fan)
+              // 3D Fan Stack initial values (13 items total: 12 cards + cover, centered symmetrically at 6.0)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const fanAngle = (idx - 5.5) * (isMobile ? 4.6 : 6.2); // Wider fan tilt
-              const fanX = (idx - 5.5) * (isMobile ? 18 : 28); // Wider horizontal spread
-              const fanY = Math.pow(Math.abs(idx - 5.5), 1.35) * (isMobile ? 3.8 : 5.0) - (isMobile ? 10 : 16); // Gentle natural arc
+              const angleStep = isMobile ? 3.2 : 4.4; // Closed fan tilt (cards closer together)
+              const spreadStep = isMobile ? 13 : 20; // Closed horizontal spread (cards closer together)
+              const arcStep = isMobile ? 2.8 : 3.8;
+              const arcBase = isMobile ? 8 : 12;
+
+              const fanDelta = idx - 6.0; // Symmetrical around 6.0 for 13 items (0..12)
+              const fanAngle = fanDelta * angleStep;
+              const fanX = fanDelta * spreadStep;
+              const fanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
               const fanScale = isMobile ? 0.64 : 0.76;
-              const fanZ = 30 + idx; // Restored previous stacking order
+              const fanZ = 30 + idx;
 
               // Staggered deal interpolation
               const staggerStart = idx * 0.042;
@@ -534,16 +540,30 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             );
           })}
 
-          {/* ================= 2.1. CAPA DOS CARDS (Some após a abertura) ================= */}
+          {/* ================= 2.1. CAPA DOS CARDS (Posicionada após o último card no leque) ================= */}
           {isIntroActive && (
             (() => {
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const coverBaseScale = isMobile ? 0.68 : 0.80;
-              // Diminui a opacidade e eleva suavemente durante a abertura, sumindo completamente
+              const angleStep = isMobile ? 3.2 : 4.4;
+              const spreadStep = isMobile ? 13 : 20;
+              const arcStep = isMobile ? 2.8 : 3.8;
+              const arcBase = isMobile ? 8 : 12;
+
+              // Virtual index 12: comes right after card 11 (the last card)
+              const fanDelta = 12 - 6.0; // +6.0
+              const fanAngle = fanDelta * angleStep;
+              const fanX = fanDelta * spreadStep;
+              const fanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
+              const fanScale = isMobile ? 0.64 : 0.76;
+
+              // Smooth transition during deal animation
               const coverOpacity = Math.max(0, 1 - introProgress * 2.2);
-              const coverScale = coverBaseScale + introProgress * 0.12;
-              const coverY = -introProgress * 45;
-              const coverZIndex = 65; // Sobreposto a todos os cards do leque
+              const p = 1 - Math.pow(1 - Math.min(1, introProgress * 1.5), 3);
+              const coverCurrentX = fanX + p * 40;
+              const coverCurrentY = fanY - introProgress * 50;
+              const coverCurrentRot = fanAngle * (1 - introProgress * 0.4);
+              const coverCurrentScale = fanScale + introProgress * 0.08;
+              const coverZIndex = 55; // Sits on top of the last card (card 11 has zIndex = 41)
 
               if (coverOpacity <= 0) return null;
 
@@ -561,7 +581,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   style={{
                     left: '50%',
                     top: '50%',
-                    transform: `translate3d(-50%, calc(-50% + ${coverY}px), 0) scale(${coverScale})`,
+                    transform: `translate3d(calc(-50% + ${coverCurrentX}px), calc(-50% + ${coverCurrentY}px), 0) scale(${coverCurrentScale}) rotate(${coverCurrentRot}deg)`,
                     transformOrigin: 'center center',
                     opacity: coverOpacity,
                     zIndex: coverZIndex,
