@@ -19,7 +19,9 @@ import {
   GeneroCharts,
   FaixaEtariaBarChart,
   RacaCorBarChart,
-  EscolaridadeComparisonChart,
+  RacaCorTabela2BarChart,
+  EscolaridadeEvolucaoLineChart,
+  EscolaridadeZoomLineChart,
   GrandesAreasLineChart,
   TopCargosBarChart,
   NacionalidadesCharts,
@@ -52,20 +54,32 @@ const SLIDES: SlideDefinition[] = [
   {
     id: 'faixaEtaria',
     category: 'Demografia',
-    title: 'Perfil Etário dos Servidores',
-    subtitle: 'Distribuição por faixas de idade, do servidor mais jovem ao mais experiente',
+    title: 'Perfil Etário dos Servidores por Categoria',
+    subtitle: 'Distribuição por faixas etárias diferenciando Docentes, Pesquisadores e Técnicos-Administrativos',
   },
   {
-    id: 'racaCor',
+    id: 'racaCorGeral',
     category: 'Inclusão & Equidade',
-    title: 'Distribuição Étnico-Racial',
-    subtitle: 'Autodeclaração de raça e cor consolidada entre todas as categorias',
+    title: 'Distribuição Étnico-Racial (Visão Geral)',
+    subtitle: 'Tabela 1: Autodeclaração de raça e cor consolidada entre todos os servidores da Universidade',
   },
   {
-    id: 'escolaridade',
+    id: 'racaCorTabela2',
+    category: 'Inclusão & Equidade',
+    title: 'Distribuição Étnico-Racial por Categoria',
+    subtitle: 'Tabela 2: Detalhamento por Docentes, Pesquisadores, Técnicos-Administrativos e Extra-Quadro',
+  },
+  {
+    id: 'escolaridadeGeral',
     category: 'Desenvolvimento Profissional',
     title: 'Evolução da Escolaridade PAEPE (2016 - 2026)',
-    subtitle: 'Salto histórico na qualificação acadêmica e pós-graduação dos servidores técnico-administrativos',
+    subtitle: 'Histórico decenal de todos os níveis de formação dos servidores técnico-administrativos',
+  },
+  {
+    id: 'escolaridadeZoom',
+    category: 'Desenvolvimento Profissional',
+    title: 'Evolução da Escolaridade PAEPE (Zoom em Detalhe)',
+    subtitle: 'Foco ampliado em Mestrado, Fundamental, Doutorado e Fundamental Incompleto',
   },
   {
     id: 'grandesAreas',
@@ -190,23 +204,23 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
 
           {/* ================= SLIDE 3: FAIXA ETÁRIA ================= */}
           {currentSlideIndex === 2 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
               {/* Highlight callout box */}
-              <div className="p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
                 <div className="text-xs sm:text-sm font-bold leading-relaxed">
                   📌 <strong>Destaque Demográfico:</strong> "{DESTAQUE_FAIXA_ETARIA.jovem}" e "{DESTAQUE_FAIXA_ETARIA.velho}".
                 </div>
               </div>
 
-              {/* Age Histogram */}
+              {/* Age Stacked Bar Chart by Categories */}
               <FaixaEtariaBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 4: RAÇA / COR ================= */}
+          {/* ================= SLIDE 4: RAÇA / COR (TABELA 1 - GERAL) ================= */}
           {currentSlideIndex === 3 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
               <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 mb-1">
                 {RACA_COR_DATA.map((item) => (
                   <div key={item.raca} className="p-2.5 rounded-2xl bg-slate-50 border border-black/10 text-center">
@@ -222,38 +236,74 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 5: ESCOLARIDADE (2016-2026) ================= */}
+          {/* ================= SLIDE 5: RAÇA / COR (TABELA 2 - DETALHAMENTO) ================= */}
           {currentSlideIndex === 4 && (
-            <div className="space-y-4 flex-1 flex flex-col justify-center">
-              {/* Highlight callout box */}
-              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0" />
-                <div className="text-xs sm:text-sm">
-                  <strong>Salto na Pós-Graduação (2016 a 2026):</strong> Em 2016 eram 1.139 com Especialização e 221 com Doutorado. Em 2026 são <strong>1.697 (+49%)</strong> e <strong>325 (+47%)</strong>!
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
+              {/* Tabela 2 Header Badge & Information Callout */}
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-xs font-black tracking-wider uppercase shadow-xs">
+                    Tabela 2
+                  </span>
+                  <div className="text-xs sm:text-sm font-bold">
+                    Autodeclaração Étnico-Racial discriminada por categoria (Docentes, Pesquisadores, PAEPE e Extra-Quadro)
+                  </div>
                 </div>
               </div>
 
-              {/* Escolaridade Comparison Chart */}
-              <EscolaridadeComparisonChart />
+              {/* Tabela 2 Stacked Bar Chart */}
+              <RacaCorTabela2BarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 6: GRANDES ÁREAS ================= */}
+          {/* ================= SLIDE 6: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
           {currentSlideIndex === 5 && (
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
+              {/* Highlight callout box */}
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3">
+                <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0" />
+                <div className="text-xs sm:text-sm">
+                  <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
+                </div>
+              </div>
+
+              {/* All education levels Line Chart */}
+              <EscolaridadeEvolucaoLineChart />
+            </div>
+          )}
+
+          {/* ================= SLIDE 7: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlideIndex === 6 && (
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
+              {/* Highlight callout box */}
+              <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-sky-700 shrink-0" />
+                <div className="text-xs sm:text-sm">
+                  <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong> e <strong>Doutorado (+47%)</strong>, com queda nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
+                </div>
+              </div>
+
+              {/* Zoom Line Chart */}
+              <EscolaridadeZoomLineChart />
+            </div>
+          )}
+
+          {/* ================= SLIDE 8: GRANDES ÁREAS ================= */}
+          {currentSlideIndex === 7 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <GrandesAreasLineChart />
             </div>
           )}
 
-          {/* ================= SLIDE 7: MAIORES CARGOS ================= */}
-          {currentSlideIndex === 6 && (
+          {/* ================= SLIDE 9: MAIORES CARGOS ================= */}
+          {currentSlideIndex === 8 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <TopCargosBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 8: NACIONALIDADES ================= */}
-          {currentSlideIndex === 7 && (
+          {/* ================= SLIDE 10: NACIONALIDADES ================= */}
+          {currentSlideIndex === 9 && (
             <div className="space-y-4 flex-1 flex flex-col justify-center">
               <NacionalidadesCharts />
             </div>

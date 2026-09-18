@@ -4,7 +4,9 @@ import {
   GENERO_DATA,
   FAIXA_ETARIA_DATA,
   RACA_COR_DATA,
+  RACA_COR_TABELA_2,
   ESCOLARIDADE_EVOLUCAO,
+  ESCOLARIDADE_ZOOM_SERIES,
   GRANDES_AREAS_EVOLUCAO,
   TOP_CARGOS_2026,
   NACIONALIDADES_DATA,
@@ -306,12 +308,22 @@ export const FaixaEtariaBarChart: React.FC = () => {
           labels: FAIXA_ETARIA_DATA.map((f) => f.faixa),
           datasets: [
             {
-              label: 'Total de Servidores',
-              data: FAIXA_ETARIA_DATA.map((f) => f.total),
-              backgroundColor: FAIXA_ETARIA_DATA.map((f) =>
-                f.faixa === '40 a 49 anos' ? '#105e7b' : '#334155'
-              ),
-              borderRadius: 8,
+              label: 'Docentes',
+              data: FAIXA_ETARIA_DATA.map((f) => f.docentes),
+              backgroundColor: '#b43a2b',
+              borderRadius: 4,
+            },
+            {
+              label: 'Pesquisadores (PQ)',
+              data: FAIXA_ETARIA_DATA.map((f) => f.pesquisadores),
+              backgroundColor: '#047857',
+              borderRadius: 4,
+            },
+            {
+              label: 'Técnicos-administrativos (PAEPE)',
+              data: FAIXA_ETARIA_DATA.map((f) => f.tecnicos),
+              backgroundColor: '#105e7b',
+              borderRadius: 4,
             },
           ],
         },
@@ -319,7 +331,13 @@ export const FaixaEtariaBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
+            x: {
+              stacked: true,
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+            },
             y: {
+              stacked: true,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 font: { weight: 'bold', size: 11 },
@@ -327,19 +345,30 @@ export const FaixaEtariaBarChart: React.FC = () => {
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
-            x: {
-              grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
-            },
           },
           plugins: {
-            legend: { display: false },
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { weight: 'bold', size: 11 },
+                color: '#1e293b',
+              },
+            },
             tooltip: {
               padding: 12,
               callbacks: {
                 label: (ctx: any) => {
+                  const val = Number(ctx.raw);
                   const item = FAIXA_ETARIA_DATA[ctx.dataIndex];
-                  return ` ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1)}% do quadro)`;
+                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                  return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}% da faixa)`;
+                },
+                footer: (items: any[]) => {
+                  if (!items.length) return '';
+                  const item = FAIXA_ETARIA_DATA[items[0].dataIndex];
+                  return `Total da faixa: ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1)}% do quadro)`;
                 },
               },
             },
@@ -355,7 +384,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[300px]">
+    <div className="w-full h-[280px] sm:h-[300px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -438,7 +467,281 @@ export const RacaCorBarChart: React.FC = () => {
 };
 
 /* =========================================================================
-   5. ESCOLARIDADE: Comparison Bar Chart (2016 vs 2026)
+   4b. RAÇA / COR: Tabela 2 (Detalhamento por Categoria)
+   ========================================================================= */
+export const RacaCorTabela2BarChart: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let chart: any = null;
+    let active = true;
+
+    getChartJS().then((Chart) => {
+      if (!active || !canvasRef.current || !Chart) return;
+      const ctx = canvasRef.current.getContext('2d');
+      if (!ctx) return;
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: RACA_COR_TABELA_2.map((r) => r.raca),
+          datasets: [
+            {
+              label: 'Docentes',
+              data: RACA_COR_TABELA_2.map((r) => r.docentes),
+              backgroundColor: '#b43a2b',
+              borderRadius: 4,
+            },
+            {
+              label: 'Pesquisadores (PQ)',
+              data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
+              backgroundColor: '#047857',
+              borderRadius: 4,
+            },
+            {
+              label: 'Técnicos-administrativos (PAEPE)',
+              data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
+              backgroundColor: '#105e7b',
+              borderRadius: 4,
+            },
+            {
+              label: 'Extra-quadro',
+              data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
+              backgroundColor: '#d97706',
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true,
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                font: { weight: 'bold', size: 11 },
+                color: '#64748b',
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+              },
+            },
+            y: {
+              stacked: true,
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+            },
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { weight: 'bold', size: 11 },
+                color: '#1e293b',
+              },
+            },
+            tooltip: {
+              padding: 12,
+              callbacks: {
+                label: (ctx: any) => {
+                  const val = Number(ctx.raw);
+                  const item = RACA_COR_TABELA_2[ctx.dataIndex];
+                  const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1) : '0';
+                  return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
+                },
+                footer: (items: any[]) => {
+                  if (!items.length) return '';
+                  const item = RACA_COR_TABELA_2[items[0].dataIndex];
+                  return `Total: ${item.total.toLocaleString('pt-BR')} servidores`;
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+
+    return () => {
+      active = false;
+      chart?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-[280px] sm:h-[300px]">
+      <canvas ref={canvasRef} />
+    </div>
+  );
+};
+
+/* =========================================================================
+   5a. ESCOLARIDADE: Evolução Completa em Linhas (Todas as Categorias)
+   ========================================================================= */
+export const EscolaridadeEvolucaoLineChart: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let chart: any = null;
+    let active = true;
+
+    getChartJS().then((Chart) => {
+      if (!active || !canvasRef.current || !Chart) return;
+      const ctx = canvasRef.current.getContext('2d');
+      if (!ctx) return;
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ESCOLARIDADE_EVOLUCAO.anos,
+          datasets: ESCOLARIDADE_EVOLUCAO.series.map((s) => ({
+            label: s.nivel,
+            data: s.valores,
+            borderColor: s.cor,
+            backgroundColor: s.cor,
+            tension: 0.3,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            borderWidth: 2.5,
+          })),
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                font: { weight: 'bold', size: 11 },
+                color: '#64748b',
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+              },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+            },
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                boxHeight: 10,
+                font: { weight: 'bold', size: 10 },
+                color: '#1e293b',
+              },
+            },
+            tooltip: {
+              padding: 10,
+              callbacks: {
+                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+              },
+            },
+          },
+        },
+      });
+    });
+
+    return () => {
+      active = false;
+      chart?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-[280px] sm:h-[300px]">
+      <canvas ref={canvasRef} />
+    </div>
+  );
+};
+
+/* =========================================================================
+   5b. ESCOLARIDADE: Zoom em Linha (Mestrado, Fundamental, Doutorado e Fund. Incompleto)
+   ========================================================================= */
+export const EscolaridadeZoomLineChart: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let chart: any = null;
+    let active = true;
+
+    getChartJS().then((Chart) => {
+      if (!active || !canvasRef.current || !Chart) return;
+      const ctx = canvasRef.current.getContext('2d');
+      if (!ctx) return;
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ESCOLARIDADE_EVOLUCAO.anos,
+          datasets: ESCOLARIDADE_ZOOM_SERIES.map((s) => ({
+            label: s.nivel,
+            data: s.valores,
+            borderColor: s.cor,
+            backgroundColor: s.cor,
+            tension: 0.3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            borderWidth: 3,
+          })),
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              min: 0,
+              max: 500,
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                font: { weight: 'bold', size: 11 },
+                color: '#64748b',
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+              },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+            },
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { weight: 'bold', size: 11 },
+                color: '#1e293b',
+              },
+            },
+            tooltip: {
+              padding: 10,
+              callbacks: {
+                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+              },
+            },
+          },
+        },
+      });
+    });
+
+    return () => {
+      active = false;
+      chart?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-[280px] sm:h-[300px]">
+      <canvas ref={canvasRef} />
+    </div>
+  );
+};
+
+/* =========================================================================
+   5c. ESCOLARIDADE: Comparison Bar Chart (2016 vs 2026 - legado)
    ========================================================================= */
 export const EscolaridadeComparisonChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

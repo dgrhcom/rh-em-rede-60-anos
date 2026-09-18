@@ -79,6 +79,16 @@ export const RACA_COR_DATA = [
   { raca: 'Indígena', total: 27, pct: 0.2, docentes: 4, extraQuadro: 16, tecnicos: 7, pesquisadores: 0 },
 ];
 
+// Dados da Tabela 2 da planilha oficial: Raça/Cor discriminada por Carreira
+export const RACA_COR_TABELA_2 = [
+  { raca: 'Branca', docentes: 1750, pesquisadores: 84, tecnicos: 5321, extraQuadro: 3102, total: 10302 },
+  { raca: 'Parda', docentes: 107, pesquisadores: 1, tecnicos: 1151, extraQuadro: 604, total: 1870 },
+  { raca: 'Preta', docentes: 39, pesquisadores: 0, tecnicos: 579, extraQuadro: 167, total: 794 },
+  { raca: 'Amarela', docentes: 42, pesquisadores: 3, tecnicos: 172, extraQuadro: 114, total: 332 },
+  { raca: 'Não Informado', docentes: 50, pesquisadores: 4, tecnicos: 41, extraQuadro: 134, total: 229 },
+  { raca: 'Indígena', docentes: 4, pesquisadores: 0, tecnicos: 7, extraQuadro: 16, total: 27 },
+];
+
 export const ESCOLARIDADE_EVOLUCAO = {
   anos: ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'],
   series: [
@@ -87,11 +97,19 @@ export const ESCOLARIDADE_EVOLUCAO = {
     { nivel: 'Especialização', valores: [1139, 1105, 1120, 1119, 1107, 1120, 1263, 1330, 1441, 1599, 1697], cor: '#16a34a' },
     { nivel: 'Mestrado', valores: [396, 374, 382, 382, 388, 390, 407, 429, 430, 446, 463], cor: '#b43a2b' },
     { nivel: 'Doutorado', valores: [221, 219, 230, 225, 232, 242, 262, 263, 276, 302, 325], cor: '#7c3aed' },
-    { nivel: 'Fundamental', valores: [312, 270, 246, 218, 195, 185, 164, 144, 122, 114, 110], cor: '#64748b' },
-    { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#94a3b8' },
+    { nivel: 'Fundamental', valores: [312, 270, 246, 218, 195, 185, 164, 144, 122, 114, 110], cor: '#475569' },
+    { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#d97706' },
     { nivel: 'Pós-Doutorado (Maior que Doutorado)', valores: [9, 8, 9, 10, 10, 14, 20, 25, 23, 26, 28], cor: '#0ea5e9' },
   ],
 };
+
+// Séries com zoom específico: Mestrado, Fundamental, Doutorado e Fundamental Incompleto
+export const ESCOLARIDADE_ZOOM_SERIES = [
+  { nivel: 'Mestrado', valores: [396, 374, 382, 382, 388, 390, 407, 429, 430, 446, 463], cor: '#b43a2b' },
+  { nivel: 'Doutorado', valores: [221, 219, 230, 225, 232, 242, 262, 263, 276, 302, 325], cor: '#7c3aed' },
+  { nivel: 'Fundamental', valores: [312, 270, 246, 218, 195, 185, 164, 144, 122, 114, 110], cor: '#475569' },
+  { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#d97706' },
+];
 
 export const GRANDES_AREAS_EVOLUCAO = {
   anos: ['2022', '2023', '2024', '2025', '2026'],
