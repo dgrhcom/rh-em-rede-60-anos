@@ -83,15 +83,17 @@ export function App() {
         }}
       />
 
-      {/* Top Main Navigation Header */}
-      <Header
-        isCentered={isFanIdle && currentView === 'timeline'}
-        currentView={currentView}
-        onNavigate={(view) => setCurrentView(view)}
-      />
+      {/* Top Main Navigation Header (Timeline only) */}
+      {currentView === 'timeline' && (
+        <Header
+          isCentered={isFanIdle}
+          currentView={currentView}
+          onNavigate={(view) => setCurrentView(view)}
+        />
+      )}
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
-      <main className="flex-1 w-full relative pt-14 z-10">
+      <main className={`flex-1 w-full relative z-10 ${currentView === 'timeline' ? 'pt-14' : 'pt-2 sm:pt-4'}`}>
         {currentView === 'timeline' ? (
           <ContinuousTimeline
             periods={periods}

@@ -149,78 +149,18 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-3.5rem)] text-slate-900 pb-20 px-3 sm:px-6 md:px-8 max-w-6xl mx-auto flex flex-col justify-between select-none">
-      {/* ================= PRESENTATION TOP BAR ================= */}
-      <div className="pt-3 pb-4 flex items-center justify-between gap-4 border-b border-black/15">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              soundFx.playCardTick();
-              onBackToTimeline();
-            }}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs sm:text-sm shadow-md border border-white/20 transition-all cursor-pointer hover:scale-105 active:scale-95 group"
-            title="Voltar à Linha do Tempo contínua (Esc)"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="hidden sm:inline">Voltar à Linha do Tempo</span>
-            <span className="sm:hidden">Linha do Tempo</span>
-          </button>
-
-          <div className="h-5 w-px bg-black/20 hidden sm:block" />
-
-          <div className="hidden sm:block">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#105e7b]">
-              A Gestão de Pessoas nos 60 Anos da Unicamp
-            </span>
-            <div className="text-xs font-black text-slate-900">
-              Painel Comemorativo de Indicadores
-            </div>
-          </div>
-        </div>
-
-        {/* Slide Counter & Mode Badges */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 border border-slate-950 shadow-xs text-xs font-black text-slate-900">
-            <span className="text-[#105e7b]">{currentSlideIndex + 1}</span>
-            <span className="text-slate-400">/</span>
-            <span>{totalSlides}</span>
-          </div>
-
-          <button
-            onClick={toggleFullscreen}
-            className="p-2 rounded-full bg-white/90 hover:bg-white text-slate-900 border border-slate-950 shadow-xs transition-all cursor-pointer hover:scale-105 active:scale-95"
-            title="Alternar Tela Cheia para Apresentação"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
-
+    <div className="w-full min-h-[calc(100vh-2rem)] text-slate-900 pb-12 px-3 sm:px-6 md:px-8 max-w-6xl mx-auto flex flex-col justify-center select-none">
       {/* ================= PRESENTATION SLIDE STAGE ================= */}
-      <div className="flex-1 my-4 flex flex-col justify-center">
+      <div className="flex-1 my-2 sm:my-4 flex flex-col justify-center">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-8 md:p-10 shadow-2xl transition-all duration-300 relative overflow-hidden min-h-[540px] flex flex-col justify-between">
           {/* Header of the Current Slide */}
-          <div className="border-b border-black/10 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#105e7b] mb-1">
-                <span className="px-2.5 py-0.5 rounded-full bg-[#105e7b] text-white text-[10px]">
-                  {currentSlide.category}
-                </span>
-                <span>• Slide {currentSlideIndex + 1} de {totalSlides}</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
-                {currentSlide.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
-                {currentSlide.subtitle}
-              </p>
-            </div>
-
-            <div className="hidden md:flex items-center gap-1 text-[11px] font-bold text-slate-400">
-              <span>Navegue com</span>
-              <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300 font-mono text-slate-700">⬅</kbd>
-              <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-300 font-mono text-slate-700">➡</kbd>
-            </div>
+          <div className="border-b border-black/10 pb-3 mb-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
+              {currentSlide.title}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
+              {currentSlide.subtitle}
+            </p>
           </div>
 
           {/* ================= SLIDE 1: SERVIDORES POR ÁREA ================= */}
@@ -321,14 +261,28 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
 
           {/* Slide Footer with Dots Navigation */}
           <div className="pt-4 mt-4 border-t border-black/10 flex items-center justify-between">
-            <button
-              onClick={handlePrevSlide}
-              disabled={currentSlideIndex === 0}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-900 font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Anterior</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrevSlide}
+                disabled={currentSlideIndex === 0}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-900 font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Anterior</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundFx.playCardTick();
+                  onBackToTimeline();
+                }}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
+                title="Voltar à Linha do Tempo (Esc)"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Linha do Tempo (Esc)</span>
+              </button>
+            </div>
 
             {/* Dots */}
             <div className="flex items-center gap-1.5">
@@ -344,19 +298,29 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                       ? 'w-7 bg-[#105e7b]'
                       : 'w-2.5 bg-slate-300 hover:bg-slate-400'
                   }`}
-                  title={`Ir para o slide ${idx + 1}`}
+                  title={`Slide ${idx + 1}`}
                 />
               ))}
             </div>
 
-            <button
-              onClick={handleNextSlide}
-              disabled={currentSlideIndex === totalSlides - 1}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-            >
-              <span>Próximo</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleFullscreen}
+                className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+                title="Tela Cheia"
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+
+              <button
+                onClick={handleNextSlide}
+                disabled={currentSlideIndex === totalSlides - 1}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+              >
+                <span>Próximo</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
