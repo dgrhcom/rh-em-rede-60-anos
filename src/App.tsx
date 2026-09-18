@@ -23,6 +23,7 @@ export function App() {
   const [selectedPhotoPeriod, setSelectedPhotoPeriod] = useState<HistoricalPeriod | null>(null);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
   const [isFanIdle, setIsFanIdle] = useState<boolean>(true);
+  const [isLogoVisible, setIsLogoVisible] = useState<boolean>(false);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -97,6 +98,7 @@ export function App() {
         isCentered={isFanIdle && currentView === 'timeline'}
         currentView={currentView}
         onNavigate={(view) => setCurrentView(view)}
+        logoVisible={isLogoVisible || currentView === 'dashboard' || !isFanIdle}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
@@ -108,6 +110,7 @@ export function App() {
             onSelectPeriod={handleSelectPeriod}
             onOpenPhoto={handleOpenPhoto}
             onFanIdleChange={setIsFanIdle}
+            onLogoVisibilityChange={setIsLogoVisible}
             onOpenDashboard={() => {
               if (typeof window !== 'undefined') {
                 const url = new URL(window.location.href);

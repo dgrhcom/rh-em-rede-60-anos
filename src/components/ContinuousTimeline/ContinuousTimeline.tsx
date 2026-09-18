@@ -14,6 +14,7 @@ interface ContinuousTimelineProps {
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
   onFanIdleChange?: (isIdle: boolean) => void;
   onOpenDashboard?: () => void;
+  onLogoVisibilityChange?: (visible: boolean) => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -23,6 +24,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   onOpenPhoto,
   onFanIdleChange,
   onOpenDashboard,
+  onLogoVisibilityChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -33,13 +35,19 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [cardSpacing, setCardSpacing] = useState(320);
 
-  // Intro animation lifecycle: 'idle_fan' (waiting for user click) -> 'animating' (dealing out) -> 'done'
-  const [introStatus, setIntroStatus] = useState<'idle_fan' | 'animating' | 'done'>('idle_fan');
+  // Intro animation lifecycle:
+  // 'pre_animating': entrance sequence (logo -> deck rises from below -> fan opens -> button appears)
+  // 'idle_fan': resting fan state with button visible, waiting for user click
+  // 'animating': dealing out cards into horizontal timeline
+  // 'done': in continuous timeline mode
+  const [introStatus, setIntroStatus] = useState<'pre_animating' | 'idle_fan' | 'animating' | 'done'>('pre_animating');
+  const [preAnimProgress, setPreAnimProgress] = useState<number>(0);
   const [introProgress, setIntroProgress] = useState<number>(0);
 
   const isIntroActive = introStatus !== 'done';
-  const isFanIdle = introStatus === 'idle_fan';
+  const isFanIdle = introStatus === 'idle_fan' || introStatus === 'pre_animating';
   const isAnimating = introStatus === 'animating';
+  const isPreAnimating = introStatus === 'pre_animating';
 
   // Notify parent component about fan idle status
   useEffect(() => {
@@ -58,6 +66,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const autoPlayTimerRef = useRef<number | null>(null);
   const tweenRef = useRef<gsap.core.Tween | null>(null);
   const introTweenRef = useRef<gsap.core.Tween | null>(null);
+  const preAnimTweenRef = useRef<gsap.core.Tween | null>(null);
 
   const currentPositionRef = useRef<number>(currentPosition);
   useEffect(() => {
@@ -120,6 +129,77 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     });
   }, [onSelectPeriod, totalPeriods]);
 
+  // Entrance Pre-Animation Sequence:
+  // 1. Logo appears gradually in the center (0.0s -> 0.6s)
+  // 2. Cards rise up from below the screen forming a stacked deck ("monte no centro") (0.6s -> 1.6s)
+  // 3. Deck pauses briefly then fans out into the curved fan (1.6s -> 2.5s)
+  // 4. "Iniciar apresentação" button appears gracefully (2.5s -> 2.8s)
+  const startPreAnimation = useCallback(() => {
+    if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+    if (introTweenRef.current) introTweenRef.current.kill();
+
+    setIntroStatus('pre_animating');
+    setPreAnimProgress(0);
+    onLogoVisibilityChange?.(false);
+
+    // 1. Logo fades in gradually in center
+    const timerLogo = setTimeout(() => {
+      onLogoVisibilityChange?.(true);
+    }, 60);
+
+    const obj = { p: 0 };
+    let tickDeckPlayed = false;
+    let tickFanPlayed = false;
+
+    preAnimTweenRef.current = gsap.to(obj, {
+      p: 1,
+      duration: 2.8,
+      ease: 'none',
+      onUpdate: () => {
+        setPreAnimProgress(obj.p);
+        // Play subtle sound at arrival of deck in center and fan opening
+        if (obj.p >= 0.58 && !tickDeckPlayed) {
+          tickDeckPlayed = true;
+          soundFx.playCardTick();
+        }
+        if (obj.p >= 0.65 && !tickFanPlayed) {
+          tickFanPlayed = true;
+          soundFx.playCardTick();
+        }
+      },
+      onComplete: () => {
+        preAnimTweenRef.current = null;
+        setPreAnimProgress(1);
+        setIntroStatus('idle_fan');
+        onLogoVisibilityChange?.(true);
+        soundFx.playCardTick();
+      },
+    });
+
+    return () => {
+      clearTimeout(timerLogo);
+      if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+    };
+  }, [onLogoVisibilityChange]);
+
+  // Run pre-animation on mount
+  useEffect(() => {
+    const cleanup = startPreAnimation();
+    return () => {
+      cleanup?.();
+    };
+  }, [startPreAnimation]);
+
+  // Skip pre-animation immediately to resting fan state
+  const skipPreAnim = useCallback(() => {
+    if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+    preAnimTweenRef.current = null;
+    onLogoVisibilityChange?.(true);
+    setPreAnimProgress(1);
+    setIntroStatus('idle_fan');
+    soundFx.playCardTick();
+  }, [onLogoVisibilityChange]);
+
   // Execute Opening Animation: strictly guarantees all cards are unselected at start,
   // animates cards dealing out from the 3D fan, and selects the first card (index 0) by default upon completion.
   const executeOpeningAnimation = useCallback(() => {
@@ -166,23 +246,26 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     slideToIndex(0);
   }, [slideToIndex]);
 
-  // Reset to initial 3D fan view (idle state with all cards unselected)
+  // Reset to initial 3D fan view (re-runs the entrance sequence)
   const handleReplayIntro = useCallback(() => {
     if (introTweenRef.current) introTweenRef.current.kill();
+    if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (tweenRef.current) tweenRef.current.kill();
     prevActiveIndexRef.current = null;
     currentPositionRef.current = 0;
     onSelectPeriod(null);
     setCurrentPosition(0);
     setIntroProgress(0);
-    setIntroStatus('idle_fan');
+    startPreAnimation();
     soundFx.playCardTick();
-  }, [onSelectPeriod]);
+  }, [onSelectPeriod, startPreAnimation]);
 
-  // Cleanup tween on unmount
+  // Cleanup tweens on unmount
   useEffect(() => {
     return () => {
       if (introTweenRef.current) introTweenRef.current.kill();
+      if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+      if (tweenRef.current) tweenRef.current.kill();
     };
   }, []);
 
@@ -219,6 +302,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isPreAnimating) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          skipPreAnim();
+        }
+        return;
+      }
+
       if (isFanIdle) {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -259,7 +350,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFanIdle, isAnimating, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod, onOpenDashboard, totalPeriods]);
+  }, [isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod, onOpenDashboard, totalPeriods]);
 
   // Mouse wheel navigation
   useEffect(() => {
@@ -376,8 +467,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       onPointerCancel={handlePointerUp}
     >
       {/* ================= 1. INTRO 3D FAN OVERLAY (Cards + Start Button Only) ================= */}
-      {isFanIdle && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-[136px] sm:pb-[152px] md:pb-[168px]">
+      {(introStatus === 'idle_fan' || introStatus === 'pre_animating') && (
+        <div
+          className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-[136px] sm:pb-[152px] md:pb-[168px] transition-all duration-300"
+          style={{
+            opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, (preAnimProgress - 0.90) / 0.10),
+            transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, (preAnimProgress - 0.90) / 0.10)) * 18}px)`,
+            pointerEvents: introStatus === 'idle_fan' || preAnimProgress >= 0.95 ? 'auto' : 'none',
+          }}
+        >
           <div className="pointer-events-auto">
             <button
               onClick={executeOpeningAnimation}
@@ -411,7 +509,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             isFanIdle ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'
           }`}
           onClick={() => {
-            if (isFanIdle) {
+            if (introStatus === 'pre_animating') {
+              skipPreAnim();
+            } else if (introStatus === 'idle_fan') {
               executeOpeningAnimation();
             }
           }}
@@ -459,7 +559,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               targetZIndex = Math.round(50 - absOffset * 4);
             }
 
-            // Calculations during Intro Animation (interpolating from center 3D fan stack to timeline)
+            // Calculations during Intro Animation / Pre-animation / Idle fan
             let currentX = targetX;
             let currentY = 0;
             let currentRot = 0;
@@ -470,31 +570,79 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             if (isIntroActive) {
               // 3D Fan Stack initial values (13 items total: 12 cards + cover, centered symmetrically at 6.0)
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const angleStep = isMobile ? 3.2 : 4.4; // Closed fan tilt (cards closer together)
-              const spreadStep = isMobile ? 13 : 20; // Closed horizontal spread (cards closer together)
-              const arcStep = isMobile ? 2.8 : 3.8;
-              const arcBase = isMobile ? 8 : 12;
+              const angleStep = isMobile ? 2.4 : 3.2; // Closed fan tilt (cards closer together)
+              const spreadStep = isMobile ? 10 : 14;  // Closed horizontal spread (cards closer together)
+              const arcStep = isMobile ? 2.2 : 2.8;   // Gentle natural arc
+              const arcBase = isMobile ? 6 : 8;
 
               const fanDelta = idx - 6.0; // Symmetrical around 6.0 for 13 items (0..12)
-              const fanAngle = fanDelta * angleStep;
-              const fanX = fanDelta * spreadStep;
-              const fanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
+              const finalFanAngle = fanDelta * angleStep;
+              const finalFanX = fanDelta * spreadStep;
+              const finalFanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
               const fanScale = isMobile ? 0.64 : 0.76;
               const fanZ = 30 + idx;
 
-              // Staggered deal interpolation
-              const staggerStart = idx * 0.042;
-              const dealDuration = 0.52;
-              const rawP = Math.max(0, Math.min(1, (introProgress - staggerStart) / dealDuration));
-              // Ease out function
-              const p = 1 - Math.pow(1 - rawP, 3);
+              if (introStatus === 'pre_animating') {
+                const p = preAnimProgress;
+                if (p < 0.20) {
+                  // Phase 1: Logo fades in in center, cards hidden below screen
+                  currentY = 750;
+                  currentX = 0;
+                  currentRot = 0;
+                  currentScale = fanScale * 0.85;
+                  currentOpacity = 0;
+                  currentZIndex = fanZ;
+                } else if (p < 0.58) {
+                  // Phase 2: Cards rise from below to form a deck in the center ("monte no centro")
+                  const riseRaw = (p - 0.20) / (0.58 - 0.20);
+                  const riseP = 1 - Math.pow(1 - riseRaw, 3);
+                  currentY = 750 * (1 - riseP) + (idx - 6) * -0.4;
+                  currentX = 0;
+                  currentRot = 0;
+                  currentScale = (fanScale * 0.85) + (fanScale * 0.15) * riseP;
+                  currentOpacity = Math.min(1, riseRaw * 3);
+                  currentZIndex = fanZ;
+                } else if (p < 0.64) {
+                  // Phase 3: Hold stacked deck in center
+                  currentY = (idx - 6) * -0.4;
+                  currentX = 0;
+                  currentRot = 0;
+                  currentScale = fanScale;
+                  currentOpacity = 1;
+                  currentZIndex = fanZ;
+                } else {
+                  // Phase 4: Deck opens in fan
+                  const fanRaw = Math.min(1, (p - 0.64) / (0.92 - 0.64));
+                  const fanP = 1 - Math.pow(1 - fanRaw, 3);
+                  currentX = finalFanX * fanP;
+                  currentY = finalFanY * fanP + (1 - fanP) * ((idx - 6) * -0.4);
+                  currentRot = finalFanAngle * fanP;
+                  currentScale = fanScale;
+                  currentOpacity = 1;
+                  currentZIndex = fanZ;
+                }
+              } else if (introStatus === 'animating') {
+                // Staggered deal interpolation into horizontal timeline
+                const staggerStart = idx * 0.042;
+                const dealDuration = 0.52;
+                const rawP = Math.max(0, Math.min(1, (introProgress - staggerStart) / dealDuration));
+                const p = 1 - Math.pow(1 - rawP, 3);
 
-              currentX = fanX + (targetX - fanX) * p;
-              currentY = fanY + (0 - fanY) * p;
-              currentRot = fanAngle * (1 - p);
-              currentScale = fanScale + (targetScale - fanScale) * p;
-              currentOpacity = 1;
-              currentZIndex = Math.round(fanZ + (targetZIndex - fanZ) * p);
+                currentX = finalFanX + (targetX - finalFanX) * p;
+                currentY = finalFanY + (0 - finalFanY) * p;
+                currentRot = finalFanAngle * (1 - p);
+                currentScale = fanScale + (targetScale - fanScale) * p;
+                currentOpacity = 1;
+                currentZIndex = Math.round(fanZ + (targetZIndex - fanZ) * p);
+              } else {
+                // idle_fan
+                currentX = finalFanX;
+                currentY = finalFanY;
+                currentRot = finalFanAngle;
+                currentScale = fanScale;
+                currentOpacity = 1;
+                currentZIndex = fanZ;
+              }
             } else {
               // Limit rendering of distant cards outside intro for high performance
               if (absOffset > 4.5) return null;
@@ -504,10 +652,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               <div
                 key={period.id}
                 className={`absolute transition-shadow duration-300 pointer-events-auto ${
-                  isFanIdle ? 'cursor-pointer hover:scale-[1.03] transition-transform' : ''
+                  introStatus === 'idle_fan' ? 'cursor-pointer hover:scale-[1.03] transition-transform' : ''
                 }`}
                 onClick={(e) => {
-                  if (isFanIdle) {
+                  if (introStatus === 'pre_animating') {
+                    e.stopPropagation();
+                    skipPreAnim();
+                  } else if (introStatus === 'idle_fan') {
                     e.stopPropagation();
                     executeOpeningAnimation();
                   }
@@ -527,7 +678,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   period={period}
                   isActive={isCardActive}
                   onSelect={() => {
-                    if (isFanIdle) {
+                    if (introStatus === 'pre_animating') {
+                      skipPreAnim();
+                    } else if (introStatus === 'idle_fan') {
                       executeOpeningAnimation();
                     } else if (!isIntroActive) {
                       slideToIndex(idx);
@@ -544,36 +697,82 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           {isIntroActive && (
             (() => {
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const angleStep = isMobile ? 3.2 : 4.4;
-              const spreadStep = isMobile ? 13 : 20;
-              const arcStep = isMobile ? 2.8 : 3.8;
-              const arcBase = isMobile ? 8 : 12;
+              const angleStep = isMobile ? 2.4 : 3.2; // Closed fan tilt
+              const spreadStep = isMobile ? 10 : 14;  // Closed horizontal spread
+              const arcStep = isMobile ? 2.2 : 2.8;   // Gentle natural arc
+              const arcBase = isMobile ? 6 : 8;
 
               // Virtual index 12: comes right after card 11 (the last card)
               const fanDelta = 12 - 6.0; // +6.0
-              const fanAngle = fanDelta * angleStep;
-              const fanX = fanDelta * spreadStep;
-              const fanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
+              const finalFanAngle = fanDelta * angleStep;
+              const finalFanX = fanDelta * spreadStep;
+              const finalFanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
               const fanScale = isMobile ? 0.64 : 0.76;
+              const coverZIndex = 55; // Sits on top of the last card & top of the deck
 
-              // Smooth transition during deal animation
-              const coverOpacity = Math.max(0, 1 - introProgress * 2.2);
-              const p = 1 - Math.pow(1 - Math.min(1, introProgress * 1.5), 3);
-              const coverCurrentX = fanX + p * 40;
-              const coverCurrentY = fanY - introProgress * 50;
-              const coverCurrentRot = fanAngle * (1 - introProgress * 0.4);
-              const coverCurrentScale = fanScale + introProgress * 0.08;
-              const coverZIndex = 55; // Sits on top of the last card (card 11 has zIndex = 41)
+              let coverCurrentX = finalFanX;
+              let coverCurrentY = finalFanY;
+              let coverCurrentRot = finalFanAngle;
+              let coverCurrentScale = fanScale;
+              let coverOpacity = 1;
+
+              if (introStatus === 'pre_animating') {
+                const p = preAnimProgress;
+                if (p < 0.20) {
+                  // Phase 1: Logo fades in in center, cover hidden below screen
+                  coverCurrentY = 750;
+                  coverCurrentX = 0;
+                  coverCurrentRot = 0;
+                  coverCurrentScale = fanScale * 0.85;
+                  coverOpacity = 0;
+                } else if (p < 0.58) {
+                  // Phase 2: Cover rises as top card of the deck
+                  const riseRaw = (p - 0.20) / (0.58 - 0.20);
+                  const riseP = 1 - Math.pow(1 - riseRaw, 3);
+                  coverCurrentY = 750 * (1 - riseP) + (12 - 6) * -0.4;
+                  coverCurrentX = 0;
+                  coverCurrentRot = 0;
+                  coverCurrentScale = (fanScale * 0.85) + (fanScale * 0.15) * riseP;
+                  coverOpacity = Math.min(1, riseRaw * 3);
+                } else if (p < 0.64) {
+                  // Phase 3: Hold top of deck in center
+                  coverCurrentY = (12 - 6) * -0.4;
+                  coverCurrentX = 0;
+                  coverCurrentRot = 0;
+                  coverCurrentScale = fanScale;
+                  coverOpacity = 1;
+                } else {
+                  // Phase 4: Fans out to index 12
+                  const fanRaw = Math.min(1, (p - 0.64) / (0.92 - 0.64));
+                  const fanP = 1 - Math.pow(1 - fanRaw, 3);
+                  coverCurrentX = finalFanX * fanP;
+                  coverCurrentY = finalFanY * fanP + (1 - fanP) * ((12 - 6) * -0.4);
+                  coverCurrentRot = finalFanAngle * fanP;
+                  coverCurrentScale = fanScale;
+                  coverOpacity = 1;
+                }
+              } else if (introStatus === 'animating') {
+                // Smooth transition during deal animation into timeline
+                coverOpacity = Math.max(0, 1 - introProgress * 2.2);
+                const p = 1 - Math.pow(1 - Math.min(1, introProgress * 1.5), 3);
+                coverCurrentX = finalFanX + p * 40;
+                coverCurrentY = finalFanY - introProgress * 50;
+                coverCurrentRot = finalFanAngle * (1 - introProgress * 0.4);
+                coverCurrentScale = fanScale + introProgress * 0.08;
+              }
 
               if (coverOpacity <= 0) return null;
 
               return (
                 <div
                   className={`absolute pointer-events-auto transition-transform duration-300 ${
-                    isFanIdle ? 'cursor-pointer hover:scale-[1.03]' : ''
+                    introStatus === 'idle_fan' ? 'cursor-pointer hover:scale-[1.03]' : ''
                   }`}
                   onClick={(e) => {
-                    if (isFanIdle) {
+                    if (introStatus === 'pre_animating') {
+                      e.stopPropagation();
+                      skipPreAnim();
+                    } else if (introStatus === 'idle_fan') {
                       e.stopPropagation();
                       executeOpeningAnimation();
                     }
