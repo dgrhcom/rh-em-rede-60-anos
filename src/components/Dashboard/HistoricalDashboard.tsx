@@ -8,14 +8,6 @@ import {
   Sparkles,
   TrendingUp,
   LayoutGrid,
-  Users,
-  CalendarClock,
-  HeartHandshake,
-  GraduationCap,
-  ZoomIn,
-  PieChart,
-  Trophy,
-  Globe2,
   Play,
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundEffects';
@@ -43,9 +35,19 @@ interface SlideDefinition {
   title: string;
   subtitle: string;
   tag: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
 }
+
+// Deep, vibrant auxiliary and secondary design system colors for each chart card
+export const SLIDE_BG_COLORS = [
+  'bg-[#5e2a6b]', // 0: Gênero - Aux 2 (Roxo DGRH)
+  'bg-[#d67b27]', // 1: Faixa Etária - Aux 3 (Laranja DGRH)
+  'bg-[#477b2f]', // 2: Raça / Cor - Aux 1 (Verde DGRH)
+  'bg-[#6b213b]', // 3: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
+  'bg-[#c05621]', // 4: Escolaridade Zoom - Aux 3 (Terracota)
+  'bg-[#366023]', // 5: Áreas da Unicamp - Aux 1 (Verde Floresta)
+  'bg-[#b8801a]', // 6: Top 20 Cargos - Secundária (Dourado Profundo 60 Anos)
+  'bg-[#701a75]', // 7: Nacionalidades - Aux 2 (Ameixa DGRH)
+];
 
 const SLIDES: SlideDefinition[] = [
   {
@@ -54,8 +56,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Distribuição Geral por Gênero',
     subtitle: 'Composição feminina e masculina no quadro geral e por carreira na Unicamp',
     tag: 'Gênero',
-    icon: Users,
-    color: 'from-blue-500/15 to-indigo-500/15 text-blue-700 border-blue-200',
   },
   {
     id: 'faixaEtaria',
@@ -63,8 +63,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Perfil Etário dos Servidores por Categoria',
     subtitle: 'Distribuição por faixas etárias diferenciando Docentes, Pesquisadores e Técnicos-Administrativos',
     tag: 'Faixa Etária',
-    icon: CalendarClock,
-    color: 'from-amber-500/15 to-orange-500/15 text-amber-700 border-amber-200',
   },
   {
     id: 'racaCor',
@@ -72,8 +70,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Distribuição Étnico-Racial dos Servidores',
     subtitle: 'Autodeclaração geral de raça/cor e detalhamento por carreira funcional na Universidade',
     tag: 'Raça / Cor',
-    icon: HeartHandshake,
-    color: 'from-rose-500/15 to-pink-500/15 text-rose-700 border-rose-200',
   },
   {
     id: 'escolaridadeGeral',
@@ -81,8 +77,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Evolução da Escolaridade PAEPE (2016 - 2026)',
     subtitle: 'Histórico decenal de todos os níveis de formação dos servidores técnico-administrativos',
     tag: 'Escolaridade',
-    icon: GraduationCap,
-    color: 'from-emerald-500/15 to-teal-500/15 text-emerald-700 border-emerald-200',
   },
   {
     id: 'escolaridadeZoom',
@@ -90,8 +84,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Evolução da Escolaridade PAEPE (Zoom em Detalhe)',
     subtitle: 'Foco ampliado em Mestrado, Fundamental, Doutorado, Fundamental Incompleto e Maior que Doutorado',
     tag: 'Pós-Graduação',
-    icon: ZoomIn,
-    color: 'from-sky-500/15 to-cyan-500/15 text-sky-700 border-sky-200',
   },
   {
     id: 'areas',
@@ -99,8 +91,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Servidores Ativos - Por Área da Universidade',
     subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
     tag: 'Áreas da Unicamp',
-    icon: PieChart,
-    color: 'from-teal-500/15 to-emerald-500/15 text-teal-700 border-teal-200',
   },
   {
     id: 'cargos',
@@ -108,8 +98,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Ranking dos 20 Maiores Cargos em 2026',
     subtitle: 'As 20 funções e carreiras com maior número de profissionais em atividade',
     tag: 'Top 20 Cargos',
-    icon: Trophy,
-    color: 'from-purple-500/15 to-violet-500/15 text-purple-700 border-purple-200',
   },
   {
     id: 'nacionalidade',
@@ -117,8 +105,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Docentes e Pesquisadores por Nacionalidade',
     subtitle: 'Origem geográfica e presença internacional na pesquisa e docência da Unicamp',
     tag: 'Nacionalidades',
-    icon: Globe2,
-    color: 'from-indigo-500/15 to-blue-500/15 text-indigo-700 border-indigo-200',
   },
 ];
 
@@ -224,88 +210,107 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
 
   return (
     <div className="w-full text-slate-900 px-2 sm:px-4 max-w-[1400px] mx-auto flex flex-col items-center justify-center select-none py-1">
-      {/* ================= PRESENTATION SLIDE STAGE ================= */}
-      <div className="w-full flex flex-col justify-center my-auto items-center">
-        <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between">
-          {/* Header of the Current Slide or Index */}
-          <div className="border-b border-black/10 pb-2 mb-2 shrink-0 flex items-center justify-between">
-            <div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight flex items-center gap-2.5">
-                {isIndex ? (
-                  <>
-                    <div className="p-1.5 rounded-xl bg-[#105e7b]/10 text-[#105e7b]">
-                      <LayoutGrid className="w-5 h-5" />
+      {isIndex ? (
+        /* ================= 1. ÍNDICE DE GRÁFICOS (SEM CONTAINER DE FUNDO) ================= */
+        <div className="w-full max-w-[1360px] flex flex-col justify-center my-auto py-2">
+          {/* Grid de 8 Cards no estilo dos cards da linha do tempo */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
+            {SLIDES.map((slide, idx) => {
+              const cardBg = SLIDE_BG_COLORS[idx % SLIDE_BG_COLORS.length];
+              return (
+                <button
+                  key={slide.id}
+                  onClick={() => {
+                    soundFx.playCardTick();
+                    setCurrentSlideIndex(idx);
+                  }}
+                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[220px] sm:min-h-[240px]`}
+                >
+                  <div>
+                    {/* Topo: Categoria e Número do Card */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider border border-white/30 shadow-xs">
+                        {slide.category}
+                      </span>
+                      <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
+                        {idx + 1}
+                      </span>
                     </div>
-                    <span>Índice de Indicadores & Gráficos</span>
-                  </>
-                ) : (
-                  currentSlide?.title
-                )}
-              </h2>
-              {!isIndex && (
+
+                    {/* Título */}
+                    <h3 className="text-base sm:text-lg font-black text-white leading-snug tracking-tight">
+                      {slide.title}
+                    </h3>
+
+                    {/* Subtítulo em tom claro */}
+                    <p className="text-xs sm:text-[13px] text-white/85 font-medium leading-relaxed mt-2 line-clamp-3">
+                      {slide.subtitle}
+                    </p>
+                  </div>
+
+                  {/* Rodapé do Card: Tag e Ação (Sem ícones) */}
+                  <div className="pt-3 border-t border-white/20 flex items-center justify-between mt-4 text-xs font-bold text-white/90">
+                    <span className="truncate">{slide.tag}</span>
+                    <span className="shrink-0 font-black text-white group-hover:translate-x-1 transition-transform">
+                      Ver gráfico →
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Barra Inferior do Índice: Voltar à Linha do Tempo e Iniciar Apresentação */}
+          <div className="w-full flex items-center justify-between pt-6 px-1 shrink-0">
+            <button
+              onClick={onBackToTimeline}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80"
+              title="Voltar à Linha do Tempo Contínua"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Linha do Tempo</span>
+            </button>
+
+            <button
+              onClick={() => {
+                soundFx.playCardTick();
+                setCurrentSlideIndex(0);
+              }}
+              className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 group"
+              title="Iniciar Apresentação a partir do 1º gráfico"
+            >
+              <Play className="w-4 h-4 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
+              <span>Iniciar Apresentação</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO BRANCO) ================= */
+        <div className="w-full flex flex-col justify-center my-auto items-center">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between">
+            {/* Header of the Current Slide */}
+            <div className="border-b border-black/10 pb-2 mb-2 shrink-0 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
+                  {currentSlide?.title}
+                </h2>
                 <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
                   {currentSlide?.subtitle}
                 </p>
-              )}
-            </div>
-            {!isIndex && (
+              </div>
               <button
                 onClick={() => {
                   soundFx.playCardTick();
                   setCurrentSlideIndex(-1);
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all cursor-pointer border border-slate-300 shadow-xs"
                 title="Voltar ao Índice de Cards"
               >
                 <LayoutGrid className="w-3.5 h-3.5 text-[#105e7b]" />
                 <span>Ver Índice</span>
               </button>
-            )}
-          </div>
-
-          {/* ================= BODY: INDEX CARD GRID (WHEN isIndex) ================= */}
-          {isIndex && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 flex-1 min-h-0 py-1">
-              {SLIDES.map((slide, idx) => {
-                const IconComponent = slide.icon;
-                return (
-                  <button
-                    key={slide.id}
-                    onClick={() => {
-                      soundFx.playCardTick();
-                      setCurrentSlideIndex(idx);
-                    }}
-                    className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white hover:bg-gradient-to-br hover:from-white hover:to-slate-50 border-2 border-slate-200 hover:border-[#105e7b] shadow-xs hover:shadow-lg transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-0.5"
-                  >
-                    <div>
-                      {/* Icon and Title */}
-                      <div className="flex items-start gap-2.5 mb-1.5">
-                        <div className={`p-2 rounded-xl bg-gradient-to-br ${slide.color} shrink-0 group-hover:scale-105 transition-transform`}>
-                          <IconComponent className="w-4 h-4" />
-                        </div>
-                        <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-snug group-hover:text-[#105e7b] transition-colors line-clamp-2">
-                          {slide.title}
-                        </h3>
-                      </div>
-
-                      {/* Subtitle / Description */}
-                      <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-3">
-                        {slide.subtitle}
-                      </p>
-                    </div>
-
-                    {/* Bottom bar of card */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-1 text-[11px] font-bold text-slate-400 group-hover:text-[#105e7b] transition-colors">
-                      <span>{slide.tag}</span>
-                      <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        Ver gráfico <ChevronRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
             </div>
-          )}
 
           {/* ================= SLIDE 1: GÊNERO ================= */}
           {currentSlideIndex === 0 && (
@@ -489,34 +494,20 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
 
-              {isIndex ? (
-                <button
-                  onClick={() => {
-                    soundFx.playCardTick();
-                    setCurrentSlideIndex(0);
-                  }}
-                  className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#105e7b] hover:bg-[#0c4960] text-white font-black text-xs shadow-md transition-all cursor-pointer group"
-                  title="Iniciar apresentação a partir do 1º gráfico (Seta Direita / Espaço)"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Iniciar</span>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              ) : (
-                <button
-                  onClick={handleNextSlide}
-                  disabled={currentSlideIndex === totalSlides - 1}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-                  title="Próximo Slide (Seta Direita / Espaço)"
-                >
-                  <span>Próximo</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
+              <button
+                onClick={handleNextSlide}
+                disabled={currentSlideIndex === totalSlides - 1}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                title="Próximo Slide (Seta Direita / Espaço)"
+              >
+                <span>Próximo</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
