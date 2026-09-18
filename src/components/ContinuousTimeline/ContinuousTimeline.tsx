@@ -142,7 +142,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   // 1. Logo appears gradually in the center of the screen with bottom-up mask reveal (~2s duration)
   // 2. At p >= 0.28, cards enter swiftly from left to right pushing the logo up to the top and assembling into the center deck
   // 3. Stacked deck pauses briefly, then fans out into an extra-tight curved fan
-  // 4. Exactly 0.5s after fan opens, the "Iniciar apresentação" button appears gracefully
+  // 4. Practically right as the fan opens, the "Iniciar apresentação" button appears gracefully
   const startPreAnimation = useCallback(() => {
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (introTweenRef.current) introTweenRef.current.kill();
@@ -516,11 +516,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         <div
           className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-[136px] sm:pb-[152px] md:pb-[168px] transition-all duration-500"
           style={{
-            opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, Math.min(1, (preAnimProgress - 0.84) / 0.14)),
-            transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, Math.min(1, (preAnimProgress - 0.84) / 0.14))) * 18}px)`,
+            opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, Math.min(1, (preAnimProgress - 0.78) / 0.12)),
+            transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, Math.min(1, (preAnimProgress - 0.78) / 0.12))) * 18}px)`,
           }}
         >
-          <div className={introStatus === 'idle_fan' || preAnimProgress >= 0.90 ? 'pointer-events-auto' : 'pointer-events-none'}>
+          <div className={introStatus === 'idle_fan' || preAnimProgress >= 0.82 ? 'pointer-events-auto' : 'pointer-events-none'}>
             <button
               onClick={executeOpeningAnimation}
               className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
