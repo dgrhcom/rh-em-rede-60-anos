@@ -101,7 +101,7 @@ export const AreasStackedBarChart: React.FC = () => {
             tooltip: {
               padding: 12,
               callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
               },
             },
           },
@@ -171,7 +171,7 @@ export const GeneroCharts: React.FC = () => {
                 },
                 tooltip: {
                   callbacks: {
-                    label: (ctx) => {
+                    label: (ctx: any) => {
                       const val = Number(ctx.raw);
                       const pct = ctx.dataIndex === 0 ? GENERO_DATA.total.pctFeminino : GENERO_DATA.total.pctMasculino;
                       return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
@@ -214,7 +214,7 @@ export const GeneroCharts: React.FC = () => {
                 y: {
                   max: 100,
                   ticks: {
-                    callback: (val) => `${val}%`,
+                    callback: (val: any) => `${val}%`,
                     font: { weight: 'bold', size: 11 },
                     color: '#64748b',
                   },
@@ -236,7 +236,7 @@ export const GeneroCharts: React.FC = () => {
                 },
                 tooltip: {
                   callbacks: {
-                    label: (ctx) => {
+                    label: (ctx: any) => {
                       const careerIdx = ctx.dataIndex;
                       const career = GENERO_DATA.porCarreira[careerIdx];
                       const count = ctx.datasetIndex === 0 ? career.feminino : career.masculino;
@@ -324,7 +324,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
               ticks: {
                 font: { weight: 'bold', size: 11 },
                 color: '#64748b',
-                callback: (val) => Number(val).toLocaleString('pt-BR'),
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             x: {
@@ -337,7 +337,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
             tooltip: {
               padding: 12,
               callbacks: {
-                label: (ctx) => {
+                label: (ctx: any) => {
                   const item = FAIXA_ETARIA_DATA[ctx.dataIndex];
                   return ` ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1)}% do quadro)`;
                 },
@@ -401,7 +401,7 @@ export const RacaCorBarChart: React.FC = () => {
               ticks: {
                 font: { weight: 'bold', size: 11 },
                 color: '#64748b',
-                callback: (val) => Number(val).toLocaleString('pt-BR'),
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             y: {
@@ -413,7 +413,7 @@ export const RacaCorBarChart: React.FC = () => {
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => {
+                label: (ctx: any) => {
                   const item = RACA_COR_DATA[ctx.dataIndex];
                   return ` ${item.total.toLocaleString('pt-BR')} (${item.pct.toFixed(1)}%)`;
                 },
@@ -484,7 +484,7 @@ export const EscolaridadeComparisonChart: React.FC = () => {
               ticks: {
                 font: { weight: 'bold', size: 11 },
                 color: '#64748b',
-                callback: (val) => Number(val).toLocaleString('pt-BR'),
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             x: {
@@ -503,7 +503,7 @@ export const EscolaridadeComparisonChart: React.FC = () => {
             },
             tooltip: {
               callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
+                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')} servidores`,
               },
             },
           },
@@ -563,7 +563,7 @@ export const GrandesAreasLineChart: React.FC = () => {
               ticks: {
                 font: { weight: 'bold', size: 11 },
                 color: '#64748b',
-                callback: (val) => Number(val).toLocaleString('pt-BR'),
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             x: {
@@ -584,7 +584,7 @@ export const GrandesAreasLineChart: React.FC = () => {
             tooltip: {
               padding: 10,
               callbacks: {
-                label: (ctx) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')}`,
+                label: (ctx: any) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString('pt-BR')}`,
               },
             },
           },
@@ -645,7 +645,7 @@ export const TopCargosBarChart: React.FC = () => {
               ticks: {
                 font: { weight: 'bold', size: 11 },
                 color: '#64748b',
-                callback: (val) => Number(val).toLocaleString('pt-BR'),
+                callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             y: {
@@ -657,7 +657,7 @@ export const TopCargosBarChart: React.FC = () => {
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (ctx) => {
+                label: (ctx: any) => {
                   const cargo = top10[ctx.dataIndex];
                   return ` ${cargo.quantidade.toLocaleString('pt-BR')} servidores (${cargo.categoria})`;
                 },
@@ -732,7 +732,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 },
                 tooltip: {
                   callbacks: {
-                    label: (ctx) => {
+                    label: (ctx: any) => {
                       const val = Number(ctx.raw);
                       const pct = ctx.dataIndex === 0 ? '94,9%' : '5,1%';
                       return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct})`;
@@ -779,7 +779,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 legend: { display: false },
                 tooltip: {
                   callbacks: {
-                    label: (ctx) => {
+                    label: (ctx: any) => {
                       const item = NACIONALIDADES_DATA.regioesEstrangeiros[ctx.dataIndex];
                       return ` ${item.total} pesquisadores/docentes (${item.pct.toFixed(1)}%)`;
                     },

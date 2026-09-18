@@ -11,10 +11,8 @@ import {
 import { soundFx } from '../../utils/soundEffects';
 import {
   SERVIDORES_POR_AREA,
-  GENERO_DATA,
   DESTAQUE_FAIXA_ETARIA,
   RACA_COR_DATA,
-  NACIONALIDADES_DATA,
 } from '../../data/hrStatsData';
 import {
   AreasStackedBarChart,
