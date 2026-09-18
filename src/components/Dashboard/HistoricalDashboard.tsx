@@ -96,8 +96,8 @@ const SLIDES: SlideDefinition[] = [
   {
     id: 'areas',
     category: 'Estrutura Institucional',
-    title: 'Servidores Ativos por Área da Universidade',
-    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração, Centros e Colégios',
+    title: 'Servidores Ativos - Por Área da Universidade',
+    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
     tag: 'Áreas da Unicamp',
     icon: PieChart,
     color: 'from-teal-500/15 to-emerald-500/15 text-teal-700 border-teal-200',

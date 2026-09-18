@@ -11,11 +11,11 @@ export interface AreaDistribution {
 }
 
 export const SERVIDORES_POR_AREA: AreaDistribution[] = [
-  { tipoOrgao: 'Faculdades e Institutos', docentes: 1792, pesquisadores: 4, tecnicos: 1829, total: 3625, percentual: 38.5, cor: '#2e7d32' },
-  { tipoOrgao: 'Área da Saúde', docentes: 0, pesquisadores: 1, tecnicos: 3022, total: 3023, percentual: 32.1, cor: '#ea580c' },
   { tipoOrgao: 'Administração Central', docentes: 19, pesquisadores: 0, tecnicos: 2069, total: 2088, percentual: 22.2, cor: '#0284c7' },
   { tipoOrgao: 'Centros e Núcleos', docentes: 0, pesquisadores: 87, tecnicos: 350, total: 437, percentual: 4.6, cor: '#eab308' },
   { tipoOrgao: 'Colégios', docentes: 181, pesquisadores: 0, tecnicos: 62, total: 243, percentual: 2.6, cor: '#7e22ce' },
+  { tipoOrgao: 'Faculdades e Institutos', docentes: 1792, pesquisadores: 4, tecnicos: 1829, total: 3625, percentual: 38.5, cor: '#2e7d32' },
+  { tipoOrgao: 'Área da Saúde', docentes: 0, pesquisadores: 1, tecnicos: 3022, total: 3023, percentual: 32.1, cor: '#ea580c' },
 ];
 
 export const TOTAL_SERVIDORES_ATIVOS = 9416;
@@ -112,20 +112,6 @@ export const ESCOLARIDADE_ZOOM_SERIES = [
   { nivel: 'Fundamental Incompleto', valores: [152, 134, 125, 107, 96, 87, 77, 66, 60, 53, 52], cor: '#d97706' },
   { nivel: 'Maior que Doutorado', valores: [9, 8, 9, 10, 10, 14, 20, 25, 23, 26, 28], cor: '#0ea5e9' },
 ];
-
-export const GRANDES_AREAS_EVOLUCAO = {
-  anos: ['2022', '2023', '2024', '2025', '2026'],
-  areas: [
-    { area: 'Saúde', valores: [2687, 2770, 2879, 3053, 3042], cor: '#b43a2b' },
-    { area: 'Educação, Pesquisa e Ciência', valores: [2798, 2839, 2871, 2887, 2882], cor: '#105e7b' },
-    { area: 'Administração e RH', valores: [1752, 1786, 1923, 2082, 2087], cor: '#e5a93a' },
-    { area: 'Tecnologia da Informação (TI)', valores: [500, 504, 570, 583, 586], cor: '#0284c7' },
-    { area: 'Manutenção e Serviços Operacionais', valores: [263, 249, 245, 252, 251], cor: '#d97706' },
-    { area: 'Comunicação, Cultura e Arte', valores: [183, 184, 184, 200, 204], cor: '#9333ea' },
-    { area: 'Engenharia e Arquitetura', valores: [164, 163, 176, 190, 196], cor: '#059669' },
-    { area: 'Serviços Gerais e Segurança', valores: [169, 160, 152, 145, 143], cor: '#475569' },
-  ],
-};
 
 export const TOP_CARGOS_2026 = [
   { cargo: 'Técnico em Administração (PAEPE)', quantidade: 1430, categoria: 'Técnico-Administrativo' },
