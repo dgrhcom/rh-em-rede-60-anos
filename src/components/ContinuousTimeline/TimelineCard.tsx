@@ -153,16 +153,13 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
           {/* ================= COLUNA 2: MARCOS HISTÓRICOS (SEM RESUMO ACIMA) ================= */}
           <div className="flex flex-col justify-between h-full min-w-0 sm:border-l-2 sm:border-white/20 sm:pl-5 lg:pl-6 text-left">
             {/* Header da Coluna 2 */}
-            <div className="flex items-center justify-between pb-2 border-b-2 border-white/20 shrink-0">
+            <div className="flex items-center pb-2 border-b-2 border-white/20 shrink-0">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#e5a93a]" />
                 <h4 className="text-xs sm:text-sm lg:text-base font-black uppercase tracking-wider text-white">
                   Marcos Históricos
                 </h4>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-black text-xs shrink-0">
-                {period.milestones.length} marcos
-              </span>
             </div>
 
             {/* Lista de Marcos com Fonte Aumentada */}
