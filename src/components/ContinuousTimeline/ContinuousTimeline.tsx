@@ -506,10 +506,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           style={{
             opacity: introStatus === 'idle_fan' ? 1 : Math.max(0, (preAnimProgress - 0.90) / 0.10),
             transform: `translateY(${introStatus === 'idle_fan' ? 0 : (1 - Math.max(0, (preAnimProgress - 0.90) / 0.10)) * 18}px)`,
-            pointerEvents: introStatus === 'idle_fan' || preAnimProgress >= 0.95 ? 'auto' : 'none',
           }}
         >
-          <div className="pointer-events-auto">
+          <div className={introStatus === 'idle_fan' || preAnimProgress >= 0.95 ? 'pointer-events-auto' : 'pointer-events-none'}>
             <button
               onClick={executeOpeningAnimation}
               className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
@@ -541,9 +540,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           className={`relative z-10 w-full h-full flex items-center justify-center ${
             isFanIdle ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'
           }`}
+          onMouseLeave={() => {
+            if (introStatus === 'idle_fan') {
+              setHoveredCardIndex(null);
+            }
+          }}
           style={{
             perspective: '1200px',
-            transformStyle: 'preserve-3d',
           }}
           onClick={() => {
             if (introStatus === 'pre_animating') {
@@ -627,24 +630,24 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 const cardDur = 0.09;
 
                 if (p < cardStart) {
-                  // Phase 1: Waiting below screen, vertical/portrait, hidden
-                  currentY = 750;
+                  // Phase 1: Waiting below screen, horizontal (deitada), hidden
+                  currentY = 780;
                   currentX = 0;
-                  currentRot = 0;
-                  currentRotX = 14;
-                  currentScale = fanScale * 0.92;
+                  currentRot = -90;
+                  currentRotX = 65;
+                  currentScale = fanScale * 0.88;
                   currentOpacity = 0;
                   currentZIndex = fanZ;
                 } else if (p < cardStart + cardDur) {
-                  // Phase 2: Rising vertically into the deck cleanly without cutting the previous card
+                  // Phase 2: Rising from horizontal (deitada) to vertical (em pé) into the central deck
                   const rawRise = (p - cardStart) / cardDur;
                   const riseP = 1 - Math.pow(1 - rawRise, 3);
-                  currentY = 750 * (1 - riseP) + (idx - 6) * -0.5;
+                  currentY = 780 * (1 - riseP) + (idx - 6) * -0.5;
                   currentX = 0;
-                  currentRot = 0;
-                  currentRotX = 14 * (1 - riseP);
-                  currentScale = (fanScale * 0.92) + (fanScale * 0.08) * riseP;
-                  currentOpacity = Math.min(1, rawRise * 2.5);
+                  currentRot = -90 * (1 - riseP);
+                  currentRotX = 65 * (1 - riseP);
+                  currentScale = (fanScale * 0.88) + (fanScale * 0.12) * riseP;
+                  currentOpacity = Math.min(1, rawRise * 2.8);
                   currentZIndex = fanZ;
                 } else if (p < 0.67) {
                   // Phase 3: Resting in central stacked deck ("monte no centro")
@@ -827,23 +830,23 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 const cardDur = 0.09;
 
                 if (p < cardStart) {
-                  // Phase 1: Waiting below screen, vertical/portrait, hidden
-                  coverCurrentY = 750;
+                  // Phase 1: Waiting below screen, horizontal (deitada), hidden
+                  coverCurrentY = 780;
                   coverCurrentX = 0;
-                  coverCurrentRot = 0;
-                  coverCurrentRotX = 14;
-                  coverCurrentScale = fanScale * 0.92;
+                  coverCurrentRot = -90;
+                  coverCurrentRotX = 65;
+                  coverCurrentScale = fanScale * 0.88;
                   coverOpacity = 0;
                 } else if (p < cardStart + cardDur) {
-                  // Phase 2: Cover rises vertically as top card of the deck cleanly
+                  // Phase 2: Cover rises from horizontal (deitada) to vertical (em pé) into top of deck
                   const riseRaw = (p - cardStart) / cardDur;
                   const riseP = 1 - Math.pow(1 - riseRaw, 3);
-                  coverCurrentY = 750 * (1 - riseP) + (12 - 6) * -0.5;
+                  coverCurrentY = 780 * (1 - riseP) + (12 - 6) * -0.5;
                   coverCurrentX = 0;
-                  coverCurrentRot = 0;
-                  coverCurrentRotX = 14 * (1 - riseP);
-                  coverCurrentScale = (fanScale * 0.92) + (fanScale * 0.08) * riseP;
-                  coverOpacity = Math.min(1, riseRaw * 2.5);
+                  coverCurrentRot = -90 * (1 - riseP);
+                  coverCurrentRotX = 65 * (1 - riseP);
+                  coverCurrentScale = (fanScale * 0.88) + (fanScale * 0.12) * riseP;
+                  coverOpacity = Math.min(1, riseRaw * 2.8);
                 } else if (p < 0.67) {
                   // Phase 3: Hold top of deck in center
                   coverCurrentY = (12 - 6) * -0.5;
