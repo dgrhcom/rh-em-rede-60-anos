@@ -228,13 +228,13 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
       <div className="w-full flex flex-col justify-center my-auto items-center">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between">
           {/* Header of the Current Slide or Index */}
-          <div className="border-b border-black/10 pb-2.5 mb-2 shrink-0 flex items-center justify-between">
+          <div className="border-b border-black/10 pb-2 mb-2 shrink-0 flex items-center justify-between">
             <div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight flex items-center gap-2.5">
                 {isIndex ? (
                   <>
                     <div className="p-1.5 rounded-xl bg-[#105e7b]/10 text-[#105e7b]">
-                      <LayoutGrid className="w-6 h-6" />
+                      <LayoutGrid className="w-5 h-5" />
                     </div>
                     <span>Índice de Indicadores & Gráficos</span>
                   </>
@@ -242,18 +242,13 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                   currentSlide?.title
                 )}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
-                {isIndex
-                  ? 'Painel analítico dos 60 anos da Unicamp • Clique em um card ou use as setas do teclado para navegar'
-                  : currentSlide?.subtitle}
-              </p>
+              {!isIndex && (
+                <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
+                  {currentSlide?.subtitle}
+                </p>
+              )}
             </div>
-            {isIndex ? (
-              <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-300 text-amber-950 text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>8 Tópicos • Apresentação Interativa</span>
-              </div>
-            ) : (
+            {!isIndex && (
               <button
                 onClick={() => {
                   soundFx.playCardTick();
@@ -282,17 +277,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                     }}
                     className="group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white hover:bg-gradient-to-br hover:from-white hover:to-slate-50 border-2 border-slate-200 hover:border-[#105e7b] shadow-xs hover:shadow-lg transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-0.5"
                   >
-                    {/* Top row: Number and Category */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-mono font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 group-hover:bg-[#105e7b] group-hover:text-white transition-colors">
-                          {String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <span className="text-[9.5px] uppercase font-black tracking-wider text-slate-400 group-hover:text-[#105e7b] transition-colors">
-                          {slide.category}
-                        </span>
-                      </div>
-
                       {/* Icon and Title */}
                       <div className="flex items-start gap-2.5 mb-1.5">
                         <div className={`p-2 rounded-xl bg-gradient-to-br ${slide.color} shrink-0 group-hover:scale-105 transition-transform`}>
