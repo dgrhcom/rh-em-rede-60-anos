@@ -227,16 +227,6 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                   className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[220px] sm:min-h-[240px]`}
                 >
                   <div>
-                    {/* Topo: Categoria e Número do Card */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider border border-white/30 shadow-xs">
-                        {slide.category}
-                      </span>
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
-                        {idx + 1}
-                      </span>
-                    </div>
-
                     {/* Título */}
                     <h3 className="text-base sm:text-lg font-black text-white leading-snug tracking-tight">
                       {slide.title}
