@@ -637,14 +637,14 @@ export const RacaCorCharts: React.FC = () => {
     <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
       {/* Left Column: Donut/Pizza Visão Geral */}
       <div className="md:col-span-5 flex flex-col items-center justify-center">
-        <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
+        <div className="text-xs font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
           Visão Geral (Autodeclaração)
         </div>
-        <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] relative">
+        <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] relative">
           <canvas ref={pieRef} />
         </div>
-        <div className="text-center mt-1">
-          <span className="text-[11px] font-bold text-slate-500">
+        <div className="text-center mt-1.5">
+          <span className="text-xs font-bold text-slate-500">
             Total Geral: <strong>13.554</strong> servidores cadastrados
           </span>
         </div>
