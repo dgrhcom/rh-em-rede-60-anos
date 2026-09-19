@@ -64,14 +64,29 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const isAnimating = introStatus === 'animating';
   const isPreAnimating = introStatus === 'pre_animating';
 
+  const onFanIdleChangeRef = useRef(onFanIdleChange);
+  onFanIdleChangeRef.current = onFanIdleChange;
+
+  const onPreAnimatingChangeRef = useRef(onPreAnimatingChange);
+  onPreAnimatingChangeRef.current = onPreAnimatingChange;
+
+  const onLogoVisibilityChangeRef = useRef(onLogoVisibilityChange);
+  onLogoVisibilityChangeRef.current = onLogoVisibilityChange;
+
+  const onLogoPositionChangeRef = useRef(onLogoPositionChange);
+  onLogoPositionChangeRef.current = onLogoPositionChange;
+
+  const onIntroDoneChangeRef = useRef(onIntroDoneChange);
+  onIntroDoneChangeRef.current = onIntroDoneChange;
+
   // Notify parent component about fan idle status
   useEffect(() => {
-    onFanIdleChange?.(isFanIdle);
-  }, [isFanIdle, onFanIdleChange]);
+    onFanIdleChangeRef.current?.(isFanIdle);
+  }, [isFanIdle]);
 
   useEffect(() => {
-    onPreAnimatingChange?.(isPreAnimating);
-  }, [isPreAnimating, onPreAnimatingChange]);
+    onPreAnimatingChangeRef.current?.(isPreAnimating);
+  }, [isPreAnimating]);
 
   const [soundActive, setSoundActive] = useState<boolean>(() => soundFx.isEnabled());
 
@@ -87,6 +102,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const introTweenRef = useRef<gsap.core.Tween | null>(null);
   const preAnimTweenRef = useRef<gsap.core.Tween | null>(null);
   const introTargetIndexRef = useRef<number>(0);
+  const hasMountedRef = useRef<boolean>(false);
 
   const currentPositionRef = useRef<number>(currentPosition);
   useEffect(() => {
@@ -161,8 +177,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setIntroStatus('pre_animating');
     setPreAnimProgress(0);
     setHoveredCardIndex(null);
-    onLogoVisibilityChange?.(true);
-    onLogoPositionChange?.(true); // Logo starts in the exact center of the screen
+    onLogoVisibilityChangeRef.current?.(true);
+    onLogoPositionChangeRef.current?.(true); // Logo starts in the exact center of the screen
 
     const obj = { p: 0 };
     const cardsTicked = new Set<number>();
@@ -179,7 +195,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         // When cards begin entering from the left at p >= 0.28, smoothly push the logo up to the top
         if (obj.p >= 0.28 && !logoPushedUp) {
           logoPushedUp = true;
-          onLogoPositionChange?.(false);
+          onLogoPositionChangeRef.current?.(false);
         }
 
         // Sound cadence as cards slide in from the left and snap individually into the central deck
@@ -200,8 +216,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         preAnimTweenRef.current = null;
         setPreAnimProgress(1);
         setIntroStatus('idle_fan');
-        onLogoVisibilityChange?.(true);
-        onLogoPositionChange?.(false);
+        onLogoVisibilityChangeRef.current?.(true);
+        onLogoPositionChangeRef.current?.(false);
         soundFx.playCardTick();
       },
     });
@@ -209,37 +225,42 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     return () => {
       if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     };
-  }, [onLogoPositionChange, onLogoVisibilityChange]);
+  }, []);
 
   // Run pre-animation on mount only if intro hasn't already been completed
   useEffect(() => {
+    if (hasMountedRef.current) return;
+    hasMountedRef.current = true;
+
     if (initialIntroDone) {
-      onLogoVisibilityChange?.(true);
-      onLogoPositionChange?.(false);
-      onFanIdleChange?.(false);
-      onPreAnimatingChange?.(false);
+      onLogoVisibilityChangeRef.current?.(true);
+      onLogoPositionChangeRef.current?.(false);
+      onFanIdleChangeRef.current?.(false);
+      onPreAnimatingChangeRef.current?.(false);
       if (activeIndex === null) {
         slideToIndex(0);
       }
       return;
     }
-    const cleanup = startPreAnimation();
+
+    startPreAnimation();
+
     return () => {
-      cleanup?.();
+      if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     };
-  }, [initialIntroDone, startPreAnimation, onLogoVisibilityChange, onLogoPositionChange, onFanIdleChange, onPreAnimatingChange, activeIndex, slideToIndex]);
+  }, [initialIntroDone, startPreAnimation, activeIndex, slideToIndex]);
 
   // Skip pre-animation immediately to resting fan state
   const skipPreAnim = useCallback(() => {
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     preAnimTweenRef.current = null;
-    onLogoVisibilityChange?.(true);
-    onLogoPositionChange?.(false);
+    onLogoVisibilityChangeRef.current?.(true);
+    onLogoPositionChangeRef.current?.(false);
     setHoveredCardIndex(null);
     setPreAnimProgress(1);
     setIntroStatus('idle_fan');
     soundFx.playCardTick();
-  }, [onLogoPositionChange, onLogoVisibilityChange]);
+  }, []);
 
   // Execute Opening Animation:
   // 1. Capa lifts and dissolves
