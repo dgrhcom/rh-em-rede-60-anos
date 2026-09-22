@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from './types/timeline';
 import { timelinePeriods } from './data/timelineData';
 import { Header } from './components/Header';
@@ -66,7 +66,7 @@ export function App() {
   });
 
   // Mark period as visited whenever it is selected
-  const handleSelectPeriod = (index: number | null) => {
+  const handleSelectPeriod = useCallback((index: number | null) => {
     setActivePeriodIndex(index);
     if (index !== null) {
       setVisitedIndices((prev) => {
@@ -77,14 +77,14 @@ export function App() {
         return updated;
       });
     }
-  };
+  }, []);
 
   // Open standalone photo lightbox modal (shows strictly the photo and its archival info)
-  const handleOpenPhoto = (photo: MilestonePhoto, period: HistoricalPeriod) => {
+  const handleOpenPhoto = useCallback((photo: MilestonePhoto, period: HistoricalPeriod) => {
     setSelectedPhoto(photo);
     setSelectedPhotoPeriod(period);
     handleSelectPeriod(period.index);
-  };
+  }, [handleSelectPeriod]);
 
   return (
     <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">

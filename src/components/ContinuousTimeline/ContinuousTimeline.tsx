@@ -79,6 +79,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const onIntroDoneChangeRef = useRef(onIntroDoneChange);
   onIntroDoneChangeRef.current = onIntroDoneChange;
 
+  const onSelectPeriodRef = useRef(onSelectPeriod);
+  onSelectPeriodRef.current = onSelectPeriod;
+
   // Notify parent component about fan idle status
   useEffect(() => {
     onFanIdleChangeRef.current?.(isFanIdle);
@@ -102,7 +105,6 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const introTweenRef = useRef<gsap.core.Tween | null>(null);
   const preAnimTweenRef = useRef<gsap.core.Tween | null>(null);
   const introTargetIndexRef = useRef<number>(0);
-  const hasMountedRef = useRef<boolean>(false);
 
   const currentPositionRef = useRef<number>(currentPosition);
   useEffect(() => {
@@ -144,7 +146,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     const target = Math.max(0, Math.min(totalPeriods - 1, index));
     prevActiveIndexRef.current = target;
     soundFx.playCardTick();
-    onSelectPeriod(target);
+    onSelectPeriodRef.current(target);
 
     if (tweenRef.current) tweenRef.current.kill();
 
@@ -163,7 +165,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         setCurrentPosition(target);
       },
     });
-  }, [onSelectPeriod, totalPeriods]);
+  }, [totalPeriods]);
 
   // Entrance Pre-Animation Sequence:
   // 1. Logo appears gradually in the center of the screen with bottom-up mask reveal (~2s duration)
@@ -229,9 +231,6 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
   // Run pre-animation on mount only if intro hasn't already been completed
   useEffect(() => {
-    if (hasMountedRef.current) return;
-    hasMountedRef.current = true;
-
     if (initialIntroDone) {
       onLogoVisibilityChangeRef.current?.(true);
       onLogoPositionChangeRef.current?.(false);
@@ -248,7 +247,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     return () => {
       if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     };
-  }, [initialIntroDone, startPreAnimation, activeIndex, slideToIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Skip pre-animation immediately to resting fan state
   const skipPreAnim = useCallback(() => {
@@ -277,7 +277,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setHoveredCardIndex(null);
     prevActiveIndexRef.current = null;
     currentPositionRef.current = target;
-    onSelectPeriod(null);
+    onSelectPeriodRef.current(null);
     setCurrentPosition(target);
     setIntroStatus('animating');
     setIntroProgress(0);
@@ -316,13 +316,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         introTweenRef.current = null;
         setIntroProgress(1);
         setIntroStatus('done');
-        onIntroDoneChange?.(true);
+        onIntroDoneChangeRef.current?.(true);
         soundFx.playCardTick();
         // Automatically select the chosen target card
         slideToIndex(target);
       },
     });
-  }, [introStatus, onIntroDoneChange, onSelectPeriod, slideToIndex, totalPeriods]);
+  }, [introStatus, slideToIndex, totalPeriods]);
 
   // Skip Opening Animation: immediately complete and select the target card
   const skipIntro = useCallback(() => {
@@ -331,27 +331,27 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setHoveredCardIndex(null);
     setIntroProgress(1);
     setIntroStatus('done');
-    onIntroDoneChange?.(true);
+    onIntroDoneChangeRef.current?.(true);
     soundFx.playCardTick();
     // Select the target card
     slideToIndex(introTargetIndexRef.current);
-  }, [onIntroDoneChange, slideToIndex]);
+  }, [slideToIndex]);
 
   // Reset to initial 3D fan view (re-runs the entrance sequence)
   const handleReplayIntro = useCallback(() => {
     if (introTweenRef.current) introTweenRef.current.kill();
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (tweenRef.current) tweenRef.current.kill();
-    onIntroDoneChange?.(false);
+    onIntroDoneChangeRef.current?.(false);
     setHoveredCardIndex(null);
     prevActiveIndexRef.current = null;
     currentPositionRef.current = 0;
-    onSelectPeriod(null);
+    onSelectPeriodRef.current(null);
     setCurrentPosition(0);
     setIntroProgress(0);
     startPreAnimation();
     soundFx.playCardTick();
-  }, [onIntroDoneChange, onSelectPeriod, startPreAnimation]);
+  }, [startPreAnimation]);
 
   // Cleanup tweens on unmount
   useEffect(() => {
