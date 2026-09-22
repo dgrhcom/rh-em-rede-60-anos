@@ -41,10 +41,10 @@ function drawBadge(
   y: number,
   bgColor: string = 'rgba(15, 23, 42, 0.85)',
   textColor: string = '#ffffff',
-  fontSize: number = 10,
-  paddingX: number = 6,
-  paddingY: number = 3,
-  radius: number = 4
+  fontSize: number = 14.5,
+  paddingX: number = 9,
+  paddingY: number = 5,
+  radius: number = 6
 ) {
   ctx.save();
   ctx.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
@@ -123,7 +123,7 @@ export const GeneroCharts: React.FC = () => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
                 const text = `${pcts[i].toFixed(1).replace('.', ',')}%`;
-                drawBadge(ctx, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+                drawBadge(ctx, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14, 8, 4, 5);
               });
             },
           };
@@ -186,7 +186,7 @@ export const GeneroCharts: React.FC = () => {
                   const val = dataset.data[index];
                   const text = `${Number(val).toFixed(1).replace('.', ',')}%`;
                   ctx.save();
-                  ctx.font = 'bold 10.5px Inter, -apple-system, sans-serif';
+                  ctx.font = 'bold 14.5px Inter, -apple-system, sans-serif';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
                   ctx.fillStyle = dIdx === 0 ? DS_COLORS.primary : '#855807';
@@ -224,22 +224,22 @@ export const GeneroCharts: React.FC = () => {
                   max: 108,
                   ticks: {
                     callback: (val: any) => `${val}%`,
-                    font: { weight: 'bold', size: 11 },
+                    font: { weight: 'bold', size: 12 },
                     color: '#64748b',
                   },
                   grid: { color: 'rgba(0,0,0,0.05)' },
                 },
                 x: {
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
                 },
               },
               plugins: {
                 legend: {
                   position: 'top',
                   labels: {
-                    boxWidth: 12,
-                    font: { weight: 'bold', size: 11 },
+                    boxWidth: 14,
+                    font: { weight: 'bold', size: 12 },
                     color: '#1e293b',
                   },
                 },
@@ -271,11 +271,11 @@ export const GeneroCharts: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] relative">
+        <div className="w-[240px] h-[240px] sm:w-[270px] sm:h-[270px] lg:w-[300px] lg:h-[300px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-3xl font-black text-[#105e7b]">55,9%</span>
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 font-sans">Mulheres</span>
+            <span className="text-4xl sm:text-5xl font-black text-[#105e7b]">55,9%</span>
+            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600 font-sans mt-0.5">Mulheres</span>
           </div>
         </div>
         <div className="text-center mt-1">
@@ -285,7 +285,7 @@ export const GeneroCharts: React.FC = () => {
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[300px] sm:h-[330px]">
+      <div className="md:col-span-7 h-[300px] sm:h-[340px] lg:h-[380px]">
         <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
           Distribuição Percentual por Carreira
         </h4>
@@ -323,7 +323,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
             const y = element.y - 12;
             const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
 
-            drawBadge(c, text, x, y, DS_COLORS.primary, '#ffffff', 10, 6, 2.5, 4);
+            drawBadge(c, text, x, y, DS_COLORS.primary, '#ffffff', 14.5, 9, 5, 6);
           });
         },
       };
@@ -357,20 +357,20 @@ export const FaixaEtariaBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { top: 22 },
+            padding: { top: 28 },
           },
           scales: {
             x: {
               stacked: true,
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+              ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
             },
             y: {
               stacked: true,
               suggestedMax: 3450,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
+                font: { weight: 'bold', size: 12 },
                 color: '#64748b',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
@@ -380,9 +380,9 @@ export const FaixaEtariaBarChart: React.FC = () => {
             legend: {
               position: 'top',
               labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                font: { weight: 'bold', size: 11 },
+                boxWidth: 14,
+                boxHeight: 14,
+                font: { weight: 'bold', size: 12 },
                 color: '#1e293b',
               },
             },
@@ -415,7 +415,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[360px]">
+    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -461,7 +461,7 @@ export const RacaCorCharts: React.FC = () => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
                 const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
-                drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 10, 6, 2.5, 4);
+                drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
               });
             },
           };
@@ -487,11 +487,11 @@ export const RacaCorCharts: React.FC = () => {
                 legend: {
                   position: 'bottom',
                   labels: {
-                    boxWidth: 10,
-                    boxHeight: 10,
-                    font: { weight: 'bold', size: 10 },
+                    boxWidth: 12,
+                    boxHeight: 12,
+                    font: { weight: 'bold', size: 11 },
                     color: '#1e293b',
-                    padding: 6,
+                    padding: 8,
                   },
                 },
                 tooltip: {
@@ -527,7 +527,7 @@ export const RacaCorCharts: React.FC = () => {
                 const text = `${pct}% (${item.total.toLocaleString('pt-BR')})`;
 
                 c.save();
-                c.font = 'bold 10px Inter, -apple-system, sans-serif';
+                c.font = 'bold 14px Inter, -apple-system, sans-serif';
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
                 c.fillStyle = '#1e293b';
@@ -581,7 +581,7 @@ export const RacaCorCharts: React.FC = () => {
                   suggestedMax: 11800,
                   grid: { color: 'rgba(0,0,0,0.05)' },
                   ticks: {
-                    font: { weight: 'bold', size: 10 },
+                    font: { weight: 'bold', size: 11 },
                     color: '#64748b',
                     callback: (val: any) => Number(val).toLocaleString('pt-BR'),
                   },
@@ -589,16 +589,16 @@ export const RacaCorCharts: React.FC = () => {
                 y: {
                   stacked: true,
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
                 },
               },
               plugins: {
                 legend: {
                   position: 'top',
                   labels: {
-                    boxWidth: 10,
-                    boxHeight: 10,
-                    font: { weight: 'bold', size: 10 },
+                    boxWidth: 12,
+                    boxHeight: 12,
+                    font: { weight: 'bold', size: 11 },
                     color: '#1e293b',
                   },
                 },
@@ -640,7 +640,7 @@ export const RacaCorCharts: React.FC = () => {
         <div className="text-xs font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
           Visão Geral (Autodeclaração)
         </div>
-        <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] relative">
+        <div className="w-[250px] h-[250px] sm:w-[280px] sm:h-[280px] lg:w-[310px] lg:h-[310px] relative">
           <canvas ref={pieRef} />
         </div>
         <div className="text-center mt-1.5">
@@ -655,7 +655,7 @@ export const RacaCorCharts: React.FC = () => {
         <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center sm:text-left">
           Composição por Carreira Funcional
         </div>
-        <div className="w-full h-[300px] sm:h-[330px]">
+        <div className="w-full h-[300px] sm:h-[340px] lg:h-[380px]">
           <canvas ref={barRef} />
         </div>
       </div>
@@ -885,7 +885,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 23, lastElement.y, dataset.borderColor, '#ffffff', 9, 5, 2, 4);
+            drawBadge(c, pct, lastElement.x + 28, lastElement.y, dataset.borderColor, '#ffffff', 14, 8, 4, 5);
           });
         },
       };
@@ -909,7 +909,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 52 },
+            padding: { right: 75 },
           },
           scales: {
             y: {
@@ -929,9 +929,9 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             legend: {
               position: 'bottom',
               labels: {
-                boxWidth: 10,
-                boxHeight: 10,
-                font: { weight: 'bold', size: 10 },
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { weight: 'bold', size: 11 },
                 color: '#1e293b',
               },
             },
@@ -958,7 +958,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[360px]">
+    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -993,7 +993,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 23, lastElement.y, dataset.borderColor, '#ffffff', 9.5, 5, 2, 4);
+            drawBadge(c, pct, lastElement.x + 28, lastElement.y, dataset.borderColor, '#ffffff', 14, 8, 4, 5);
           });
         },
       };
@@ -1017,7 +1017,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 54 },
+            padding: { right: 75 },
           },
           scales: {
             y: {
@@ -1068,7 +1068,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[360px]">
+    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -1187,7 +1187,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
             const pos = element.tooltipPosition();
             if (!pos) return;
             const text = `${area.percentual.toFixed(1).replace('.', ',')}%`;
-            drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+            drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
           });
         },
       };
@@ -1248,7 +1248,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full">
       {/* Left Column: Official Pie Chart with Data Labels */}
-      <div className="lg:col-span-5 flex flex-col items-center justify-center relative h-[330px] sm:h-[370px]">
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative h-[310px] sm:h-[350px] lg:h-[400px]">
         <canvas ref={canvasRef} />
       </div>
 
@@ -1340,11 +1340,11 @@ export const TopCargosBarChart: React.FC = () => {
             const text = `${cargo.quantidade.toLocaleString('pt-BR')} (${pct}%)`;
 
             c.save();
-            c.font = 'bold 9.5px Inter, -apple-system, sans-serif';
+            c.font = 'bold 13.5px Inter, -apple-system, sans-serif';
             c.textAlign = 'left';
             c.textBaseline = 'middle';
             c.fillStyle = '#0f172a';
-            c.fillText(text, element.x + 5, element.y);
+            c.fillText(text, element.x + 6, element.y);
             c.restore();
           });
         },
@@ -1368,14 +1368,14 @@ export const TopCargosBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 85 },
+            padding: { right: 110 },
           },
           scales: {
             x: {
               suggestedMax: 1650,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 10 },
+                font: { weight: 'bold', size: 11 },
                 color: '#64748b',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
@@ -1383,7 +1383,7 @@ export const TopCargosBarChart: React.FC = () => {
             y: {
               grid: { display: false },
               ticks: {
-                font: { weight: 'bold', size: 9 },
+                font: { weight: 'bold', size: 11 },
                 color: '#0f172a',
               },
             },
@@ -1433,7 +1433,7 @@ export const TopCargosBarChart: React.FC = () => {
         </span>
       </div>
 
-      <div className="w-full h-[350px] sm:h-[370px]">
+      <div className="w-full h-[360px] sm:h-[400px] lg:h-[450px]">
         <canvas ref={canvasRef} />
       </div>
     </div>
@@ -1469,7 +1469,7 @@ export const NacionalidadesCharts: React.FC = () => {
               meta.data.forEach((element: any, i: number) => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                drawBadge(c, pcts[i], pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 11, 7, 3, 5);
+                drawBadge(c, pcts[i], pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
               });
             },
           };
@@ -1500,7 +1500,7 @@ export const NacionalidadesCharts: React.FC = () => {
                   position: 'bottom',
                   labels: {
                     boxWidth: 12,
-                    font: { weight: 'bold', size: 11 },
+                    font: { weight: 'bold', size: 12 },
                     color: '#1e293b',
                   },
                 },
@@ -1544,7 +1544,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 const text = `${item.pct.toFixed(1).replace('.', ',')}% (${item.total})`;
 
                 c.save();
-                c.font = 'bold 10px Inter, -apple-system, sans-serif';
+                c.font = 'bold 14px Inter, -apple-system, sans-serif';
                 c.textAlign = 'center';
                 c.textBaseline = 'bottom';
                 c.fillStyle = '#0f172a';
@@ -1571,7 +1571,7 @@ export const NacionalidadesCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { top: 20 },
+                padding: { top: 25 },
               },
               scales: {
                 y: {
@@ -1581,7 +1581,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 },
                 x: {
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 10 }, color: '#0f172a' },
+                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
                 },
               },
               plugins: {
@@ -1612,16 +1612,16 @@ export const NacionalidadesCharts: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
       <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] relative">
+        <div className="w-[240px] h-[240px] sm:w-[270px] sm:h-[270px] lg:w-[300px] lg:h-[300px] relative">
           <canvas ref={donutRef} />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-3xl font-black text-[#105e7b]">94,9%</span>
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 font-sans">Brasileiros</span>
+            <span className="text-4xl sm:text-5xl font-black text-[#105e7b]">94,9%</span>
+            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600 font-sans mt-0.5">Brasileiros</span>
           </div>
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[300px] sm:h-[330px]">
+      <div className="md:col-span-7 h-[300px] sm:h-[340px] lg:h-[380px]">
         <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
           Distribuição dos 110 Estrangeiros por Região
         </h4>

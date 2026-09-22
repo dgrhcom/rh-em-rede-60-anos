@@ -27,6 +27,8 @@ export function App() {
   const [isPreAnimating, setIsPreAnimating] = useState<boolean>(true);
   const [isLogoInCenterScreen, setIsLogoInCenterScreen] = useState<boolean>(true);
   const [hasIntroCompleted, setHasIntroCompleted] = useState<boolean>(false);
+  const [timelineResetTrigger, setTimelineResetTrigger] = useState<number>(0);
+  const [timelineFocusTrigger, setTimelineFocusTrigger] = useState<{ index: number; timestamp: number } | null>(null);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -86,6 +88,54 @@ export function App() {
     handleSelectPeriod(period.index);
   }, [handleSelectPeriod]);
 
+  // Navigate to opening logo paused state
+  const handleNavigateToOpeningLogo = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('slide');
+      url.searchParams.set('view', 'timeline');
+      window.history.replaceState(null, '', url.toString());
+    }
+    setCurrentView('timeline');
+    setActivePeriodIndex(null);
+    setHasIntroCompleted(false);
+    setIsFanIdle(true);
+    setIsLogoVisible(true);
+    setIsLogoInCenterScreen(true);
+    setIsPreAnimating(false);
+    setTimelineResetTrigger((prev) => prev + 1);
+  }, []);
+
+  // Open Historical Dashboard
+  const handleOpenDashboard = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'dashboard');
+      url.searchParams.set('slide', 'index');
+      window.history.replaceState(null, '', url.toString());
+    }
+    setCurrentView('dashboard');
+  }, []);
+
+  // Return to Timeline from Dashboard: always focus and select the LAST card (2022 - 2025)
+  const handleBackToTimeline = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('slide');
+      url.searchParams.set('view', 'timeline');
+      window.history.replaceState(null, '', url.toString());
+    }
+    const lastIndex = periods.length - 1;
+    setHasIntroCompleted(true);
+    setIsFanIdle(false);
+    setIsPreAnimating(false);
+    setIsLogoVisible(true);
+    setIsLogoInCenterScreen(false);
+    handleSelectPeriod(lastIndex);
+    setCurrentView('timeline');
+    setTimelineFocusTrigger({ index: lastIndex, timestamp: Date.now() });
+  }, [handleSelectPeriod, periods.length]);
+
   return (
     <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
       {/* Background Texture Overlay with Multiply Blend Mode over yellow background */}
@@ -100,7 +150,17 @@ export function App() {
       <Header
         isCentered={!hasIntroCompleted && isFanIdle && currentView === 'timeline'}
         currentView={currentView}
-        onNavigate={(view) => setCurrentView(view)}
+        onNavigate={(view) => {
+          if (view === 'timeline') {
+            if (currentView === 'dashboard') {
+              handleBackToTimeline();
+            } else {
+              setCurrentView('timeline');
+            }
+          } else {
+            handleOpenDashboard();
+          }
+        }}
         logoVisible={hasIntroCompleted || isLogoVisible || currentView === 'dashboard' || !isFanIdle}
         isPreAnimating={!hasIntroCompleted && isPreAnimating && currentView === 'timeline'}
         isLogoInCenterScreen={!hasIntroCompleted && isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
@@ -120,29 +180,17 @@ export function App() {
             onLogoPositionChange={setIsLogoInCenterScreen}
             initialIntroDone={hasIntroCompleted}
             onIntroDoneChange={setHasIntroCompleted}
-            onOpenDashboard={() => {
-              if (typeof window !== 'undefined') {
-                const url = new URL(window.location.href);
-                url.searchParams.set('view', 'dashboard');
-                url.searchParams.set('slide', 'index');
-                window.history.replaceState(null, '', url.toString());
-              }
-              setCurrentView('dashboard');
-            }}
+            resetTrigger={timelineResetTrigger}
+            onOpenDashboard={handleOpenDashboard}
+            isActive={currentView === 'timeline'}
+            focusTrigger={timelineFocusTrigger}
           />
         </div>
         {currentView === 'dashboard' && (
-          <div className="w-full min-h-screen pt-20 sm:pt-24 pb-4 flex flex-col justify-center">
+          <div className="w-full min-h-screen pt-14 sm:pt-16 pb-2 sm:pb-3 flex flex-col justify-center">
             <HistoricalDashboard
-              onBackToTimeline={() => {
-                if (typeof window !== 'undefined') {
-                  const url = new URL(window.location.href);
-                  url.searchParams.delete('slide');
-                  url.searchParams.set('view', 'timeline');
-                  window.history.replaceState(null, '', url.toString());
-                }
-                setCurrentView('timeline');
-              }}
+              onBackToTimeline={handleBackToTimeline}
+              onNavigateToOpeningLogo={handleNavigateToOpeningLogo}
             />
           </div>
         )}

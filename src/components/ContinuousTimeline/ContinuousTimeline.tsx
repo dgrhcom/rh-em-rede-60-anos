@@ -19,6 +19,9 @@ interface ContinuousTimelineProps {
   onLogoPositionChange?: (inCenterScreen: boolean) => void;
   initialIntroDone?: boolean;
   onIntroDoneChange?: (done: boolean) => void;
+  resetTrigger?: number;
+  isActive?: boolean;
+  focusTrigger?: { index: number; timestamp: number } | null;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -33,6 +36,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   onLogoPositionChange,
   initialIntroDone = false,
   onIntroDoneChange,
+  resetTrigger,
+  isActive = true,
+  focusTrigger,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -44,12 +50,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const [cardSpacing, setCardSpacing] = useState(320);
 
   // Intro animation lifecycle:
-  // 'pre_animating': entrance sequence (logo -> deck rises from below -> fan opens -> button appears)
+  // 'logo_pause': logo revealed in center, paused waiting for user arrow navigation
+  // 'pre_animating': cards fly in swiftly from left -> deck gathers -> fan opens
   // 'idle_fan': resting fan state with button visible, waiting for user click
   // 'animating': dealing out cards into horizontal timeline
   // 'done': in continuous timeline mode
-  const [introStatus, setIntroStatus] = useState<'pre_animating' | 'idle_fan' | 'animating' | 'done'>(() => {
-    return initialIntroDone ? 'done' : 'pre_animating';
+  const [introStatus, setIntroStatus] = useState<'logo_pause' | 'pre_animating' | 'idle_fan' | 'animating' | 'done'>(() => {
+    return initialIntroDone ? 'done' : 'logo_pause';
   });
   const [preAnimProgress, setPreAnimProgress] = useState<number>(() => {
     return initialIntroDone ? 1 : 0;
@@ -60,7 +67,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
 
   const isIntroActive = introStatus !== 'done';
-  const isFanIdle = introStatus === 'idle_fan' || introStatus === 'pre_animating';
+  const isFanIdle = introStatus === 'idle_fan' || introStatus === 'pre_animating' || introStatus === 'logo_pause';
   const isAnimating = introStatus === 'animating';
   const isPreAnimating = introStatus === 'pre_animating';
 
@@ -126,13 +133,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           setCardSpacing(230);
         }
       } else {
-        // Expanded 2-column active card spacing
+        // Expanded 2-column active card spacing (accommodates larger card width)
         if (w < 640) {
-          setCardSpacing(360);
+          setCardSpacing(380);
         } else if (w < 1024) {
-          setCardSpacing(540);
+          setCardSpacing(600);
         } else {
-          setCardSpacing(700);
+          setCardSpacing(780);
         }
       }
     };
@@ -218,10 +225,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   }, [totalPeriods]);
 
   // Entrance Pre-Animation Sequence:
-  // 1. Logo appears gradually in the center of the screen with bottom-up mask reveal (~2s duration)
-  // 2. At p >= 0.28, cards enter swiftly from left to right pushing the logo up to the top and assembling into the center deck
+  // Starts after user navigates with arrow from 'logo_pause'
+  // 1. Logo smoothly glides up to the top header position
+  // 2. Cards enter swiftly from left to right and assemble into the center deck
   // 3. Stacked deck pauses briefly, then fans out into an extra-tight curved fan
-  // 4. Practically right as the fan opens, the "Iniciar apresentação" button appears gracefully
+  // 4. "Iniciar apresentação" button appears gracefully
   const startPreAnimation = useCallback(() => {
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     if (introTweenRef.current) introTweenRef.current.kill();
@@ -230,36 +238,29 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     setPreAnimProgress(0);
     setHoveredCardIndex(null);
     onLogoVisibilityChangeRef.current?.(true);
-    onLogoPositionChangeRef.current?.(true); // Logo starts in the exact center of the screen
+    onLogoPositionChangeRef.current?.(false); // Glides logo up to the top header!
 
     const obj = { p: 0 };
     const cardsTicked = new Set<number>();
     let tickFanPlayed = false;
-    let logoPushedUp = false;
 
     preAnimTweenRef.current = gsap.to(obj, {
       p: 1,
-      duration: 7.2,
+      duration: 3.8,
       ease: 'none',
       onUpdate: () => {
         setPreAnimProgress(obj.p);
 
-        // When cards begin entering from the left at p >= 0.28, smoothly push the logo up to the top
-        if (obj.p >= 0.28 && !logoPushedUp) {
-          logoPushedUp = true;
-          onLogoPositionChangeRef.current?.(false);
-        }
-
         // Sound cadence as cards slide in from the left and snap individually into the central deck
         for (let i = 0; i <= 12; i++) {
-          const cardArrival = 0.28 + (i / 12) * 0.20 + 0.08;
+          const cardArrival = 0.02 + (i / 12) * 0.28 + 0.12;
           if (obj.p >= cardArrival && !cardsTicked.has(i)) {
             cardsTicked.add(i);
             soundFx.playCardTick();
           }
         }
 
-        if (obj.p >= 0.65 && !tickFanPlayed) {
+        if (obj.p >= 0.60 && !tickFanPlayed) {
           tickFanPlayed = true;
           soundFx.playCardTick();
         }
@@ -279,7 +280,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
   }, []);
 
-  // Run pre-animation on mount only if intro hasn't already been completed
+  const continueFromLogo = useCallback(() => {
+    soundFx.playCardTick();
+    startPreAnimation();
+  }, [startPreAnimation]);
+
+  // Run on mount
   useEffect(() => {
     if (initialIntroDone) {
       onLogoVisibilityChangeRef.current?.(true);
@@ -292,13 +298,41 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       return;
     }
 
-    startPreAnimation();
+    // On initial load, wait paused at the logo in the center
+    setIntroStatus('logo_pause');
+    onLogoVisibilityChangeRef.current?.(true);
+    onLogoPositionChangeRef.current?.(true);
+    onFanIdleChangeRef.current?.(true);
+    onPreAnimatingChangeRef.current?.(false);
 
     return () => {
       if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset to logo_pause when resetTrigger fires
+  useEffect(() => {
+    if (resetTrigger !== undefined && resetTrigger > 0) {
+      if (introTweenRef.current) introTweenRef.current.kill();
+      if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+      if (tweenRef.current) tweenRef.current.kill();
+      onIntroDoneChangeRef.current?.(false);
+      setHoveredCardIndex(null);
+      prevActiveIndexRef.current = null;
+      currentPositionRef.current = 0;
+      onSelectPeriodRef.current(null);
+      setCurrentPosition(0);
+      setIntroProgress(0);
+      setPreAnimProgress(0);
+      setIntroStatus('logo_pause');
+      onLogoVisibilityChangeRef.current?.(true);
+      onLogoPositionChangeRef.current?.(true);
+      onFanIdleChangeRef.current?.(true);
+      onPreAnimatingChangeRef.current?.(false);
+      soundFx.playCardTick();
+    }
+  }, [resetTrigger]);
 
   // Skip pre-animation immediately to resting fan state
   const skipPreAnim = useCallback(() => {
@@ -387,7 +421,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     slideToIndex(introTargetIndexRef.current);
   }, [slideToIndex]);
 
-  // Reset to initial 3D fan view (re-runs the entrance sequence)
+  // Reset to initial logo pause view (re-runs the entrance sequence after user navigates with arrow)
   const handleReplayIntro = useCallback(() => {
     if (introTweenRef.current) introTweenRef.current.kill();
     if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
@@ -399,9 +433,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     onSelectPeriodRef.current(null);
     setCurrentPosition(0);
     setIntroProgress(0);
-    startPreAnimation();
+    setPreAnimProgress(0);
+    setIntroStatus('logo_pause');
+    onLogoVisibilityChangeRef.current?.(true);
+    onLogoPositionChangeRef.current?.(true);
+    onFanIdleChangeRef.current?.(true);
+    onPreAnimatingChangeRef.current?.(false);
     soundFx.playCardTick();
-  }, [startPreAnimation]);
+  }, []);
 
   // Cleanup tweens on unmount
   useEffect(() => {
@@ -421,13 +460,28 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       !isIntroActive
     ) {
       prevActiveIndexRef.current = activeIndex;
-      if (Math.abs(currentPositionRef.current - activeIndex) > 0.01) {
-        slideToIndex(activeIndex, 0.5);
-      }
+      slideToIndex(activeIndex, 0.5);
     } else {
       prevActiveIndexRef.current = activeIndex;
     }
   }, [activeIndex, isDragging, isIntroActive, slideToIndex]);
+
+  // Focus trigger (e.g. returning to timeline from dashboard to focus last card)
+  useEffect(() => {
+    if (focusTrigger && focusTrigger.index !== undefined) {
+      if (introTweenRef.current) introTweenRef.current.kill();
+      if (preAnimTweenRef.current) preAnimTweenRef.current.kill();
+      setIntroStatus('done');
+      setIntroProgress(1);
+      setPreAnimProgress(1);
+      onIntroDoneChangeRef.current?.(true);
+      onLogoVisibilityChangeRef.current?.(true);
+      onLogoPositionChangeRef.current?.(false);
+      onFanIdleChangeRef.current?.(false);
+      onPreAnimatingChangeRef.current?.(false);
+      slideToIndex(focusTrigger.index, 0.4);
+    }
+  }, [focusTrigger, slideToIndex]);
 
   // Next & Previous
   const handlePrev = useCallback(() => {
@@ -452,7 +506,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
   // Keyboard navigation
   useEffect(() => {
+    if (!isActive) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (introStatus === 'logo_pause') {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
+          e.preventDefault();
+          continueFromLogo();
+        }
+        return;
+      }
+
       if (isPreAnimating) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'ArrowRight') {
           e.preventDefault();
@@ -462,9 +526,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       }
 
       if (isFanIdle) {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
           e.preventDefault();
-          executeOpeningAnimation();
+          executeOpeningAnimation(0);
         } else if (e.key === 'Escape') {
           skipIntro();
         }
@@ -505,12 +569,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, handleCloseCard, slideToIndex, onOpenPhoto, periods, currentPosition, onOpenDashboard, totalPeriods]);
+  }, [isActive, introStatus, continueFromLogo, isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, handleCloseCard, slideToIndex, onOpenPhoto, periods, currentPosition, onOpenDashboard, totalPeriods]);
 
   // Mouse wheel navigation
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || isIntroActive) return;
+    if (!container || isIntroActive || !isActive) return;
 
     let wheelTimeout: number | null = null;
     let accumulatedDelta = 0;
@@ -538,7 +602,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       container.removeEventListener('wheel', handleWheel);
       if (wheelTimeout) clearTimeout(wheelTimeout);
     };
-  }, [handleNext, handlePrev, isIntroActive]);
+  }, [handleNext, handlePrev, isIntroActive, isActive]);
 
   // Drag & Swipe gesture handling
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -621,6 +685,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
+
       {/* ================= 1. INTRO 3D FAN OVERLAY (Cards + Start Button Only) ================= */}
       {(introStatus === 'idle_fan' || introStatus === 'pre_animating') && (
         <div
@@ -671,7 +736,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             perspective: '1200px',
           }}
           onClick={() => {
-            if (introStatus === 'pre_animating') {
+            if (introStatus === 'logo_pause') {
+              continueFromLogo();
+            } else if (introStatus === 'pre_animating') {
               skipPreAnim();
             } else if (introStatus === 'idle_fan') {
               executeOpeningAnimation(0);
@@ -747,12 +814,21 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               const fanScale = isMobile ? 0.64 : 0.76;
               const fanZ = 30 + idx;
 
-              if (introStatus === 'pre_animating') {
+              if (introStatus === 'logo_pause') {
+                const enterStartX = Math.max(850, winW * 0.72 + 250);
+                currentX = -enterStartX;
+                currentY = (idx - 6) * -0.5;
+                currentRot = -8;
+                currentRotX = 0;
+                currentScale = fanScale;
+                currentOpacity = 0;
+                currentZIndex = fanZ;
+              } else if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
-                // Staggered swift arrival from left to right: 13 items (0..12). Card 0 starts at 0.28, Card 12 starts at 0.48.
-                const cardStart = 0.28 + (idx / 12) * 0.20;
-                const cardDur = 0.08;
+                // Staggered swift arrival from left to right: 13 items (0..12).
+                const cardStart = 0.02 + (idx / 12) * 0.28;
+                const cardDur = 0.12;
 
                 if (p < cardStart) {
                   // Phase 1: Waiting off-screen to the left, hidden
@@ -774,7 +850,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentScale = fanScale;
                   currentOpacity = Math.min(1, rawFlight * 4);
                   currentZIndex = fanZ;
-                } else if (p < 0.65) {
+                } else if (p < 0.60) {
                   // Phase 3: Resting in central stacked deck ("monte no centro")
                   currentY = (idx - 6) * -0.5;
                   currentX = 0;
@@ -785,7 +861,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentZIndex = fanZ;
                 } else {
                   // Phase 4: Deck opens into tight curved fan
-                  const fanRaw = Math.min(1, (p - 0.65) / (0.77 - 0.65));
+                  const fanRaw = Math.min(1, (p - 0.60) / (0.86 - 0.60));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   currentX = finalFanX * fanP;
                   currentY = finalFanY * fanP + (1 - fanP) * ((idx - 6) * -0.5);
@@ -967,7 +1043,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   }
                 }}
                 onClick={(e) => {
-                  if (introStatus === 'pre_animating') {
+                  if (introStatus === 'logo_pause') {
+                    e.stopPropagation();
+                    continueFromLogo();
+                  } else if (introStatus === 'pre_animating') {
                     e.stopPropagation();
                     skipPreAnim();
                   } else if (introStatus === 'idle_fan') {
@@ -995,7 +1074,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   period={period}
                   isActive={isCardActive}
                   onSelect={() => {
-                    if (introStatus === 'pre_animating') {
+                    if (introStatus === 'logo_pause') {
+                      continueFromLogo();
+                    } else if (introStatus === 'pre_animating') {
                       skipPreAnim();
                     } else if (introStatus === 'idle_fan') {
                       executeOpeningAnimation(idx);
@@ -1036,12 +1117,20 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               let coverCurrentZ = coverZIndex;
               let coverOpacity = 1;
 
-              if (introStatus === 'pre_animating') {
+              if (introStatus === 'logo_pause') {
+                const enterStartX = Math.max(850, winW * 0.72 + 250);
+                coverCurrentX = -enterStartX;
+                coverCurrentY = (12 - 6) * -0.5;
+                coverCurrentRot = -8;
+                coverCurrentRotX = 0;
+                coverCurrentScale = fanScale;
+                coverOpacity = 0;
+              } else if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
                 // Capa is idx 12 (last card to enter from the left and land on top of the central deck)
-                const cardStart = 0.28 + (12 / 12) * 0.20; // 0.48
-                const cardDur = 0.08;
+                const cardStart = 0.02 + (12 / 12) * 0.28;
+                const cardDur = 0.12;
 
                 if (p < cardStart) {
                   // Phase 1: Waiting off-screen to the left, hidden
@@ -1061,7 +1150,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
                   coverOpacity = Math.min(1, riseRaw * 4);
-                } else if (p < 0.65) {
+                } else if (p < 0.60) {
                   // Phase 3: Hold top of deck in center
                   coverCurrentY = (12 - 6) * -0.5;
                   coverCurrentX = 0;
@@ -1071,7 +1160,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   coverOpacity = 1;
                 } else {
                   // Phase 4: Fans out to index 12
-                  const fanRaw = Math.min(1, (p - 0.65) / (0.77 - 0.65));
+                  const fanRaw = Math.min(1, (p - 0.60) / (0.86 - 0.60));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   coverCurrentX = finalFanX * fanP;
                   coverCurrentY = finalFanY * fanP + (1 - fanP) * ((12 - 6) * -0.5);
@@ -1141,7 +1230,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     }
                   }}
                   onClick={(e) => {
-                    if (introStatus === 'pre_animating') {
+                    if (introStatus === 'logo_pause') {
+                      e.stopPropagation();
+                      continueFromLogo();
+                    } else if (introStatus === 'pre_animating') {
                       e.stopPropagation();
                       skipPreAnim();
                     } else if (introStatus === 'idle_fan') {

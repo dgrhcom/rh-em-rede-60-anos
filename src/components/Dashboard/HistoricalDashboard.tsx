@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import gsap from 'gsap';
 import {
   ArrowLeft,
   ChevronLeft,
@@ -27,6 +28,7 @@ import {
 
 interface HistoricalDashboardProps {
   onBackToTimeline: () => void;
+  onNavigateToOpeningLogo?: () => void;
 }
 
 interface SlideDefinition {
@@ -39,17 +41,31 @@ interface SlideDefinition {
 
 // Deep, vibrant auxiliary and secondary design system colors for each chart card
 export const SLIDE_BG_COLORS = [
-  'bg-[#5e2a6b]', // 0: Gênero - Aux 2 (Roxo DGRH)
-  'bg-[#d67b27]', // 1: Faixa Etária - Aux 3 (Laranja DGRH)
-  'bg-[#477b2f]', // 2: Raça / Cor - Aux 1 (Verde DGRH)
-  'bg-[#6b213b]', // 3: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
-  'bg-[#c05621]', // 4: Escolaridade Zoom - Aux 3 (Terracota)
-  'bg-[#366023]', // 5: Áreas da Unicamp - Aux 1 (Verde Floresta)
-  'bg-[#b8801a]', // 6: Top 20 Cargos - Secundária (Dourado Profundo 60 Anos)
+  'bg-[#366023]', // 0: Áreas da Unicamp - Aux 1 (Verde Floresta)
+  'bg-[#b8801a]', // 1: Top 20 Cargos - Secundária (Dourado Profundo 60 Anos)
+  'bg-[#5e2a6b]', // 2: Gênero - Aux 2 (Roxo DGRH)
+  'bg-[#d67b27]', // 3: Faixa Etária - Aux 3 (Laranja DGRH)
+  'bg-[#477b2f]', // 4: Raça / Cor - Aux 1 (Verde DGRH)
+  'bg-[#6b213b]', // 5: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
+  'bg-[#c05621]', // 6: Escolaridade Zoom - Aux 3 (Terracota)
   'bg-[#701a75]', // 7: Nacionalidades - Aux 2 (Ameixa DGRH)
 ];
 
 const SLIDES: SlideDefinition[] = [
+  {
+    id: 'areas',
+    category: 'Estrutura Institucional',
+    title: 'Servidores Ativos - Por Área da Universidade',
+    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
+    tag: 'Áreas da Unicamp',
+  },
+  {
+    id: 'cargos',
+    category: 'Quadro Funcional',
+    title: 'Ranking dos 20 Maiores Cargos em 2026',
+    subtitle: 'As 20 funções e carreiras com maior número de profissionais em atividade',
+    tag: 'Top 20 Cargos',
+  },
   {
     id: 'genero',
     category: 'Diversidade & Perfil',
@@ -86,20 +102,6 @@ const SLIDES: SlideDefinition[] = [
     tag: 'Pós-Graduação',
   },
   {
-    id: 'areas',
-    category: 'Estrutura Institucional',
-    title: 'Servidores Ativos - Por Área da Universidade',
-    subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
-    tag: 'Áreas da Unicamp',
-  },
-  {
-    id: 'cargos',
-    category: 'Quadro Funcional',
-    title: 'Ranking dos 20 Maiores Cargos em 2026',
-    subtitle: 'As 20 funções e carreiras com maior número de profissionais em atividade',
-    tag: 'Top 20 Cargos',
-  },
-  {
     id: 'nacionalidade',
     category: 'Internacionalização',
     title: 'Docentes e Pesquisadores por Nacionalidade',
@@ -108,7 +110,10 @@ const SLIDES: SlideDefinition[] = [
   },
 ];
 
-export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBackToTimeline }) => {
+export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
+  onBackToTimeline,
+  onNavigateToOpeningLogo,
+}) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const search = new URLSearchParams(window.location.search);
@@ -157,7 +162,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
         e.preventDefault();
-        handleNextSlide();
+        if (currentSlideIndex === totalSlides - 1) {
+          soundFx.playCardTick();
+          onNavigateToOpeningLogo?.();
+        } else {
+          handleNextSlide();
+        }
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
         if (currentSlideIndex === -1) {
@@ -179,7 +189,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNextSlide, handlePrevSlide, currentSlideIndex, onBackToTimeline]);
+  }, [handleNextSlide, handlePrevSlide, currentSlideIndex, onBackToTimeline, onNavigateToOpeningLogo, totalSlides]);
 
   // Sync slide with URL query parameter
   useEffect(() => {
@@ -195,6 +205,41 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
     }
   }, [currentSlideIndex]);
 
+  const cardsGridRef = useRef<HTMLDivElement | null>(null);
+  const bottomBarRef = useRef<HTMLDivElement | null>(null);
+
+  // Staggered entrance animation for Index cards and bottom bar
+  useEffect(() => {
+    if (isIndex && cardsGridRef.current) {
+      const cards = cardsGridRef.current.children;
+      gsap.killTweensOf(cards);
+      gsap.fromTo(
+        cards,
+        {
+          opacity: 0,
+          y: 40,
+          scale: 0.93,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.55,
+          stagger: 0.06,
+          ease: 'power3.out',
+        }
+      );
+      if (bottomBarRef.current) {
+        gsap.killTweensOf(bottomBarRef.current);
+        gsap.fromTo(
+          bottomBarRef.current,
+          { opacity: 0, y: 15 },
+          { opacity: 1, y: 0, duration: 0.45, delay: 0.3, ease: 'power2.out' }
+        );
+      }
+    }
+  }, [isIndex]);
+
   // Fullscreen toggle
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -209,12 +254,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
   };
 
   return (
-    <div className="w-full text-slate-900 px-2 sm:px-4 max-w-[1400px] mx-auto flex flex-col items-center justify-center select-none py-1">
+    <div className="w-full text-slate-900 px-2 sm:px-4 md:px-6 max-w-[98vw] xl:max-w-[1720px] 2xl:max-w-[1840px] mx-auto flex flex-col items-center justify-center select-none py-1">
       {isIndex ? (
         /* ================= 1. ÍNDICE DE GRÁFICOS (SEM CONTAINER DE FUNDO) ================= */
-        <div className="w-full max-w-[1360px] flex flex-col justify-center my-auto py-2">
-          {/* Grid de 8 Cards no estilo dos cards da linha do tempo */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
+        <div className="w-full max-w-[1720px] flex flex-col justify-center my-auto py-2">
+          {/* Grid de 8 Cards no estilo dos cards da linha do tempo com animação de entrada */}
+          <div ref={cardsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
             {SLIDES.map((slide, idx) => {
               const cardBg = SLIDE_BG_COLORS[idx % SLIDE_BG_COLORS.length];
               return (
@@ -224,7 +269,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
                     soundFx.playCardTick();
                     setCurrentSlideIndex(idx);
                   }}
-                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[220px] sm:min-h-[240px]`}
+                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[230px] sm:min-h-[260px]`}
                 >
                   <div>
                     {/* Título */}
@@ -251,7 +296,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
           </div>
 
           {/* Barra Inferior do Índice: Voltar à Linha do Tempo e Iniciar Apresentação */}
-          <div className="w-full flex items-center justify-between pt-6 px-1 shrink-0">
+          <div ref={bottomBarRef} className="w-full flex items-center justify-between pt-6 px-1 shrink-0">
             <button
               onClick={onBackToTimeline}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80"
@@ -279,7 +324,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
         /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO COM 96% DE OPACIDADE) ================= */
         <div className="w-full flex flex-col justify-center my-auto items-center">
           <div
-            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-6 sm:p-7 md:p-8 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1360px] h-[640px] flex flex-col justify-between"
+            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.8rem)] min-h-[500px] max-h-[790px] flex flex-col justify-between"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.96)' }}
           >
             {/* Header of the Current Slide */}
@@ -305,15 +350,29 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
               </button>
             </div>
 
-          {/* ================= SLIDE 1: GÊNERO ================= */}
+          {/* ================= SLIDE 1 (Index 0): SERVIDORES ATIVOS POR ÁREA ================= */}
           {currentSlideIndex === 0 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <ServidoresPorAreaPieChart />
+            </div>
+          )}
+
+          {/* ================= SLIDE 2 (Index 1): RANKING DOS 20 CARGOS ================= */}
+          {currentSlideIndex === 1 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <TopCargosBarChart />
+            </div>
+          )}
+
+          {/* ================= SLIDE 3 (Index 2): GÊNERO ================= */}
+          {currentSlideIndex === 2 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <GeneroCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 2: FAIXA ETÁRIA ================= */}
-          {currentSlideIndex === 1 && (
+          {/* ================= SLIDE 4 (Index 3): FAIXA ETÁRIA ================= */}
+          {currentSlideIndex === 3 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
               <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3 shrink-0">
@@ -328,15 +387,15 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 3: RAÇA / COR (INTEGRADO) ================= */}
-          {currentSlideIndex === 2 && (
+          {/* ================= SLIDE 5 (Index 4): RAÇA / COR (INTEGRADO) ================= */}
+          {currentSlideIndex === 4 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <RacaCorCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 4: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
-          {currentSlideIndex === 3 && (
+          {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
+          {currentSlideIndex === 5 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
               <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3 shrink-0">
@@ -351,8 +410,8 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 5: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
-          {currentSlideIndex === 4 && (
+          {/* ================= SLIDE 7 (Index 6): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlideIndex === 6 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
               {/* Highlight callout box */}
               <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3 shrink-0">
@@ -367,21 +426,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
             </div>
           )}
 
-          {/* ================= SLIDE 6: SERVIDORES ATIVOS POR ÁREA (PIE DA PLANILHA) ================= */}
-          {currentSlideIndex === 5 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
-              <ServidoresPorAreaPieChart />
-            </div>
-          )}
-
-          {/* ================= SLIDE 7: MAIORES CARGOS ================= */}
-          {currentSlideIndex === 6 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
-              <TopCargosBarChart />
-            </div>
-          )}
-
-          {/* ================= SLIDE 8: NACIONALIDADES ================= */}
+          {/* ================= SLIDE 8 (Index 7): NACIONALIDADES ================= */}
           {currentSlideIndex === 7 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <NacionalidadesCharts />
@@ -488,13 +533,29 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({ onBack
               </button>
 
               <button
-                onClick={handleNextSlide}
-                disabled={currentSlideIndex === totalSlides - 1}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-                title="Próximo Slide (Seta Direita / Espaço)"
+                onClick={() => {
+                  if (currentSlideIndex === totalSlides - 1) {
+                    soundFx.playCardTick();
+                    onNavigateToOpeningLogo?.();
+                  } else {
+                    handleNextSlide();
+                  }
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs transition-all cursor-pointer group"
+                title={currentSlideIndex === totalSlides - 1 ? "Voltar à Abertura (Logotipo)" : "Próximo Slide (Seta Direita / Espaço)"}
               >
-                <span>Próximo</span>
-                <ChevronRight className="w-4 h-4" />
+                {currentSlideIndex === totalSlides - 1 ? (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-[#e5a93a]" />
+                    <span>Abertura</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </>
+                ) : (
+                  <>
+                    <span>Próximo</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </div>
