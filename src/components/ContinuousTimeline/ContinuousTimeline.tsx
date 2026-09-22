@@ -112,18 +112,18 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   }, [currentPosition]);
   const prevActiveIndexRef = useRef<number | null>(activeIndex);
 
-  // Responsive spacing calculation
+  // Responsive spacing calculation (cards are closer together when all closed)
   useEffect(() => {
     const updateSpacing = () => {
       const w = window.innerWidth;
       if (activeIndex === null) {
-        // Compact gallery spacing when no card is selected
+        // Compact gallery spacing when no card is selected (cards sit close to each other)
         if (w < 640) {
-          setCardSpacing(280);
+          setCardSpacing(175);
         } else if (w < 1024) {
-          setCardSpacing(320);
+          setCardSpacing(210);
         } else {
-          setCardSpacing(360);
+          setCardSpacing(230);
         }
       } else {
         // Expanded 2-column active card spacing
@@ -141,7 +141,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     return () => window.removeEventListener('resize', updateSpacing);
   }, [activeIndex]);
 
-  // Smoothly slide to index using GSAP
+  // Smoothly slide to index using GSAP (selects/opens card)
   const slideToIndex = useCallback((index: number, duration = 0.6) => {
     const target = Math.max(0, Math.min(totalPeriods - 1, index));
     prevActiveIndexRef.current = target;
@@ -155,6 +155,56 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     tweenRef.current = gsap.to(obj, {
       pos: target,
       duration,
+      ease: 'power3.out',
+      onUpdate: () => {
+        currentPositionRef.current = obj.pos;
+        setCurrentPosition(obj.pos);
+      },
+      onComplete: () => {
+        currentPositionRef.current = target;
+        setCurrentPosition(target);
+      },
+    });
+  }, [totalPeriods]);
+
+  // Smoothly slide position without expanding/opening card (for gallery mode when cards are all closed)
+  const slideToPositionOnly = useCallback((index: number, duration = 0.5) => {
+    const target = Math.max(0, Math.min(totalPeriods - 1, index));
+    soundFx.playCardTick();
+
+    if (tweenRef.current) tweenRef.current.kill();
+
+    const startPos = currentPositionRef.current;
+    const obj = { pos: startPos };
+    tweenRef.current = gsap.to(obj, {
+      pos: target,
+      duration,
+      ease: 'power3.out',
+      onUpdate: () => {
+        currentPositionRef.current = obj.pos;
+        setCurrentPosition(obj.pos);
+      },
+      onComplete: () => {
+        currentPositionRef.current = target;
+        setCurrentPosition(target);
+      },
+    });
+  }, [totalPeriods]);
+
+  // Close / collapse currently expanded card back to compact gallery view in place without jumping to card 0
+  const handleCloseCard = useCallback(() => {
+    soundFx.playCardTick();
+    prevActiveIndexRef.current = null;
+    onSelectPeriodRef.current(null);
+
+    // Keep current position centered on the card that was just closed
+    const target = Math.max(0, Math.min(totalPeriods - 1, Math.round(currentPositionRef.current)));
+    if (tweenRef.current) tweenRef.current.kill();
+    const startPos = currentPositionRef.current;
+    const obj = { pos: startPos };
+    tweenRef.current = gsap.to(obj, {
+      pos: target,
+      duration: 0.4,
       ease: 'power3.out',
       onUpdate: () => {
         currentPositionRef.current = obj.pos;
@@ -383,14 +433,22 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   const handlePrev = useCallback(() => {
     const current = activeIndex ?? Math.round(currentPositionRef.current);
     const nextIdx = Math.max(0, current - 1);
-    slideToIndex(nextIdx);
-  }, [activeIndex, slideToIndex]);
+    if (activeIndex !== null) {
+      slideToIndex(nextIdx);
+    } else {
+      slideToPositionOnly(nextIdx);
+    }
+  }, [activeIndex, slideToIndex, slideToPositionOnly]);
 
   const handleNext = useCallback(() => {
     const current = activeIndex ?? Math.round(currentPositionRef.current);
     const nextIdx = Math.min(totalPeriods - 1, current + 1);
-    slideToIndex(nextIdx);
-  }, [activeIndex, totalPeriods, slideToIndex]);
+    if (activeIndex !== null) {
+      slideToIndex(nextIdx);
+    } else {
+      slideToPositionOnly(nextIdx);
+    }
+  }, [activeIndex, totalPeriods, slideToIndex, slideToPositionOnly]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -432,18 +490,22 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           handleNext();
         }
       } else if (e.key === 'Enter') {
-        const currentIdx = activeIndex ?? Math.round(currentPosition);
-        const currentPeriod = periods[currentIdx];
-        if (currentPeriod?.photos && currentPeriod.photos.length > 0) {
-          onOpenPhoto(currentPeriod.photos[0], currentPeriod);
+        const currentIdx = activeIndex ?? Math.round(currentPositionRef.current);
+        if (activeIndex === null) {
+          slideToIndex(currentIdx);
+        } else {
+          const currentPeriod = periods[currentIdx];
+          if (currentPeriod?.photos && currentPeriod.photos.length > 0) {
+            onOpenPhoto(currentPeriod.photos[0], currentPeriod);
+          }
         }
       } else if (e.key === 'Escape' && activeIndex !== null) {
-        slideToIndex(0);
+        handleCloseCard();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, onOpenPhoto, periods, currentPosition, onSelectPeriod, onOpenDashboard, totalPeriods]);
+  }, [isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, handleCloseCard, slideToIndex, onOpenPhoto, periods, currentPosition, onOpenDashboard, totalPeriods]);
 
   // Mouse wheel navigation
   useEffect(() => {
@@ -601,7 +663,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             isFanIdle ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'
           }`}
           onMouseLeave={() => {
-            if (introStatus === 'idle_fan') {
+            if (introStatus === 'idle_fan' || activeIndex === null) {
               setHoveredCardIndex(null);
             }
           }}
@@ -652,10 +714,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               targetOpacity = absOffset > 2.3 ? Math.max(0.15, 1 - (absOffset - 2.3) * 0.75) : 1;
               targetZIndex = Math.round(50 - absOffset * 10);
             } else {
-              // Mode B: NO CARD SELECTED (Clean compact gallery of cards side-by-side)
+              // Mode B: NO CARD SELECTED (Clean compact gallery of cards side-by-side, closer together)
               targetX = offset * cardSpacing;
-              targetScale = Math.max(0.48, 1.0 - absOffset * 0.13);
-              targetOpacity = absOffset > 3.2 ? Math.max(0.12, 1 - (absOffset - 3.2) * 0.75) : 1;
+              targetScale = Math.max(0.48, 1.0 - absOffset * 0.12);
+              targetOpacity = absOffset > 3.8 ? Math.max(0.10, 1 - (absOffset - 3.8) * 0.6) : 1;
               targetZIndex = Math.round(50 - absOffset * 4);
             }
 
@@ -876,23 +938,31 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 currentZIndex = hoverZ;
               }
             } else {
+              // Gallery mode when all cards are closed: subtle lift and focus on hover
+              if (activeIndex === null && hoveredCardIndex === idx) {
+                currentScale = targetScale * 1.06;
+                currentY = -14;
+                currentZIndex = 65;
+              }
+
               // Limit rendering of distant cards outside intro for high performance
-              if (absOffset > 4.5) return null;
+              if (activeIndex !== null && absOffset > 4.5) return null;
+              if (activeIndex === null && absOffset > 6.5) return null;
             }
 
             return (
               <div
                 key={period.id}
                 className={`absolute pointer-events-auto ${
-                  introStatus === 'idle_fan' ? 'cursor-pointer' : ''
+                  introStatus === 'idle_fan' || (!isIntroActive && activeIndex === null) ? 'cursor-pointer' : ''
                 }`}
                 onMouseEnter={() => {
-                  if (introStatus === 'idle_fan') {
+                  if (introStatus === 'idle_fan' || (!isIntroActive && activeIndex === null)) {
                     setHoveredCardIndex(idx);
                   }
                 }}
                 onMouseLeave={() => {
-                  if (introStatus === 'idle_fan') {
+                  if (introStatus === 'idle_fan' || (!isIntroActive && activeIndex === null)) {
                     setHoveredCardIndex((prev) => (prev === idx ? null : prev));
                   }
                 }}
@@ -933,7 +1003,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                       slideToIndex(idx);
                     }
                   }}
-                  onClose={() => slideToIndex(0)}
+                  onClose={handleCloseCard}
                   onOpenPhoto={onOpenPhoto}
                 />
               </div>
@@ -1192,15 +1262,20 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
             {/* Filled progress bar */}
             <div
-              className={`absolute left-4 top-1/2 h-1 ${activeIndex !== null ? pureBgColors[activeIndex % pureBgColors.length] : 'bg-transparent'} -translate-y-1/2 rounded-full transition-all duration-300 -z-0`}
+              className={`absolute left-4 top-1/2 h-1 ${
+                activeIndex !== null
+                  ? pureBgColors[activeIndex % pureBgColors.length]
+                  : 'bg-slate-950/40'
+              } -translate-y-1/2 rounded-full transition-all duration-300 -z-0`}
               style={{
-                width: activeIndex !== null ? `calc(${(activeIndex / (totalPeriods - 1)) * 100}% - 16px)` : '0px',
+                width: `calc(${(((activeIndex ?? Math.round(currentPosition)) / (totalPeriods - 1))) * 100}% - 16px)`,
               }}
             />
 
             {/* 12 Historical Compact Nodes with Years directly inside circles */}
             {periods.map((p, idx) => {
               const isSelected = activeIndex !== null && idx === activeIndex;
+              const isCenterInGallery = activeIndex === null && Math.round(currentPosition) === idx;
               const cardBgClass = pureBgColors[idx % pureBgColors.length];
 
               return (
@@ -1214,6 +1289,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     className={`min-w-6 sm:min-w-8 h-6 sm:h-7 px-1 sm:px-1.5 rounded-full flex items-center justify-center transition-all ${
                       isSelected
                         ? `${cardBgClass} text-white border-2 border-white shadow-md scale-110 ring-2 ring-black/20`
+                        : isCenterInGallery
+                        ? 'bg-white text-slate-900 border-2 border-slate-950 scale-105 shadow-md ring-2 ring-white/50'
                         : 'bg-white text-slate-900 border border-black/10 hover:border-black/30 hover:scale-105 shadow-xs'
                     }`}
                   >
