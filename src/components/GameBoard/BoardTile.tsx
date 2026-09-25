@@ -44,7 +44,8 @@ const pureBgColors = [
   'bg-[#2d5a27]', // 8: 2008-2011 (Aux 1 - Verde Escuro)
   'bg-[#4c1d95]', // 9: 2014-2015 (Aux 2 - Roxo Profundo)
   'bg-[#b44318]', // 10: 2017-2019 (Aux 3 - Terracota Queimado)
-  'bg-[#701a75]', // 11: 2022-2025 (Aux 2 - Ameixa DGRH)
+  'bg-[#701a75]', // 11: 2020-2022 (Aux 2 - Ameixa DGRH)
+  'bg-[#105e7b]', // 12: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
 ];
 
 export const BoardTile: React.FC<BoardTileProps> = ({

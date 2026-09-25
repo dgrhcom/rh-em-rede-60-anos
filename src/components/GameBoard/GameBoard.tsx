@@ -17,7 +17,7 @@ interface GameBoardProps {
   onOpenDetail: (period: HistoricalPeriod) => void;
 }
 
-// Pure DGRH colors for the 12 periods
+// Pure DGRH colors for the 13 periods
 const pureBgColors = [
   'bg-[#105e7b]', // 0: 1983-1986 (Azul DGRH)
   'bg-[#477b2f]', // 1: 1989 (Verde DGRH)
@@ -30,7 +30,8 @@ const pureBgColors = [
   'bg-[#4c1d95]', // 8: 2008-2011 (Roxo Escuro)
   'bg-[#c05621]', // 9: 2014-2015 (Terracota)
   'bg-[#0d6e8a]', // 10: 2017-2019 (Azul Oceano)
-  'bg-[#105e7b]', // 11: 2022-2025 (Azul DGRH 60 Anos)
+  'bg-[#701a75]', // 11: 2020-2022 (Ameixa DGRH)
+  'bg-[#105e7b]', // 12: 2024-2026 (Azul DGRH 60 Anos)
 ];
 
 // 4-column dynamic board game trail coordinates with expanded vertical spacing (step ~450px)
@@ -46,7 +47,8 @@ const trailPositions = [
   { x: 38, y: 3780 },  // 8: 2008-2011 (Col 2)
   { x: 82, y: 4230 },  // 9: 2014-2015 (Col 4)
   { x: 38, y: 4680 },  // 10: 2017-2019 (Col 2)
-  { x: 62, y: 5130 },  // 11: 2022-2025 (Col 3 - Topo / Chegada 60 Anos)
+  { x: 62, y: 5130 },  // 11: 2020-2022 (Col 3)
+  { x: 82, y: 5580 },  // 12: 2024-2026 (Col 4 - Topo / Chegada 60 Anos)
 ];
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -130,9 +132,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const activePeriod = periods[currentTileIndex];
   const progressPercent = Math.round((visitedIndices.size / totalTiles) * 100);
 
-  // Generate SVG path connecting the 12 tiles from bottom to top (using 0..1000 X coordinate space)
-  // Generate SVG orthogonal path connecting the 12 tiles with straight lines and 90° bends
-  const svgTotalHeight = 5400;
+  // Generate SVG path connecting the 13 tiles from bottom to top (using 0..1000 X coordinate space)
+  // Generate SVG orthogonal path connecting the 13 tiles with straight lines and 90° bends
+  const svgTotalHeight = 5850;
   const buildSvgPath = () => {
     if (trailPositions.length === 0) return '';
     let d = '';

@@ -14,7 +14,7 @@ interface TimelineCardProps {
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
 }
 
-// Deep, saturated DGRH colors for the 12 periods (Secondary and Auxiliaries only - Primary reserved strictly for Cover)
+// Deep, saturated DGRH colors for the 13 periods (Secondary and Auxiliaries only - Primary reserved strictly for Cover)
 export const pureBgColors = [
   'bg-[#477b2f]', // 0: 1983-1986 (Aux 1 - Verde DGRH)
   'bg-[#5e2a6b]', // 1: 1989 (Aux 2 - Roxo DGRH)
@@ -27,7 +27,8 @@ export const pureBgColors = [
   'bg-[#2d5a27]', // 8: 2008-2011 (Aux 1 - Verde Escuro)
   'bg-[#4c1d95]', // 9: 2014-2015 (Aux 2 - Roxo Profundo)
   'bg-[#b44318]', // 10: 2017-2019 (Aux 3 - Terracota Queimado)
-  'bg-[#701a75]', // 11: 2022-2025 (Aux 2 - Ameixa DGRH)
+  'bg-[#701a75]', // 11: 2020-2022 (Aux 2 - Ameixa DGRH)
+  'bg-[#105e7b]', // 12: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
 ];
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({
@@ -84,11 +85,17 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       >
         {/* Header Superior Global do Card Todo (Acima das Fotos e dos Marcos) */}
         <div className="pb-3 sm:pb-3.5 border-b-2 border-white/20 shrink-0 text-left pr-12 sm:pr-14 mb-3 sm:mb-4">
-          <h2 className="text-xl sm:text-2xl lg:text-[28px] xl:text-[32px] font-bold text-white tracking-tight leading-tight">
-            <span className="whitespace-nowrap">{period.period}</span>
-            <span className="mx-2.5 sm:mx-3 text-white/40 font-light select-none">|</span>
-            <span className="text-white/95 font-medium sm:font-semibold">{period.title}</span>
-          </h2>
+          <div className="flex flex-wrap items-baseline gap-x-3 sm:gap-x-4 gap-y-1">
+            <span className="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black tracking-tight text-[#e5a93a] whitespace-nowrap leading-none drop-shadow-xs">
+              {period.period}
+            </span>
+            <span className="text-white/30 font-light select-none text-2xl sm:text-3xl lg:text-4xl hidden sm:inline leading-none">
+              |
+            </span>
+            <h2 className="text-xl sm:text-2xl lg:text-[28px] xl:text-[30px] font-bold text-white/95 tracking-tight leading-tight inline">
+              {period.title}
+            </h2>
+          </div>
         </div>
 
         <div className={`grid ${hasPhotos ? 'grid-cols-1 sm:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] gap-4 sm:gap-6 lg:gap-8' : 'grid-cols-1'} flex-1 min-h-0 items-stretch`}>

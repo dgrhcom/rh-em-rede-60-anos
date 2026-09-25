@@ -1507,7 +1507,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             </span>
           ) : (
             <span className="text-[11px] font-black text-slate-900 bg-white/95 border border-slate-950 px-3 py-0.5 rounded-full shadow-xs">
-              1983 — 2025
+              1983 — 2026
             </span>
           )}
         </div>
