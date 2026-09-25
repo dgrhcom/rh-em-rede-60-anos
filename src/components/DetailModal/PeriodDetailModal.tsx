@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
+import { isTopAlignedPhoto } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { 
   X, ChevronLeft, ChevronRight, Image as ImageIcon, 
@@ -122,7 +123,11 @@ export const PeriodDetailModal: React.FC<PeriodDetailModalProps> = ({
                       <img
                         src={photo.url}
                         alt={photo.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full group-hover:scale-105 transition-transform duration-500 ${
+                          photo.objectFit === 'contain'
+                            ? 'object-contain p-2 bg-slate-900'
+                            : `object-cover ${isTopAlignedPhoto(photo) ? 'object-top' : 'object-center'}`
+                        }`}
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center text-center p-4">

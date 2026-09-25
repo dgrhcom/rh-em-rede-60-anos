@@ -13,9 +13,6 @@ import {
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundEffects';
 import {
-  DESTAQUE_FAIXA_ETARIA,
-} from '../../data/hrStatsData';
-import {
   GeneroCharts,
   FaixaEtariaBarChart,
   RacaCorCharts,
@@ -322,9 +319,9 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
         </div>
       ) : (
         /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO COM 96% DE OPACIDADE) ================= */
-        <div className="w-full flex flex-col justify-center my-auto items-center">
+        <div className="w-full flex flex-col justify-center my-auto items-center pb-10 sm:pb-12">
           <div
-            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.8rem)] min-h-[500px] max-h-[790px] flex flex-col justify-between"
+            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.5rem)] min-h-[500px] max-h-[820px] flex flex-col justify-between"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.96)' }}
           >
             {/* Header of the Current Slide */}
@@ -373,16 +370,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
 
           {/* ================= SLIDE 4 (Index 3): FAIXA ETÁRIA ================= */}
           {currentSlideIndex === 3 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
-              {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-center gap-3 shrink-0">
-                <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-                <div className="text-xs sm:text-sm font-bold leading-relaxed">
-                  📌 <strong>Destaque Demográfico:</strong> "{DESTAQUE_FAIXA_ETARIA.jovem}" e "{DESTAQUE_FAIXA_ETARIA.velho}".
-                </div>
-              </div>
-
-              {/* Age Stacked Bar Chart by Categories */}
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <FaixaEtariaBarChart />
             </div>
           )}
@@ -396,33 +384,37 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
 
           {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
           {currentSlideIndex === 5 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
-              {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3 shrink-0">
+            <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
+              {/* All education levels Line Chart */}
+              <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
+                <EscolaridadeEvolucaoLineChart />
+              </div>
+
+              {/* Highlight callout box (Abaixo do Gráfico) */}
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3 shrink-0 shadow-xs">
                 <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0" />
-                <div className="text-xs sm:text-sm">
+                <div className="text-xs sm:text-sm md:text-base leading-relaxed">
                   <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
                 </div>
               </div>
-
-              {/* All education levels Line Chart */}
-              <EscolaridadeEvolucaoLineChart />
             </div>
           )}
 
           {/* ================= SLIDE 7 (Index 6): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
           {currentSlideIndex === 6 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 gap-2.5 overflow-hidden">
-              {/* Highlight callout box */}
-              <div className="p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3 shrink-0">
+            <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
+              {/* Zoom Line Chart */}
+              <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
+                <EscolaridadeZoomLineChart />
+              </div>
+
+              {/* Highlight callout box (Abaixo do Gráfico) */}
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3 shrink-0 shadow-xs">
                 <Sparkles className="w-5 h-5 text-sky-700 shrink-0" />
-                <div className="text-xs sm:text-sm">
+                <div className="text-xs sm:text-sm md:text-base leading-relaxed">
                   <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
                 </div>
               </div>
-
-              {/* Zoom Line Chart */}
-              <EscolaridadeZoomLineChart />
             </div>
           )}
 
@@ -433,61 +425,48 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             </div>
           )}
 
-          {/* Slide Footer with Dots Navigation and Index Controls */}
-          <div className="pt-2.5 mt-2 border-t border-black/10 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
-              {isIndex ? (
-                <button
-                  onClick={() => {
-                    soundFx.playCardTick();
-                    onBackToTimeline();
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xs transition-all cursor-pointer"
-                  title="Voltar à Linha do Tempo (Esc)"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Linha do Tempo (Esc)</span>
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={handlePrevSlide}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-900 font-black text-xs transition-all cursor-pointer"
-                    title={currentSlideIndex === 0 ? "Voltar ao Índice Geral" : "Slide Anterior"}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>{currentSlideIndex === 0 ? "Índice" : "Anterior"}</span>
-                  </button>
+          </div>
 
-                  <button
-                    onClick={() => {
-                      soundFx.playCardTick();
-                      setCurrentSlideIndex(-1);
-                    }}
-                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
-                    title="Ver Grade de Índice"
-                  >
-                    <LayoutGrid className="w-3.5 h-3.5 text-[#105e7b]" />
-                    <span>Índice</span>
-                  </button>
+          {/* ================= BARRA DE NAVEGAÇÃO EXTERNA (FIXADA NA BASE DA PÁGINA) ================= */}
+          <div className="fixed bottom-3 sm:bottom-4 md:bottom-5 inset-x-0 mx-auto w-full max-w-[1720px] px-2 sm:px-4 md:px-6 z-30 flex items-center justify-between pointer-events-none">
+            {/* Controles da Esquerda */}
+            <div className="flex items-center gap-2 pointer-events-auto">
+              <button
+                onClick={handlePrevSlide}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-slate-950 font-black text-xs transition-all cursor-pointer border border-slate-950/40 shadow-md hover:scale-105 active:scale-95"
+                title={currentSlideIndex === 0 ? "Voltar ao Índice Geral" : "Slide Anterior"}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>{currentSlideIndex === 0 ? "Índice" : "Anterior"}</span>
+              </button>
 
-                  <button
-                    onClick={() => {
-                      soundFx.playCardTick();
-                      onBackToTimeline();
-                    }}
-                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
-                    title="Voltar à Linha do Tempo (Esc)"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Linha do Tempo</span>
-                  </button>
-                </>
-              )}
+              <button
+                onClick={() => {
+                  soundFx.playCardTick();
+                  setCurrentSlideIndex(-1);
+                }}
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/85 hover:bg-white text-slate-800 text-xs font-bold transition-all cursor-pointer border border-slate-950/30 shadow-xs hover:scale-105"
+                title="Ver Grade de Índice"
+              >
+                <LayoutGrid className="w-3.5 h-3.5 text-[#105e7b]" />
+                <span>Índice</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundFx.playCardTick();
+                  onBackToTimeline();
+                }}
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/85 hover:bg-white text-slate-800 text-xs font-bold transition-all cursor-pointer border border-slate-950/30 shadow-xs hover:scale-105"
+                title="Voltar à Linha do Tempo (Esc)"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Linha do Tempo</span>
+              </button>
             </div>
 
-            {/* Dots Navigation with Index Shortcut */}
-            <div className="flex items-center gap-1.5">
+            {/* Pílula Central com Marcadores (Dots) dos Slides */}
+            <div className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-950/40 shadow-md pointer-events-auto">
               <button
                 onClick={() => {
                   soundFx.playCardTick();
@@ -496,7 +475,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                 className={`h-6 px-2.5 rounded-full transition-all cursor-pointer flex items-center gap-1 text-[11px] font-black ${
                   isIndex
                     ? 'bg-[#105e7b] text-white shadow-xs'
-                    : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
+                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
                 }`}
                 title="Página de Índice Geral"
               >
@@ -516,17 +495,18 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                   className={`h-2.5 rounded-full transition-all cursor-pointer ${
                     idx === currentSlideIndex
                       ? 'w-7 bg-[#105e7b]'
-                      : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                      : 'w-2.5 bg-slate-300 hover:bg-slate-500'
                   }`}
                   title={`Slide ${idx + 1}: ${s.title}`}
                 />
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Controles da Direita */}
+            <div className="flex items-center gap-2 pointer-events-auto">
               <button
                 onClick={toggleFullscreen}
-                className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+                className="p-2 rounded-full bg-white/85 hover:bg-white text-slate-700 hover:text-slate-950 border border-slate-950/30 shadow-xs transition-all cursor-pointer hover:scale-105"
                 title="Tela Cheia"
               >
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -541,7 +521,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                     handleNextSlide();
                   }
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs transition-all cursor-pointer group"
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-black text-xs transition-all cursor-pointer group border-2 border-white/80 shadow-md hover:scale-105 active:scale-95"
                 title={currentSlideIndex === totalSlides - 1 ? "Voltar à Abertura (Logotipo)" : "Próximo Slide (Seta Direita / Espaço)"}
               >
                 {currentSlideIndex === totalSlides - 1 ? (
@@ -560,7 +540,6 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );

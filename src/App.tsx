@@ -187,7 +187,7 @@ export function App() {
           />
         </div>
         {currentView === 'dashboard' && (
-          <div className="w-full min-h-screen pt-14 sm:pt-16 pb-2 sm:pb-3 flex flex-col justify-center">
+          <div className="w-full min-h-screen pt-16 sm:pt-20 pb-2 sm:pb-3 flex flex-col justify-center">
             <HistoricalDashboard
               onBackToTimeline={handleBackToTimeline}
               onNavigateToOpeningLogo={handleNavigateToOpeningLogo}

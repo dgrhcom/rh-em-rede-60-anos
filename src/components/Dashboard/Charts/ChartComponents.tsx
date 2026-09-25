@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
+  TOTAL_SERVIDORES_ATIVOS,
   GENERO_DATA,
   FAIXA_ETARIA_DATA,
+  DESTAQUE_FAIXA_ETARIA,
   RACA_COR_DATA,
   RACA_COR_TABELA_2,
   ESCOLARIDADE_EVOLUCAO,
@@ -44,7 +46,8 @@ function drawBadge(
   fontSize: number = 14.5,
   paddingX: number = 9,
   paddingY: number = 5,
-  radius: number = 6
+  radius: number = 6,
+  borderColor: string = 'transparent'
 ) {
   ctx.save();
   ctx.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
@@ -65,6 +68,12 @@ function drawBadge(
     ctx.rect(rx, ry, width, height);
   }
   ctx.fill();
+
+  if (borderColor && borderColor !== 'transparent') {
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
 
   ctx.fillStyle = textColor;
   ctx.fillText(text, x, y);
@@ -94,42 +103,62 @@ async function getChartJS() {
 }
 
 /* =========================================================================
-   1. GÊNERO: Doughnut Chart Geral + Bar Chart por Carreira
+   1. GÊNERO: Pie Chart Geral Ampliado + Bar Chart por Carreira
    ========================================================================= */
 export const GeneroCharts: React.FC = () => {
-  const donutRef = useRef<HTMLCanvasElement | null>(null);
+  const pieRef = useRef<HTMLCanvasElement | null>(null);
   const barRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    let donutChart: any = null;
+    let pieChart: any = null;
     let barChart: any = null;
     let active = true;
 
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      // 1. Donut Chart com rótulo percentual nas fatias
-      if (donutRef.current) {
-        const ctx1 = donutRef.current.getContext('2d');
+      // 1. Pie Chart com rótulo percentual ampliado nas fatias e sem legenda inferior
+      if (pieRef.current) {
+        const ctx1 = pieRef.current.getContext('2d');
         if (ctx1) {
-          const doughnutPlugin = {
-            id: 'donutPercentageBadges',
+          const piePercentageBadges = {
+            id: 'generoPiePercentageBadges',
             afterDatasetsDraw(chart: any) {
               const { ctx } = chart;
               const meta = chart.getDatasetMeta(0);
-              const pcts = [GENERO_DATA.total.pctFeminino, GENERO_DATA.total.pctMasculino];
+              const isMobile = chart.width < 500;
+              const badgeFontSize = isMobile ? 16 : 23;
+              const padX = isMobile ? 10 : 16;
+              const padY = isMobile ? 6 : 10;
+              const items = [
+                { label: 'Mulheres', pct: GENERO_DATA.total.pctFeminino, total: GENERO_DATA.total.feminino },
+                { label: 'Homens', pct: GENERO_DATA.total.pctMasculino, total: GENERO_DATA.total.masculino },
+              ];
 
               meta.data.forEach((element: any, i: number) => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                const text = `${pcts[i].toFixed(1).replace('.', ',')}%`;
-                drawBadge(ctx, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14, 8, 4, 5);
+                const pctText = `${items[i].pct.toFixed(1).replace('.', ',')}%`;
+                const text = isMobile ? pctText : `${items[i].label}: ${pctText}`;
+                drawBadge(
+                  ctx,
+                  text,
+                  pos.x,
+                  pos.y,
+                  'rgba(15, 23, 42, 0.92)',
+                  '#ffffff',
+                  badgeFontSize,
+                  padX,
+                  padY,
+                  8,
+                  'rgba(255, 255, 255, 0.45)'
+                );
               });
             },
           };
 
-          donutChart = new Chart(ctx1, {
-            type: 'doughnut',
+          pieChart = new Chart(ctx1, {
+            type: 'pie',
             data: {
               labels: ['Feminino', 'Masculino'],
               datasets: [
@@ -145,18 +174,17 @@ export const GeneroCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '68%',
+              layout: {
+                padding: 10,
+              },
               plugins: {
                 legend: {
-                  position: 'bottom',
-                  labels: {
-                    boxWidth: 12,
-                    boxHeight: 12,
-                    font: { weight: 'bold', size: 11 },
-                    color: '#1e293b',
-                  },
+                  display: false, // Desativa a legenda inferior conforme solicitado
                 },
                 tooltip: {
+                  padding: 14,
+                  titleFont: { size: 15, weight: 'bold' },
+                  bodyFont: { size: 14 },
                   callbacks: {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
@@ -167,12 +195,12 @@ export const GeneroCharts: React.FC = () => {
                 },
               },
             },
-            plugins: [doughnutPlugin],
+            plugins: [piePercentageBadges],
           });
         }
       }
 
-      // 2. Bar Chart por Carreira com rótulos de porcentagem
+      // 2. Bar Chart por Carreira com rótulos de porcentagem e eixos bem maiores
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
@@ -180,17 +208,20 @@ export const GeneroCharts: React.FC = () => {
             id: 'groupedBarPercentageLabels',
             afterDatasetsDraw(chart: any) {
               const { ctx } = chart;
+              const isMobile = chart.width < 500;
+              const fontSize = isMobile ? 17 : 24;
+
               chart.data.datasets.forEach((dataset: any, dIdx: number) => {
                 const meta = chart.getDatasetMeta(dIdx);
                 meta.data.forEach((element: any, index: number) => {
                   const val = dataset.data[index];
                   const text = `${Number(val).toFixed(1).replace('.', ',')}%`;
                   ctx.save();
-                  ctx.font = 'bold 14.5px Inter, -apple-system, sans-serif';
+                  ctx.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
-                  ctx.fillStyle = dIdx === 0 ? DS_COLORS.primary : '#855807';
-                  ctx.fillText(text, element.x, element.y - 4);
+                  ctx.fillStyle = '#0f172a';
+                  ctx.fillText(text, element.x, element.y - 8);
                   ctx.restore();
                 });
               });
@@ -200,50 +231,75 @@ export const GeneroCharts: React.FC = () => {
           barChart = new Chart(ctx2, {
             type: 'bar',
             data: {
-              labels: GENERO_DATA.porCarreira.map((c) => c.carreira),
+              labels: [
+                ['Técnico-administrativos', '(PAEPE)'],
+                'Docentes',
+                ['Pesquisadores', '(PQ)'],
+              ],
               datasets: [
                 {
                   label: 'Feminino (%)',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctFeminino),
                   backgroundColor: DS_COLORS.primary,
-                  borderRadius: 6,
+                  hoverBackgroundColor: DS_COLORS.primaryHover,
+                  borderRadius: 8,
+                  borderSkipped: false,
                 },
                 {
                   label: 'Masculino (%)',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctMasculino),
                   backgroundColor: DS_COLORS.secondary,
-                  borderRadius: 6,
+                  hoverBackgroundColor: DS_COLORS.secondaryHover,
+                  borderRadius: 8,
+                  borderSkipped: false,
                 },
               ],
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              layout: {
+                padding: {
+                  top: 28,
+                  bottom: 4,
+                },
+              },
               scales: {
                 y: {
-                  max: 108,
+                  max: 75,
+                  suggestedMax: 75,
                   ticks: {
+                    stepSize: 15,
                     callback: (val: any) => `${val}%`,
-                    font: { weight: 'bold', size: 12 },
-                    color: '#64748b',
+                    font: { weight: 'bold', size: 14 },
+                    color: '#475569',
                   },
-                  grid: { color: 'rgba(0,0,0,0.05)' },
+                  grid: { color: 'rgba(0,0,0,0.06)' },
                 },
                 x: {
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
+                  ticks: {
+                    font: { weight: 'bold', size: 16 },
+                    color: '#0f172a',
+                    padding: 8,
+                  },
                 },
               },
               plugins: {
                 legend: {
                   position: 'top',
                   labels: {
-                    boxWidth: 14,
-                    font: { weight: 'bold', size: 12 },
-                    color: '#1e293b',
+                    boxWidth: 16,
+                    boxHeight: 16,
+                    font: { weight: 'bold', size: 15 },
+                    color: '#0f172a',
+                    padding: 18,
                   },
                 },
                 tooltip: {
+                  padding: 14,
+                  titleFont: { size: 15, weight: 'bold' },
+                  bodyFont: { size: 14 },
                   callbacks: {
                     label: (ctx: any) => {
                       const careerIdx = ctx.dataIndex;
@@ -263,33 +319,64 @@ export const GeneroCharts: React.FC = () => {
 
     return () => {
       active = false;
-      donutChart?.destroy();
+      pieChart?.destroy();
       barChart?.destroy();
     };
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-      <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[240px] h-[240px] sm:w-[270px] sm:h-[270px] lg:w-[300px] lg:h-[300px] relative">
-          <canvas ref={donutRef} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-4xl sm:text-5xl font-black text-[#105e7b]">55,9%</span>
-            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600 font-sans mt-0.5">Mulheres</span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Coluna Esquerda: Gráfico de Pizza Geral Ampliado (Sem legenda inferior) */}
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full">
+        {/* Canvas da Pizza com dimensões substanciais */}
+        <div className="w-full h-[350px] sm:h-[420px] lg:h-[480px] xl:h-[530px] relative flex items-center justify-center">
+          <canvas ref={pieRef} />
+        </div>
+
+        {/* Resumo Absoluto e Percentual no Rodapé da Coluna Esquerda */}
+        <div className="w-full max-w-[460px] grid grid-cols-2 gap-2.5 sm:gap-3 mt-2.5">
+          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#105e7b] flex flex-col items-center justify-center shadow-xs">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Mulheres</span>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-base sm:text-lg lg:text-xl font-black text-[#105e7b]">
+                {GENERO_DATA.total.feminino.toLocaleString('pt-BR')}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-[#105e7b]/80">
+                ({GENERO_DATA.total.pctFeminino.toFixed(1).replace('.', ',')}%)
+              </span>
+            </div>
+          </div>
+
+          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#e5a93a] flex flex-col items-center justify-center shadow-xs">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Homens</span>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-base sm:text-lg lg:text-xl font-black text-[#b45309]">
+                {GENERO_DATA.total.masculino.toLocaleString('pt-BR')}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-[#b45309]/80">
+                ({GENERO_DATA.total.pctMasculino.toFixed(1).replace('.', ',')}%)
+              </span>
+            </div>
           </div>
         </div>
-        <div className="text-center mt-1">
-          <span className="text-xs font-bold text-slate-500">
-            Total: <strong>{GENERO_DATA.total.total.toLocaleString('pt-BR')}</strong> servidores ativos
+
+        <div className="text-center mt-2">
+          <span className="text-xs sm:text-sm font-semibold text-slate-600">
+            Total Institucional: <strong className="text-slate-900 font-black">{GENERO_DATA.total.total.toLocaleString('pt-BR')}</strong> servidores ativos
           </span>
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[300px] sm:h-[340px] lg:h-[380px]">
-        <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
-          Distribuição Percentual por Carreira
-        </h4>
-        <canvas ref={barRef} />
+      {/* Coluna Direita: Gráfico de Barras por Carreira com % e rótulos X bem maiores */}
+      <div className="lg:col-span-7 flex flex-col justify-center w-full h-[380px] sm:h-[450px] lg:h-[520px] xl:h-[580px]">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm sm:text-base lg:text-lg font-black uppercase text-slate-800 tracking-wider text-center md:text-left">
+            Distribuição Percentual por Carreira
+          </h4>
+        </div>
+        <div className="flex-1 w-full relative">
+          <canvas ref={barRef} />
+        </div>
       </div>
     </div>
   );
@@ -300,6 +387,19 @@ export const GeneroCharts: React.FC = () => {
    ========================================================================= */
 export const FaixaEtariaBarChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstanceRef = useRef<any>(null);
+
+  const totalDocentes = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.docentes, 0);
+  const totalPesquisadores = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.pesquisadores, 0);
+  const totalTecnicos = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.tecnicos, 0);
+  const totalGeral = totalDocentes + totalPesquisadores + totalTecnicos;
+
+  const toggleDataset = (datasetIndex: number) => {
+    if (!chartInstanceRef.current) return;
+    const isVisible = chartInstanceRef.current.isDatasetVisible(datasetIndex);
+    chartInstanceRef.current.setDatasetVisibility(datasetIndex, !isVisible);
+    chartInstanceRef.current.update();
+  };
 
   useEffect(() => {
     let chart: any = null;
@@ -315,15 +415,21 @@ export const FaixaEtariaBarChart: React.FC = () => {
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
           const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
+          const isMobile = chartInstance.width < 500;
+          const fontSize = isMobile ? 17 : 24;
 
           FAIXA_ETARIA_DATA.forEach((item, index) => {
             const element = metaLast.data[index];
             if (!element) return;
-            const x = element.x;
-            const y = element.y - 12;
             const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
 
-            drawBadge(c, text, x, y, DS_COLORS.primary, '#ffffff', 14.5, 9, 5, 6);
+            c.save();
+            c.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
+            c.textAlign = 'center';
+            c.textBaseline = 'bottom';
+            c.fillStyle = '#0f172a';
+            c.fillText(text, element.x, element.y - 8);
+            c.restore();
           });
         },
       };
@@ -337,19 +443,19 @@ export const FaixaEtariaBarChart: React.FC = () => {
               label: 'Docentes',
               data: FAIXA_ETARIA_DATA.map((f) => f.docentes),
               backgroundColor: DS_COLORS.aux2, // Roxo DGRH
-              borderRadius: 4,
+              borderRadius: 6,
             },
             {
               label: 'Pesquisadores (PQ)',
               data: FAIXA_ETARIA_DATA.map((f) => f.pesquisadores),
               backgroundColor: DS_COLORS.aux1, // Verde DGRH
-              borderRadius: 4,
+              borderRadius: 6,
             },
             {
               label: 'Técnicos-administrativos (PAEPE)',
               data: FAIXA_ETARIA_DATA.map((f) => f.tecnicos),
               backgroundColor: DS_COLORS.primary, // Azul Primário DGRH
-              borderRadius: 4,
+              borderRadius: 6,
             },
           ],
         },
@@ -357,37 +463,33 @@ export const FaixaEtariaBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { top: 28 },
+            padding: { top: 34 },
           },
           scales: {
             x: {
               stacked: true,
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
+              ticks: { font: { weight: 'bold', size: 15 }, color: '#0f172a' },
             },
             y: {
               stacked: true,
               suggestedMax: 3450,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 12 },
-                color: '#64748b',
+                font: { weight: 'bold', size: 14 },
+                color: '#475569',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
           },
           plugins: {
             legend: {
-              position: 'top',
-              labels: {
-                boxWidth: 14,
-                boxHeight: 14,
-                font: { weight: 'bold', size: 12 },
-                color: '#1e293b',
-              },
+              display: false, // Desativada a legenda no topo do canvas, transferida para coluna da direita
             },
             tooltip: {
               padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
               callbacks: {
                 label: (ctx: any) => {
                   const val = Number(ctx.raw);
@@ -406,27 +508,128 @@ export const FaixaEtariaBarChart: React.FC = () => {
         },
         plugins: [topStackPercentagePlugin],
       });
+
+      chartInstanceRef.current = chart;
     });
 
     return () => {
       active = false;
+      chartInstanceRef.current = null;
       chart?.destroy();
     };
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
-      <canvas ref={canvasRef} />
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Coluna Esquerda: Gráfico de Barras Empilhadas Ampliado (Ocupa a maior parte da tela) */}
+      <div className="lg:col-span-8 xl:col-span-9 flex flex-col justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[600px]">
+        <canvas ref={canvasRef} />
+      </div>
+
+      {/* Coluna Direita Pequena: Destaque Demográfico e depois a Legenda */}
+      <div className="lg:col-span-4 xl:col-span-3 flex flex-col justify-center gap-3 sm:gap-3.5 w-full">
+        {/* 1. Destaque Demográfico */}
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-2.5 shadow-xs">
+          <Sparkles className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <span className="text-xs font-black uppercase text-amber-900 tracking-wider block mb-1">
+              Destaque Demográfico
+            </span>
+            <div className="text-xs sm:text-sm font-semibold text-amber-950 leading-relaxed space-y-1">
+              <p>• {DESTAQUE_FAIXA_ETARIA.jovem}</p>
+              <p>• {DESTAQUE_FAIXA_ETARIA.velho}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Depois a Legenda */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xs font-black uppercase text-slate-500 tracking-wider px-1">
+            Legenda por Carreira
+          </span>
+
+          {/* Docentes */}
+          <div
+            onClick={() => toggleDataset(0)}
+            className="px-3.5 py-2.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
+            style={{ borderLeftWidth: '5px', borderLeftColor: DS_COLORS.aux2 }}
+            title="Clique para alternar visibilidade de Docentes"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux2 }} />
+              <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-950">Docentes</span>
+            </div>
+            <div className="text-xs sm:text-sm font-black text-slate-900 px-2 py-0.5 rounded-lg bg-slate-100">
+              {totalDocentes.toLocaleString('pt-BR')}
+            </div>
+          </div>
+
+          {/* Pesquisadores */}
+          <div
+            onClick={() => toggleDataset(1)}
+            className="px-3.5 py-2.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
+            style={{ borderLeftWidth: '5px', borderLeftColor: DS_COLORS.aux1 }}
+            title="Clique para alternar visibilidade de Pesquisadores"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux1 }} />
+              <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-950">Pesquisadores (PQ)</span>
+            </div>
+            <div className="text-xs sm:text-sm font-black text-slate-900 px-2 py-0.5 rounded-lg bg-slate-100">
+              {totalPesquisadores.toLocaleString('pt-BR')}
+            </div>
+          </div>
+
+          {/* Técnicos (PAEPE) */}
+          <div
+            onClick={() => toggleDataset(2)}
+            className="px-3.5 py-2.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
+            style={{ borderLeftWidth: '5px', borderLeftColor: DS_COLORS.primary }}
+            title="Clique para alternar visibilidade de PAEPE"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.primary }} />
+              <span className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-slate-950">PAEPE</span>
+            </div>
+            <div className="text-xs sm:text-sm font-black text-slate-900 px-2 py-0.5 rounded-lg bg-slate-100">
+              {totalTecnicos.toLocaleString('pt-BR')}
+            </div>
+          </div>
+
+          {/* Total Geral */}
+          <div className="px-3.5 py-2 rounded-2xl bg-slate-950 text-white flex items-center justify-between shadow-xs mt-0.5">
+            <span className="text-xs font-semibold text-slate-300">Total Analisado</span>
+            <span className="text-xs sm:text-sm font-black text-amber-400">
+              {totalGeral.toLocaleString('pt-BR')}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
 /* =========================================================================
-   3. RAÇA / COR INTEGRADO: Pizza Geral (Esq) + Barras por Categoria (Dir)
+   3. RAÇA / COR INTEGRADO: Pizza Geral Ampliada (Esq) + Barras por Categoria (Dir)
    ========================================================================= */
 export const RacaCorCharts: React.FC = () => {
   const pieRef = useRef<HTMLCanvasElement | null>(null);
   const barRef = useRef<HTMLCanvasElement | null>(null);
+
+  const palette = [
+    DS_COLORS.primary,   // Branca (71.9%)
+    DS_COLORS.secondary, // Parda (18.3%)
+    DS_COLORS.aux3,      // Preta (5.6%)
+    DS_COLORS.aux1,      // Amarela (1.3%)
+    DS_COLORS.slate,     // Não Informado (2.7%)
+    DS_COLORS.aux2,      // Indígena (0.3%)
+  ];
+
+  // Fatias com tamanho reduzido (< 4%) que ficam ocultas no corpo da pizza para evitar sobreposição
+  const hiddenSlices = RACA_COR_DATA.map((item, index) => ({
+    ...item,
+    color: palette[index],
+  })).filter((item) => item.pct < 4.0);
 
   useEffect(() => {
     let pieChart: any = null;
@@ -436,45 +639,53 @@ export const RacaCorCharts: React.FC = () => {
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      const palette = [
-        DS_COLORS.primary,   // Branca (71.9%)
-        DS_COLORS.secondary, // Parda (18.3%)
-        DS_COLORS.aux3,      // Preta (5.6%)
-        DS_COLORS.aux1,      // Amarela (1.3%)
-        DS_COLORS.slate,     // Não Informado (2.7%)
-        DS_COLORS.aux2,      // Indígena (0.3%)
-      ];
-
-      // 1. Pizza / Donut - Visão Geral
+      // 1. Pizza Visão Geral Ampliada (Sem legenda inferior, com badges de porcentagem destacados)
       if (pieRef.current) {
         const ctx1 = pieRef.current.getContext('2d');
         if (ctx1) {
-          const donutSliceLabelsPlugin = {
-            id: 'donutSlicePercentageLabels',
+          const pieSliceLabelsPlugin = {
+            id: 'racaCorPiePercentageLabels',
             afterDatasetsDraw(chartInstance: any) {
               const c = chartInstance.ctx;
               const meta = chartInstance.getDatasetMeta(0);
+              const isMobile = chartInstance.width < 500;
+              const badgeFontSize = isMobile ? 15 : 21;
+              const padX = isMobile ? 8 : 14;
+              const padY = isMobile ? 5 : 8;
+
               RACA_COR_DATA.forEach((item, i) => {
-                if (item.pct < 4.0) return; // evitar sobreposição em fatias milimétricas
+                if (item.pct < 4.0) return; // evita sobreposição em fatias milimétricas (Amarela, Não Info, Indígena)
                 const element = meta.data[i];
                 if (!element) return;
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
-                drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
+                const text = isMobile ? `${item.pct.toFixed(1).replace('.', ',')}%` : `${item.raca}: ${item.pct.toFixed(1).replace('.', ',')}%`;
+                drawBadge(
+                  c,
+                  text,
+                  pos.x,
+                  pos.y,
+                  'rgba(15, 23, 42, 0.92)',
+                  '#ffffff',
+                  badgeFontSize,
+                  padX,
+                  padY,
+                  8,
+                  'rgba(255, 255, 255, 0.45)'
+                );
               });
             },
           };
 
           pieChart = new Chart(ctx1, {
-            type: 'doughnut',
+            type: 'pie',
             data: {
               labels: RACA_COR_DATA.map((r) => r.raca),
               datasets: [
                 {
                   data: RACA_COR_DATA.map((r) => r.total),
                   backgroundColor: palette,
-                  borderWidth: 2.5,
+                  borderWidth: 3,
                   borderColor: '#ffffff',
                 },
               ],
@@ -482,19 +693,17 @@ export const RacaCorCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '52%',
+              layout: {
+                padding: 10,
+              },
               plugins: {
                 legend: {
-                  position: 'bottom',
-                  labels: {
-                    boxWidth: 12,
-                    boxHeight: 12,
-                    font: { weight: 'bold', size: 11 },
-                    color: '#1e293b',
-                    padding: 8,
-                  },
+                  display: false, // Desativa legenda inferior do gráfico de pizza conforme solicitado
                 },
                 tooltip: {
+                  padding: 14,
+                  titleFont: { size: 15, weight: 'bold' },
+                  bodyFont: { size: 14 },
                   callbacks: {
                     label: (ctx: any) => {
                       const item = RACA_COR_DATA[ctx.dataIndex];
@@ -504,12 +713,12 @@ export const RacaCorCharts: React.FC = () => {
                 },
               },
             },
-            plugins: [donutSliceLabelsPlugin],
+            plugins: [pieSliceLabelsPlugin],
           });
         }
       }
 
-      // 2. Barras Empilhadas - Detalhamento por Carreira
+      // 2. Barras Empilhadas - Detalhamento por Carreira (Única legenda do slide e fontes ampliadas)
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
@@ -518,6 +727,8 @@ export const RacaCorCharts: React.FC = () => {
             afterDatasetsDraw(chartInstance: any) {
               const c = chartInstance.ctx;
               const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
+              const isMobile = chartInstance.width < 500;
+              const fontSize = isMobile ? 17 : 24;
 
               RACA_COR_TABELA_2.forEach((item, index) => {
                 const element = metaLast.data[index];
@@ -527,11 +738,11 @@ export const RacaCorCharts: React.FC = () => {
                 const text = `${pct}% (${item.total.toLocaleString('pt-BR')})`;
 
                 c.save();
-                c.font = 'bold 14px Inter, -apple-system, sans-serif';
+                c.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
-                c.fillStyle = '#1e293b';
-                c.fillText(text, element.x + 6, element.y);
+                c.fillStyle = '#0f172a';
+                c.fillText(text, element.x + 10, element.y);
                 c.restore();
               });
             },
@@ -546,25 +757,25 @@ export const RacaCorCharts: React.FC = () => {
                   label: 'Docentes',
                   data: RACA_COR_TABELA_2.map((r) => r.docentes),
                   backgroundColor: DS_COLORS.aux2, // Roxo DGRH
-                  borderRadius: 3,
+                  borderRadius: 4,
                 },
                 {
                   label: 'Pesquisadores',
                   data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
                   backgroundColor: DS_COLORS.aux1, // Verde DGRH
-                  borderRadius: 3,
+                  borderRadius: 4,
                 },
                 {
                   label: 'PAEPE',
                   data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
                   backgroundColor: DS_COLORS.primary, // Azul Primário
-                  borderRadius: 3,
+                  borderRadius: 4,
                 },
                 {
                   label: 'Extra-quadro',
                   data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
                   backgroundColor: DS_COLORS.secondary, // Dourado Secundário
-                  borderRadius: 3,
+                  borderRadius: 4,
                 },
               ],
             },
@@ -573,37 +784,44 @@ export const RacaCorCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { right: 80 },
+                padding: { right: 165 },
               },
               scales: {
                 x: {
                   stacked: true,
-                  suggestedMax: 11800,
-                  grid: { color: 'rgba(0,0,0,0.05)' },
+                  suggestedMax: 12500,
+                  grid: { color: 'rgba(0,0,0,0.06)' },
                   ticks: {
-                    font: { weight: 'bold', size: 11 },
-                    color: '#64748b',
+                    font: { weight: 'bold', size: 13 },
+                    color: '#475569',
                     callback: (val: any) => Number(val).toLocaleString('pt-BR'),
                   },
                 },
                 y: {
                   stacked: true,
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
+                  ticks: {
+                    font: { weight: 'bold', size: 16 },
+                    color: '#0f172a',
+                    padding: 8,
+                  },
                 },
               },
               plugins: {
                 legend: {
                   position: 'top',
                   labels: {
-                    boxWidth: 12,
-                    boxHeight: 12,
-                    font: { weight: 'bold', size: 11 },
-                    color: '#1e293b',
+                    boxWidth: 16,
+                    boxHeight: 16,
+                    font: { weight: 'bold', size: 14 },
+                    color: '#0f172a',
+                    padding: 16,
                   },
                 },
                 tooltip: {
-                  padding: 10,
+                  padding: 12,
+                  titleFont: { size: 14, weight: 'bold' },
+                  bodyFont: { size: 13 },
                   callbacks: {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
@@ -634,28 +852,47 @@ export const RacaCorCharts: React.FC = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-      {/* Left Column: Donut/Pizza Visão Geral */}
-      <div className="md:col-span-5 flex flex-col items-center justify-center">
-        <div className="text-xs font-black uppercase tracking-wider text-slate-500 mb-1 text-center">
-          Visão Geral (Autodeclaração)
-        </div>
-        <div className="w-[250px] h-[250px] sm:w-[280px] sm:h-[280px] lg:w-[310px] lg:h-[310px] relative">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Coluna Esquerda: Pizza Visão Geral Ampliada com rótulos para fatias menores abaixo */}
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full">
+        {/* Canvas da Pizza com proporção harmonizada */}
+        <div className="w-full h-[360px] sm:h-[430px] lg:h-[490px] xl:h-[530px] relative flex items-center justify-center">
           <canvas ref={pieRef} />
         </div>
-        <div className="text-center mt-1.5">
-          <span className="text-xs font-bold text-slate-500">
-            Total Geral: <strong>13.554</strong> servidores cadastrados
-          </span>
+
+        {/* Rótulos para as peças da pizza ocultadas por conta do tamanho reduzido */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mt-2.5 px-2">
+          {hiddenSlices.map((item) => (
+            <div
+              key={item.raca}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 text-white shadow-sm border border-slate-700/60"
+            >
+              <span
+                className="w-3 h-3 rounded-full shrink-0 border border-white/60 shadow-xs"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-xs sm:text-sm font-bold tracking-tight">
+                {item.raca}:{' '}
+                <span className="text-amber-300 font-black">
+                  {item.pct.toFixed(1).replace('.', ',')}%
+                </span>
+              </span>
+              <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                ({item.total.toLocaleString('pt-BR')})
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Right Column: Barras Empilhadas por Categoria */}
-      <div className="md:col-span-7 flex flex-col justify-center">
-        <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1 text-center sm:text-left">
-          Composição por Carreira Funcional
+      {/* Coluna Direita: Barras Empilhadas por Carreira com Rótulos e Fontes Ampliadas */}
+      <div className="lg:col-span-7 flex flex-col justify-center w-full h-[380px] sm:h-[460px] lg:h-[530px] xl:h-[580px]">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm sm:text-base lg:text-lg font-black uppercase text-slate-800 tracking-wider text-center md:text-left">
+            Composição por Carreira Funcional
+          </h4>
         </div>
-        <div className="w-full h-[300px] sm:h-[340px] lg:h-[380px]">
+        <div className="flex-1 w-full relative">
           <canvas ref={barRef} />
         </div>
       </div>
@@ -885,7 +1122,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 28, lastElement.y, dataset.borderColor, '#ffffff', 14, 8, 4, 5);
+            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6);
           });
         },
       };
@@ -900,43 +1137,46 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             borderColor: s.cor,
             backgroundColor: s.cor,
             tension: 0.3,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            borderWidth: 2.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            borderWidth: 3,
           })),
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 75 },
+            padding: { right: 85 },
           },
           scales: {
             y: {
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
+                font: { weight: 'bold', size: 13 },
+                color: '#475569',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             x: {
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+              ticks: { font: { weight: 'bold', size: 14 }, color: '#0f172a' },
             },
           },
           plugins: {
             legend: {
-              position: 'bottom',
+              position: 'top',
               labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                font: { weight: 'bold', size: 11 },
+                boxWidth: 14,
+                boxHeight: 14,
+                font: { weight: 'bold', size: 13 },
                 color: '#1e293b',
+                padding: 14,
               },
             },
             tooltip: {
-              padding: 10,
+              padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
               callbacks: {
                 label: (ctx: any) => {
                   const val = Number(ctx.raw);
@@ -958,7 +1198,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
+    <div className="w-full h-[400px] sm:h-[470px] lg:h-[530px] xl:h-[580px] relative">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -993,7 +1233,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 28, lastElement.y, dataset.borderColor, '#ffffff', 14, 8, 4, 5);
+            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6);
           });
         },
       };
@@ -1008,16 +1248,16 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             borderColor: s.cor,
             backgroundColor: s.cor,
             tension: 0.3,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            borderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            borderWidth: 3.5,
           })),
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 75 },
+            padding: { right: 85 },
           },
           scales: {
             y: {
@@ -1025,28 +1265,31 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
               max: 500,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
+                font: { weight: 'bold', size: 13 },
+                color: '#475569',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
             x: {
               grid: { display: false },
-              ticks: { font: { weight: 'bold', size: 11 }, color: '#0f172a' },
+              ticks: { font: { weight: 'bold', size: 14 }, color: '#0f172a' },
             },
           },
           plugins: {
             legend: {
               position: 'top',
               labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                font: { weight: 'bold', size: 11 },
+                boxWidth: 14,
+                boxHeight: 14,
+                font: { weight: 'bold', size: 13 },
                 color: '#1e293b',
+                padding: 14,
               },
             },
             tooltip: {
-              padding: 10,
+              padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
               callbacks: {
                 label: (ctx: any) => {
                   const val = Number(ctx.raw);
@@ -1068,7 +1311,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-[330px] sm:h-[370px] lg:h-[410px]">
+    <div className="w-full h-[400px] sm:h-[470px] lg:h-[530px] xl:h-[580px] relative">
       <canvas ref={canvasRef} />
     </div>
   );
@@ -1181,13 +1424,29 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
           const meta = chartInstance.getDatasetMeta(0);
+          const isMobile = chartInstance.width < 500;
+          const badgeFontSize = isMobile ? 16 : 23;
+          const padX = isMobile ? 10 : 15;
+          const padY = isMobile ? 6 : 9;
           SERVIDORES_POR_AREA.forEach((area, i) => {
             const element = meta.data[i];
             if (!element) return;
             const pos = element.tooltipPosition();
             if (!pos) return;
             const text = `${area.percentual.toFixed(1).replace('.', ',')}%`;
-            drawBadge(c, text, pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
+            drawBadge(
+              c,
+              text,
+              pos.x,
+              pos.y,
+              'rgba(15, 23, 42, 0.92)',
+              '#ffffff',
+              badgeFontSize,
+              padX,
+              padY,
+              8,
+              'rgba(255, 255, 255, 0.45)'
+            );
           });
         },
       };
@@ -1202,26 +1461,24 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
               backgroundColor: SERVIDORES_POR_AREA.map((a) => a.cor),
               hoverBackgroundColor: SERVIDORES_POR_AREA.map((a) => a.cor),
               borderColor: '#ffffff',
-              borderWidth: 2.5,
+              borderWidth: 3,
             },
           ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: 10,
+          },
           plugins: {
             legend: {
-              position: 'bottom',
-              labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                padding: 10,
-                font: { weight: 'bold', size: 11 },
-                color: '#1e293b',
-              },
+              display: false,
             },
             tooltip: {
-              padding: 12,
+              padding: 14,
+              titleFont: { size: 15, weight: 'bold' },
+              bodyFont: { size: 14 },
               callbacks: {
                 label: (ctx: any) => {
                   const area = SERVIDORES_POR_AREA[ctx.dataIndex];
@@ -1246,48 +1503,50 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center w-full h-full">
-      {/* Left Column: Official Pie Chart with Data Labels */}
-      <div className="lg:col-span-5 flex flex-col items-center justify-center relative h-[310px] sm:h-[350px] lg:h-[400px]">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Left Column: Official Pie Chart with Data Labels (Significantly enlarged) */}
+      <div className="lg:col-span-7 xl:col-span-8 flex flex-col items-center justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[610px]">
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Right Column: Highlights & Cards with Exact Percentages */}
-      <div className="lg:col-span-7 flex flex-col justify-center gap-3">
+      {/* Right Column: Cards with Absolute Values & Large Typography (Narrower column) */}
+      <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-center gap-2.5 sm:gap-3">
         {/* Callout box for highlighted percentages */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 flex items-start gap-3">
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-2.5 shadow-xs">
           <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm leading-relaxed">
-            <strong>Concentração Funcional:</strong> <strong>70,6%</strong> de todo o quadro funcional concentra-se em <strong>Faculdades e Institutos (38,5%)</strong> e na <strong>Área da Saúde (32,1%)</strong>, com representação integral na Administração Central (<strong>22,2%</strong>), Centros e Núcleos (<strong>4,6%</strong>) e Colégios Técnicos (<strong>2,6%</strong>).
+          <div className="text-xs sm:text-sm lg:text-[14px] leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-medium text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-medium text-slate-900">Área da Saúde (32,1%)</span>.
           </div>
         </div>
 
-        {/* 5 Area Breakdown Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {/* 5 Area Breakdown Cards - 1 column layout, elegant lighter font weight, absolute server count in badge */}
+        <div className="flex flex-col gap-2 sm:gap-2.5">
           {SERVIDORES_POR_AREA.map((item) => (
             <div
               key={item.tipoOrgao}
-              className="p-3 rounded-xl bg-white/[0.96] border border-slate-200 shadow-sm flex items-center justify-between"
-              style={{ borderLeftWidth: '4px', borderLeftColor: item.cor }}
+              className="px-4 py-2.5 sm:py-3 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md"
+              style={{ borderLeftWidth: '5px', borderLeftColor: item.cor }}
             >
-              <div className="min-w-0 pr-2">
-                <div className="text-xs font-bold text-slate-800 truncate">{item.tipoOrgao}</div>
-                <div className="text-[11px] text-slate-500 font-medium">
-                  {item.total.toLocaleString('pt-BR')} servidores
+              <div className="min-w-0 pr-3">
+                <div className="text-sm sm:text-base lg:text-lg xl:text-[19px] font-medium text-slate-800 tracking-tight">
+                  {item.tipoOrgao}
                 </div>
               </div>
               <div
-                className="px-2.5 py-1 rounded-lg text-xs font-black text-white shrink-0"
+                className="px-3.5 sm:px-4 py-1.5 rounded-xl text-sm sm:text-base lg:text-lg font-semibold text-white shrink-0 shadow-xs tracking-wider"
                 style={{ backgroundColor: item.cor }}
               >
-                {item.percentual.toFixed(1).replace('.', ',')}%
+                {item.total.toLocaleString('pt-BR')}
               </div>
             </div>
           ))}
+
           {/* Total summary banner */}
-          <div className="p-2.5 rounded-xl bg-slate-900 text-white flex items-center justify-between col-span-1 sm:col-span-2">
-            <span className="text-xs font-bold">Total Geral da Universidade</span>
-            <span className="text-sm font-black text-amber-400">9.416 servidores ativos</span>
+          <div className="px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-950 text-white flex items-center justify-between shadow-md mt-1">
+            <span className="text-xs sm:text-sm lg:text-base font-medium text-slate-300">Total Geral da Universidade</span>
+            <span className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-amber-400 tracking-wider">
+              {TOTAL_SERVIDORES_ATIVOS.toLocaleString('pt-BR')}
+            </span>
           </div>
         </div>
       </div>
@@ -1333,18 +1592,21 @@ export const TopCargosBarChart: React.FC = () => {
           const c = chartInstance.ctx;
           const meta = chartInstance.getDatasetMeta(0);
 
+          const isMobile = chartInstance.width < 500;
+          const fontSize = isMobile ? 14 : 19;
+
           top20.forEach((cargo, index) => {
             const element = meta.data[index];
             if (!element) return;
             const pct = ((cargo.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
-            const text = `${cargo.quantidade.toLocaleString('pt-BR')} (${pct}%)`;
+            const text = `${pct}% (${cargo.quantidade.toLocaleString('pt-BR')})`;
 
             c.save();
-            c.font = 'bold 13.5px Inter, -apple-system, sans-serif';
+            c.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
             c.textAlign = 'left';
             c.textBaseline = 'middle';
             c.fillStyle = '#0f172a';
-            c.fillText(text, element.x + 6, element.y);
+            c.fillText(text, element.x + 9, element.y);
             c.restore();
           });
         },
@@ -1359,7 +1621,7 @@ export const TopCargosBarChart: React.FC = () => {
               label: 'Total de Profissionais',
               data: top20.map((c) => c.quantidade),
               backgroundColor: top20.map((c) => cargoCategoryColor(c.categoria)),
-              borderRadius: 3,
+              borderRadius: 4,
             },
           ],
         },
@@ -1368,14 +1630,16 @@ export const TopCargosBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 110 },
+            padding: { right: 160, top: 4, bottom: 4 },
           },
           scales: {
             x: {
+              max: 1650,
               suggestedMax: 1650,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
+                stepSize: 200,
+                font: { weight: 'bold', size: 12 },
                 color: '#64748b',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
@@ -1383,7 +1647,7 @@ export const TopCargosBarChart: React.FC = () => {
             y: {
               grid: { display: false },
               ticks: {
-                font: { weight: 'bold', size: 11 },
+                font: { weight: 'bold', size: 15 },
                 color: '#0f172a',
               },
             },
@@ -1391,11 +1655,12 @@ export const TopCargosBarChart: React.FC = () => {
           plugins: {
             legend: { display: false },
             tooltip: {
+              padding: 12,
               callbacks: {
                 label: (ctx: any) => {
                   const cargo = top20[ctx.dataIndex];
                   const pct = ((cargo.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
-                  return ` ${cargo.quantidade.toLocaleString('pt-BR')} servidores (${pct}% do quadro total) • ${cargo.categoria}`;
+                  return ` ${pct}% (${cargo.quantidade.toLocaleString('pt-BR')} servidores) • ${cargo.categoria}`;
                 },
               },
             },
@@ -1412,70 +1677,95 @@ export const TopCargosBarChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col justify-center h-full">
-      {/* Legenda Oficial por Classificação da Universidade */}
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-2 text-[11px] font-bold text-slate-700">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.primary }} />
-          Administração e RH
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.aux3 }} />
-          Saúde
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.aux1 }} />
-          Educação, Pesquisa e Ciência
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: DS_COLORS.secondary }} />
-          Tecnologia da Informação (TI)
-        </span>
+    <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 min-h-0">
+      {/* Gráfico de Barras com Altura Aumentada e Nomes dos Cargos Maiores */}
+      <div className="flex-1 w-full h-[520px] sm:h-[580px] lg:h-[640px] xl:h-[680px] min-h-0">
+        <canvas ref={canvasRef} />
       </div>
 
-      <div className="w-full h-[360px] sm:h-[400px] lg:h-[450px]">
-        <canvas ref={canvasRef} />
+      {/* Legenda Oficial Vertical à Direita */}
+      <div className="flex flex-col gap-3 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90 shadow-xs shrink-0 self-center w-full lg:w-auto min-w-[220px]">
+        <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 pb-1.5 border-b border-slate-200">
+          Carreiras
+        </span>
+        <div className="flex flex-col gap-3 text-xs sm:text-sm font-medium text-slate-800">
+          <span className="flex items-center gap-2.5">
+            <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.primary }} />
+            <span>Administração e RH</span>
+          </span>
+          <span className="flex items-center gap-2.5">
+            <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux3 }} />
+            <span>Saúde</span>
+          </span>
+          <span className="flex items-center gap-2.5">
+            <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux1 }} />
+            <span>Educação, Pesquisa e Ciência</span>
+          </span>
+          <span className="flex items-center gap-2.5">
+            <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.secondary }} />
+            <span>Tecnologia da Informação (TI)</span>
+          </span>
+        </div>
       </div>
     </div>
   );
 };
 
 /* =========================================================================
-   8. NACIONALIDADES: Doughnut + Continental Bar Chart com Porcentagens
+   8. NACIONALIDADES: Pie Chart Geral Ampliado + Continental Bar Chart
    ========================================================================= */
 export const NacionalidadesCharts: React.FC = () => {
-  const donutRef = useRef<HTMLCanvasElement | null>(null);
+  const pieRef = useRef<HTMLCanvasElement | null>(null);
   const barRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    let donutChart: any = null;
+    let pieChart: any = null;
     let barChart: any = null;
     let active = true;
 
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      // 1. Donut (Brasileiros vs Estrangeiros)
-      if (donutRef.current) {
-        const ctx1 = donutRef.current.getContext('2d');
+      // 1. Pie Chart (Brasileiros vs Estrangeiros) Ampliado e Sem Legenda Inferior
+      if (pieRef.current) {
+        const ctx1 = pieRef.current.getContext('2d');
         if (ctx1) {
-          const donutLabelsPlugin = {
-            id: 'donutNacionalidadeBadges',
+          const pieLabelsPlugin = {
+            id: 'pieNacionalidadeBadges',
             afterDatasetsDraw(chartInstance: any) {
               const c = chartInstance.ctx;
               const meta = chartInstance.getDatasetMeta(0);
-              const pcts = ['94,9%', '5,1%'];
+              const isMobile = chartInstance.width < 500;
+              const padX = isMobile ? 10 : 16;
+              const padY = isMobile ? 6 : 10;
+              const items = [
+                { label: 'Brasileiros', pct: '94,9%', total: NACIONALIDADES_DATA.totalNatoOuNaturalizado, size: isMobile ? 16 : 23 },
+                { label: 'Estrangeiros', pct: '5,1%', total: NACIONALIDADES_DATA.totalEstrangeiro, size: isMobile ? 13 : 17 },
+              ];
 
               meta.data.forEach((element: any, i: number) => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                drawBadge(c, pcts[i], pos.x, pos.y, 'rgba(15, 23, 42, 0.85)', '#ffffff', 14.5, 9, 5, 6);
+                const text = isMobile ? items[i].pct : `${items[i].label}: ${items[i].pct}`;
+                drawBadge(
+                  c,
+                  text,
+                  pos.x,
+                  pos.y,
+                  'rgba(15, 23, 42, 0.92)',
+                  '#ffffff',
+                  items[i].size,
+                  padX,
+                  padY,
+                  8,
+                  'rgba(255, 255, 255, 0.45)'
+                );
               });
             },
           };
 
-          donutChart = new Chart(ctx1, {
-            type: 'doughnut',
+          pieChart = new Chart(ctx1, {
+            type: 'pie',
             data: {
               labels: ['Brasileiros', 'Estrangeiros'],
               datasets: [
@@ -1494,17 +1784,17 @@ export const NacionalidadesCharts: React.FC = () => {
             options: {
               responsive: true,
               maintainAspectRatio: false,
-              cutout: '68%',
+              layout: {
+                padding: 10,
+              },
               plugins: {
                 legend: {
-                  position: 'bottom',
-                  labels: {
-                    boxWidth: 12,
-                    font: { weight: 'bold', size: 12 },
-                    color: '#1e293b',
-                  },
+                  display: false, // Desativa legenda inferior da pizza conforme solicitado
                 },
                 tooltip: {
+                  padding: 14,
+                  titleFont: { size: 15, weight: 'bold' },
+                  bodyFont: { size: 14 },
                   callbacks: {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
@@ -1515,12 +1805,12 @@ export const NacionalidadesCharts: React.FC = () => {
                 },
               },
             },
-            plugins: [donutLabelsPlugin],
+            plugins: [pieLabelsPlugin],
           });
         }
       }
 
-      // 2. Bar (Origem dos Estrangeiros) com cores DS e rótulos
+      // 2. Bar (Origem dos Estrangeiros) com fontes e rótulos bem maiores
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
@@ -1537,6 +1827,8 @@ export const NacionalidadesCharts: React.FC = () => {
             afterDatasetsDraw(chartInstance: any) {
               const c = chartInstance.ctx;
               const meta = chartInstance.getDatasetMeta(0);
+              const isMobile = chartInstance.width < 500;
+              const fontSize = isMobile ? 17 : 24;
 
               NACIONALIDADES_DATA.regioesEstrangeiros.forEach((item, index) => {
                 const element = meta.data[index];
@@ -1544,11 +1836,11 @@ export const NacionalidadesCharts: React.FC = () => {
                 const text = `${item.pct.toFixed(1).replace('.', ',')}% (${item.total})`;
 
                 c.save();
-                c.font = 'bold 14px Inter, -apple-system, sans-serif';
+                c.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
                 c.textAlign = 'center';
                 c.textBaseline = 'bottom';
                 c.fillStyle = '#0f172a';
-                c.fillText(text, element.x, element.y - 5);
+                c.fillText(text, element.x, element.y - 8);
                 c.restore();
               });
             },
@@ -1557,13 +1849,19 @@ export const NacionalidadesCharts: React.FC = () => {
           barChart = new Chart(ctx2, {
             type: 'bar',
             data: {
-              labels: NACIONALIDADES_DATA.regioesEstrangeiros.map((r) => r.regiao),
+              labels: [
+                ['América', 'Latina'],
+                'Europa',
+                ['América do', 'Norte'],
+                'Ásia',
+                'Outros',
+              ],
               datasets: [
                 {
                   label: 'Estrangeiros por Continente',
                   data: NACIONALIDADES_DATA.regioesEstrangeiros.map((r) => r.total),
                   backgroundColor: continentColors,
-                  borderRadius: 6,
+                  borderRadius: 8,
                 },
               ],
             },
@@ -1571,22 +1869,29 @@ export const NacionalidadesCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { top: 25 },
+                padding: { top: 32 },
               },
               scales: {
                 y: {
                   suggestedMax: 56,
-                  grid: { color: 'rgba(0,0,0,0.05)' },
-                  ticks: { font: { weight: 'bold', size: 11 }, color: '#64748b' },
+                  grid: { color: 'rgba(0,0,0,0.06)' },
+                  ticks: { font: { weight: 'bold', size: 14 }, color: '#475569' },
                 },
                 x: {
                   grid: { display: false },
-                  ticks: { font: { weight: 'bold', size: 12 }, color: '#0f172a' },
+                  ticks: {
+                    font: { weight: 'bold', size: 16 },
+                    color: '#0f172a',
+                    padding: 8,
+                  },
                 },
               },
               plugins: {
                 legend: { display: false },
                 tooltip: {
+                  padding: 14,
+                  titleFont: { size: 15, weight: 'bold' },
+                  bodyFont: { size: 14 },
                   callbacks: {
                     label: (ctx: any) => {
                       const item = NACIONALIDADES_DATA.regioesEstrangeiros[ctx.dataIndex];
@@ -1604,28 +1909,60 @@ export const NacionalidadesCharts: React.FC = () => {
 
     return () => {
       active = false;
-      donutChart?.destroy();
+      pieChart?.destroy();
       barChart?.destroy();
     };
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-      <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-        <div className="w-[240px] h-[240px] sm:w-[270px] sm:h-[270px] lg:w-[300px] lg:h-[300px] relative">
-          <canvas ref={donutRef} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-            <span className="text-4xl sm:text-5xl font-black text-[#105e7b]">94,9%</span>
-            <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600 font-sans mt-0.5">Brasileiros</span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Coluna Esquerda: Gráfico de Pizza Geral Ampliado (Sem legenda inferior) */}
+      <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full">
+        {/* Canvas da Pizza com altura generosa */}
+        <div className="w-full h-[350px] sm:h-[420px] lg:h-[480px] xl:h-[530px] relative flex items-center justify-center">
+          <canvas ref={pieRef} />
+        </div>
+
+        {/* Resumo Absoluto e Percentual no Rodapé da Coluna Esquerda */}
+        <div className="w-full max-w-[460px] grid grid-cols-2 gap-2.5 sm:gap-3 mt-2.5">
+          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#105e7b] flex flex-col items-center justify-center shadow-xs">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Brasileiros</span>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-base sm:text-lg lg:text-xl font-black text-[#105e7b]">
+                {NACIONALIDADES_DATA.totalNatoOuNaturalizado.toLocaleString('pt-BR')}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-[#105e7b]/80">(94,9%)</span>
+            </div>
           </div>
+
+          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#e5a93a] flex flex-col items-center justify-center shadow-xs">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estrangeiros</span>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-base sm:text-lg lg:text-xl font-black text-[#b45309]">
+                {NACIONALIDADES_DATA.totalEstrangeiro.toLocaleString('pt-BR')}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-[#b45309]/80">(5,1%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mt-2">
+          <span className="text-xs sm:text-sm font-semibold text-slate-600">
+            Total de Docentes e Pesquisadores: <strong className="text-slate-900 font-black">2.084</strong>
+          </span>
         </div>
       </div>
 
-      <div className="md:col-span-7 h-[300px] sm:h-[340px] lg:h-[380px]">
-        <h4 className="text-xs font-black uppercase text-slate-500 tracking-wider mb-2 text-center md:text-left">
-          Distribuição dos 110 Estrangeiros por Região
-        </h4>
-        <canvas ref={barRef} />
+      {/* Coluna Direita: Gráfico de Barras por Região com Fontes e % Ampliados */}
+      <div className="lg:col-span-7 flex flex-col justify-center w-full h-[380px] sm:h-[450px] lg:h-[520px] xl:h-[580px]">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm sm:text-base lg:text-lg font-black uppercase text-slate-800 tracking-wider text-center md:text-left">
+            Distribuição dos 106 Estrangeiros por Região
+          </h4>
+        </div>
+        <div className="flex-1 w-full relative">
+          <canvas ref={barRef} />
+        </div>
       </div>
     </div>
   );

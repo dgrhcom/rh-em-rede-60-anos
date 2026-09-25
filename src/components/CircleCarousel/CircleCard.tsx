@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { HistoricalPeriod } from '../../types/timeline';
+import { isTopAlignedPhoto } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { 
   RotateCw, Sparkles, CheckCircle2, Image as ImageIcon, ArrowUpRight
@@ -95,7 +96,9 @@ export const CircleCard: React.FC<CircleCardProps> = ({
               <img
                 src={period.coverImage}
                 alt={period.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
+                  isTopAlignedPhoto(period.coverImage, period.title) ? 'object-top' : 'object-center'
+                }`}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-slate-100">

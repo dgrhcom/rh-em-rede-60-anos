@@ -133,13 +133,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           setCardSpacing(230);
         }
       } else {
-        // Expanded 2-column active card spacing (accommodates larger card width)
+        // Expanded 2-column active card spacing (neighbor cards balanced distance)
         if (w < 640) {
-          setCardSpacing(380);
+          setCardSpacing(355);
         } else if (w < 1024) {
-          setCardSpacing(600);
+          setCardSpacing(585);
+        } else if (w < 1440) {
+          setCardSpacing(755);
         } else {
-          setCardSpacing(780);
+          setCardSpacing(830);
         }
       }
     };
@@ -709,7 +711,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       )}
 
       {/* ================= 2. CONTINUOUS HORIZONTAL CARDS STAGE ================= */}
-      <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden">
+      <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden pt-2 sm:pt-4">
         {/* Horizontal Connecting Timeline Line */}
         <div
           className="absolute top-1/2 left-0 right-0 -translate-y-1/2 pointer-events-none z-0 transition-all duration-700"
@@ -765,17 +767,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               if (absOffset <= 1) {
                 targetX = sign * absOffset * cardSpacing;
               } else if (absOffset <= 2) {
-                targetX = sign * (cardSpacing + (absOffset - 1) * (cardSpacing * 0.52));
+                targetX = sign * (cardSpacing + (absOffset - 1) * (cardSpacing * 0.42));
               } else {
-                targetX = sign * (cardSpacing * 1.52 + (absOffset - 2) * (cardSpacing * 0.42));
+                targetX = sign * (cardSpacing * 1.42 + (absOffset - 2) * (cardSpacing * 0.33));
               }
 
               if (absOffset <= 1) {
-                targetScale = 1.0 - absOffset * 0.35;
+                targetScale = 1.0 - absOffset * 0.48;
               } else if (absOffset <= 2) {
-                targetScale = 0.65 - (absOffset - 1) * 0.23;
+                targetScale = 0.52 - (absOffset - 1) * 0.22;
               } else {
-                targetScale = Math.max(0.20, 0.42 - (absOffset - 2) * 0.16);
+                targetScale = Math.max(0.15, 0.30 - (absOffset - 2) * 0.12);
               }
 
               targetOpacity = absOffset > 2.3 ? Math.max(0.15, 1 - (absOffset - 2.3) * 0.75) : 1;
@@ -1252,7 +1254,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     backfaceVisibility: 'hidden',
                   }}
                 >
-                  <div className="relative w-[230px] sm:w-[260px] md:w-[280px] h-[390px] sm:h-[430px] md:h-[460px] lg:h-[480px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-2xl border-2.5 border-slate-950 bg-[#105e7b] text-white select-none ring-2 ring-white/60">
+                  <div className="relative w-[210px] sm:w-[235px] md:w-[250px] h-[350px] sm:h-[390px] md:h-[420px] lg:h-[440px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-2xl border-2.5 border-slate-950 bg-[#105e7b] text-white select-none ring-2 ring-white/60">
                     {/* Topo: Identificação e Título */}
                     <div className="text-center py-1 flex flex-col items-center">
                       <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-white/30 mb-1 shadow-xs">
@@ -1340,21 +1342,21 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
       {/* ================= 3. COMPACT BOTTOM TIMELINE RULER & CONTROLS ================= */}
       <div 
-        className={`relative z-20 pb-8 sm:pb-12 px-3 max-w-4xl mx-auto w-full flex flex-col items-center gap-2 transition-all duration-700 ${isIntroActive ? 'pointer-events-none' : ''}`}
+        className={`relative z-20 pb-1.5 sm:pb-2.5 px-3 max-w-3xl lg:max-w-4xl mx-auto w-full flex flex-col items-center gap-1.5 transition-all duration-700 ${isIntroActive ? 'pointer-events-none' : ''}`}
         style={{
           opacity: isIntroActive ? Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55)) : 1,
           transform: `translateY(${isIntroActive ? (1 - Math.min(1, Math.max(0, (introProgress - 0.45) / 0.55))) * 35 : 0}px)`,
         }}
       >
         {/* Sleek Low-Profile Chronological Track (Darker yellow without border) */}
-        <div className="w-full bg-[#b8801d] px-2 sm:px-3 py-2 rounded-2xl shadow-lg">
+        <div className="w-full bg-[#b8801d] px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl shadow-md">
           <div className="relative w-full flex items-center justify-between gap-1 px-1 sm:px-2">
             {/* Background connecting line */}
-            <div className="absolute inset-x-4 top-1/2 h-1 bg-black/20 -translate-y-1/2 rounded-full -z-0" />
+            <div className="absolute inset-x-4 top-1/2 h-0.5 sm:h-1 bg-black/20 -translate-y-1/2 rounded-full -z-0" />
 
             {/* Filled progress bar */}
             <div
-              className={`absolute left-4 top-1/2 h-1 ${
+              className={`absolute left-4 top-1/2 h-0.5 sm:h-1 ${
                 activeIndex !== null
                   ? pureBgColors[activeIndex % pureBgColors.length]
                   : 'bg-slate-950/40'
@@ -1378,7 +1380,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   title={`${p.period} • ${p.title}`}
                 >
                   <div
-                    className={`min-w-6 sm:min-w-8 h-6 sm:h-7 px-1 sm:px-1.5 rounded-full flex items-center justify-center transition-all ${
+                    className={`min-w-5 sm:min-w-7 h-5 sm:h-6 px-0.5 sm:px-1 rounded-full flex items-center justify-center transition-all ${
                       isSelected
                         ? `${cardBgClass} text-white border-2 border-white shadow-md scale-110 ring-2 ring-black/20`
                         : isCenterInGallery
@@ -1386,10 +1388,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                         : 'bg-white text-slate-900 border border-black/10 hover:border-black/30 hover:scale-105 shadow-xs'
                     }`}
                   >
-                    <span className="sm:hidden text-[7.5px] font-black leading-none tracking-tighter">
+                    <span className="sm:hidden text-[7px] font-black leading-none tracking-tighter">
                       {p.startYear === p.endYear ? p.startYear : `${String(p.startYear).slice(2)}-${String(p.endYear).slice(2)}`}
                     </span>
-                    <span className="hidden sm:inline text-[9px] md:text-[10px] font-black leading-none tracking-tighter">
+                    <span className="hidden sm:inline text-[8.5px] md:text-[9.5px] font-black leading-none tracking-tighter">
                       {p.startYear === p.endYear ? p.startYear : `${p.startYear}-${String(p.endYear).slice(2)}`}
                     </span>
                   </div>
@@ -1400,21 +1402,21 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         </div>
 
         {/* Compact Quick Controls Row */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5">
           {/* Replay Intro Animation button */}
           <button
             onClick={handleReplayIntro}
-            className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[10px] sm:text-[10.5px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
             title="Voltar para apresentação em leque e abertura"
           >
-            <Sparkles className="w-3 h-3 text-[#105e7b]" />
+            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#105e7b]" />
             <span>Abertura</span>
           </button>
 
           {/* Auto-play pill */}
           <button
             onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-            className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-slate-950 transition-all cursor-pointer shadow-xs ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[10.5px] font-black border border-slate-950 transition-all cursor-pointer shadow-xs ${
               isAutoPlaying
                 ? 'bg-[#105e7b] text-white ring-1 ring-white'
                 : 'bg-white hover:bg-slate-100 text-slate-900'
@@ -1423,12 +1425,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           >
             {isAutoPlaying ? (
               <>
-                <Pause className="w-3 h-3" />
+                <Pause className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 <span>Pausar</span>
               </>
             ) : (
               <>
-                <Play className="w-3 h-3 fill-current" />
+                <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />
                 <span>Apresentação</span>
               </>
             )}
@@ -1439,17 +1441,17 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             onClick={() => {
               slideToIndex(0);
             }}
-            className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[10px] sm:text-[10.5px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
             title="Voltar ao card inicial (1983)"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             <span>Início (1983)</span>
           </button>
 
           {/* Sound / Audio Toggle pill */}
           <button
             onClick={handleToggleSound}
-            className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[10.5px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer ${
               soundActive
                 ? 'bg-white hover:bg-slate-100 text-slate-900'
                 : 'bg-slate-200 text-slate-500 hover:text-slate-700'
@@ -1458,12 +1460,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           >
             {soundActive ? (
               <>
-                <Volume2 className="w-3 h-3 text-[#105e7b]" />
+                <Volume2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#105e7b]" />
                 <span>Som</span>
               </>
             ) : (
               <>
-                <VolumeX className="w-3 h-3 text-slate-500" />
+                <VolumeX className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-500" />
                 <span>Mudo</span>
               </>
             )}
@@ -1476,10 +1478,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 soundFx.playCardTick();
                 onOpenDashboard();
               }}
-              className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#105e7b] hover:bg-[#187fa1] text-white text-[11px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#105e7b] hover:bg-[#187fa1] text-white text-[10px] sm:text-[10.5px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
               title="Apresentação de Indicadores e Estatísticas dos 60 Anos"
             >
-              <BarChart3 className="w-3.5 h-3.5 text-[#e5a93a]" />
+              <BarChart3 className="w-3 h-3 text-[#e5a93a]" />
               <span>Indicadores & Gráficos</span>
             </button>
           )}

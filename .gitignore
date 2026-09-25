@@ -25,3 +25,7 @@ dist-ssr
 
 .vercel
 .env*
+
+scratch/
+save-the-date.png
+save_the_date.ai

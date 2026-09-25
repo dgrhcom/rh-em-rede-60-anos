@@ -5,7 +5,26 @@ export interface MilestonePhoto {
   url?: string;
   aspectRatio?: 'landscape' | 'portrait' | 'square';
   credit?: string;
+  objectPosition?: 'top' | 'center' | 'bottom';
+  objectFit?: 'contain' | 'cover';
 }
+
+export const isTopAlignedPhoto = (
+  photoOrUrl?: { url?: string; title?: string; credit?: string; caption?: string; objectPosition?: string } | string | null,
+  title?: string,
+  credit?: string
+): boolean => {
+  if (!photoOrUrl) return false;
+  if (typeof photoOrUrl === 'object') {
+    if (photoOrUrl.objectPosition === 'top') return true;
+    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1/i.test(
+      `${photoOrUrl.url || ''} ${photoOrUrl.title || ''} ${photoOrUrl.credit || ''} ${photoOrUrl.caption || ''}`
+    );
+  }
+  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1/i.test(
+    `${photoOrUrl} ${title || ''} ${credit || ''}`
+  );
+};
 
 export interface PeriodMilestone {
   id: string;
