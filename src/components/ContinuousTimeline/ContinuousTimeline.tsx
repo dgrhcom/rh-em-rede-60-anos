@@ -514,6 +514,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       if (introStatus === 'logo_pause') {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
           e.preventDefault();
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
           continueFromLogo();
         }
         return;
@@ -522,6 +525,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       if (isPreAnimating) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'ArrowRight') {
           e.preventDefault();
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
           skipPreAnim();
         }
         return;
@@ -530,6 +536,9 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       if (isFanIdle) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
           e.preventDefault();
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
           executeOpeningAnimation(0);
         } else if (e.key === 'Escape') {
           skipIntro();

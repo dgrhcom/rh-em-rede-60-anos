@@ -157,8 +157,11 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
   // Keyboard navigation for presentation mode: Arrow Left / Right / Space / Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') {
         e.preventDefault();
+        if (currentSlideIndex === -1 && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
         if (currentSlideIndex === totalSlides - 1) {
           soundFx.playCardTick();
           onNavigateToOpeningLogo?.();
