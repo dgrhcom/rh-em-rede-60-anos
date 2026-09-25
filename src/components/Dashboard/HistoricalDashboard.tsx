@@ -19,6 +19,7 @@ import {
   EscolaridadeEvolucaoLineChart,
   EscolaridadeZoomLineChart,
   ServidoresPorAreaPieChart,
+  TopCargosTable,
   TopCargosBarChart,
   NacionalidadesCharts,
 } from './Charts/ChartComponents';
@@ -39,13 +40,14 @@ interface SlideDefinition {
 // Deep, vibrant auxiliary and secondary design system colors for each chart card
 export const SLIDE_BG_COLORS = [
   'bg-[#366023]', // 0: Áreas da Unicamp - Aux 1 (Verde Floresta)
-  'bg-[#b8801a]', // 1: Top 20 Cargos - Secundária (Dourado Profundo 60 Anos)
-  'bg-[#5e2a6b]', // 2: Gênero - Aux 2 (Roxo DGRH)
-  'bg-[#d67b27]', // 3: Faixa Etária - Aux 3 (Laranja DGRH)
-  'bg-[#477b2f]', // 4: Raça / Cor - Aux 1 (Verde DGRH)
-  'bg-[#6b213b]', // 5: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
-  'bg-[#c05621]', // 6: Escolaridade Zoom - Aux 3 (Terracota)
-  'bg-[#701a75]', // 7: Nacionalidades - Aux 2 (Ameixa DGRH)
+  'bg-[#5e2a6b]', // 1: Gênero - Aux 2 (Roxo DGRH)
+  'bg-[#d67b27]', // 2: Faixa Etária - Aux 3 (Laranja DGRH)
+  'bg-[#105e7b]', // 3: Raça / Cor - Primária (Azul DGRH)
+  'bg-[#6b213b]', // 4: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
+  'bg-[#c05621]', // 5: Escolaridade Zoom - Aux 3 (Terracota)
+  'bg-[#701a75]', // 6: Nacionalidades - Aux 2 (Ameixa DGRH)
+  'bg-[#0d6e8a]', // 7: Top 20 Cargos Tabela - Azul Petróleo
+  'bg-[#b8801a]', // 8: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
 ];
 
 const SLIDES: SlideDefinition[] = [
@@ -57,17 +59,10 @@ const SLIDES: SlideDefinition[] = [
     tag: 'Áreas da Unicamp',
   },
   {
-    id: 'cargos',
-    category: 'Quadro Funcional',
-    title: 'Ranking dos 20 Maiores Cargos em 2026',
-    subtitle: 'As 20 funções e carreiras com maior número de profissionais em atividade',
-    tag: 'Top 20 Cargos',
-  },
-  {
     id: 'genero',
     category: 'Diversidade & Perfil',
-    title: 'Distribuição Geral por Gênero',
-    subtitle: 'Composição feminina e masculina no quadro geral e por carreira na Unicamp',
+    title: 'Distribuição por Gênero',
+    subtitle: 'Composição institucional e por carreira na Unicamp',
     tag: 'Gênero',
   },
   {
@@ -81,7 +76,7 @@ const SLIDES: SlideDefinition[] = [
     id: 'racaCor',
     category: 'Inclusão & Equidade',
     title: 'Distribuição Étnico-Racial dos Servidores',
-    subtitle: 'Autodeclaração geral de raça/cor e detalhamento por carreira funcional na Universidade',
+    subtitle: 'Autodeclaração por carreira funcional na Universidade',
     tag: 'Raça / Cor',
   },
   {
@@ -104,6 +99,20 @@ const SLIDES: SlideDefinition[] = [
     title: 'Docentes e Pesquisadores por Nacionalidade',
     subtitle: 'Origem geográfica e presença internacional na pesquisa e docência da Unicamp',
     tag: 'Nacionalidades',
+  },
+  {
+    id: 'cargosTabela',
+    category: 'Quadro Funcional',
+    title: 'Ranking dos 20 Cargos com Mais Servidores em 2026',
+    subtitle: 'Tabela quantitativa dos cargos com maior contingente de profissionais na Unicamp',
+    tag: 'Top 20 Cargos (Tabela)',
+  },
+  {
+    id: 'cargos',
+    category: 'Quadro Funcional',
+    title: 'Ranking dos 20 Cargos com Mais Servidores em 2026',
+    subtitle: 'Gráfico comparativo dos 20 cargos com maior número de profissionais em atividade',
+    tag: 'Top 20 Cargos (Gráfico)',
   },
 ];
 
@@ -265,8 +274,8 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
       {isIndex ? (
         /* ================= 1. ÍNDICE DE GRÁFICOS (SEM CONTAINER DE FUNDO) ================= */
         <div className="w-full max-w-[1720px] flex flex-col justify-center my-auto py-2">
-          {/* Grid de 8 Cards no estilo dos cards da linha do tempo com animação de entrada */}
-          <div ref={cardsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 w-full">
+          {/* Grid de 9 Cards no estilo dos cards da linha do tempo com animação de entrada */}
+          <div ref={cardsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 w-full">
             {SLIDES.map((slide, idx) => {
               const cardBg = SLIDE_BG_COLORS[idx % SLIDE_BG_COLORS.length];
               return (
@@ -276,7 +285,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                     soundFx.playCardTick();
                     setCurrentSlideIndex(idx);
                   }}
-                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[230px] sm:min-h-[260px]`}
+                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[200px] sm:min-h-[220px]`}
                 >
                   <div>
                     {/* Título */}
@@ -348,15 +357,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.5rem)] min-h-[500px] max-h-[820px] flex flex-col justify-between"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.96)' }}
           >
-            {/* Header of the Current Slide */}
-            <div className="border-b border-black/10 pb-2 mb-2 shrink-0 flex items-center justify-between">
+            {/* Header of the Current Slide (Sem subtítulo conforme solicitado) */}
+            <div className="border-b border-black/10 pb-2.5 mb-2.5 shrink-0 flex items-center justify-between">
               <div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
                   {currentSlide?.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5 font-medium">
-                  {currentSlide?.subtitle}
-                </p>
               </div>
               <button
                 onClick={() => {
@@ -378,36 +384,29 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             </div>
           )}
 
-          {/* ================= SLIDE 2 (Index 1): RANKING DOS 20 CARGOS ================= */}
+          {/* ================= SLIDE 2 (Index 1): DISTRIBUIÇÃO POR GÊNERO ================= */}
           {currentSlideIndex === 1 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
-              <TopCargosBarChart />
-            </div>
-          )}
-
-          {/* ================= SLIDE 3 (Index 2): GÊNERO ================= */}
-          {currentSlideIndex === 2 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <GeneroCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 4 (Index 3): FAIXA ETÁRIA ================= */}
-          {currentSlideIndex === 3 && (
+          {/* ================= SLIDE 3 (Index 2): FAIXA ETÁRIA ================= */}
+          {currentSlideIndex === 2 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <FaixaEtariaBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 5 (Index 4): RAÇA / COR (INTEGRADO) ================= */}
-          {currentSlideIndex === 4 && (
+          {/* ================= SLIDE 4 (Index 3): RAÇA / COR (INTEGRADO) ================= */}
+          {currentSlideIndex === 3 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <RacaCorCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
-          {currentSlideIndex === 5 && (
+          {/* ================= SLIDE 5 (Index 4): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
+          {currentSlideIndex === 4 && (
             <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
               {/* All education levels Line Chart */}
               <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
@@ -424,8 +423,8 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             </div>
           )}
 
-          {/* ================= SLIDE 7 (Index 6): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
-          {currentSlideIndex === 6 && (
+          {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlideIndex === 5 && (
             <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
               {/* Zoom Line Chart */}
               <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
@@ -442,10 +441,24 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             </div>
           )}
 
-          {/* ================= SLIDE 8 (Index 7): NACIONALIDADES ================= */}
-          {currentSlideIndex === 7 && (
+          {/* ================= SLIDE 7 (Index 6): NACIONALIDADES ================= */}
+          {currentSlideIndex === 6 && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <NacionalidadesCharts />
+            </div>
+          )}
+
+          {/* ================= SLIDE 8 (Index 7): TOP 20 CARGOS (TABELA QUANTITATIVA) ================= */}
+          {currentSlideIndex === 7 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <TopCargosTable />
+            </div>
+          )}
+
+          {/* ================= SLIDE 9 (Index 8): TOP 20 CARGOS (GRÁFICO DE BARRAS) ================= */}
+          {currentSlideIndex === 8 && (
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <TopCargosBarChart />
             </div>
           )}
 
