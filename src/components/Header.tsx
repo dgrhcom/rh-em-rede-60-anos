@@ -1,5 +1,5 @@
-import React from 'react';
-import { BarChart3, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, Clock, Maximize2, Minimize2 } from 'lucide-react';
 import { soundFx } from '../utils/soundEffects';
 
 interface HeaderProps {
@@ -19,6 +19,26 @@ export const Header: React.FC<HeaderProps> = ({
   isPreAnimating = false,
   isLogoInCenterScreen = false,
 }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    soundFx.playCardTick();
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
       <div
@@ -85,6 +105,20 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <BarChart3 className="w-3.5 h-3.5 text-[#e5a93a]" />
             <span>Indicadores & Gráficos</span>
+          </button>
+
+          <div className="w-px h-4 bg-slate-300 mx-0.5" />
+
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center justify-center p-2 rounded-full text-slate-700 hover:text-slate-950 hover:bg-slate-100 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            title={isFullscreen ? "Sair da Tela Cheia (Esc)" : "Entrar em Tela Cheia (F11)"}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-3.5 h-3.5 text-[#105e7b]" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5 text-slate-700" />
+            )}
           </button>
         </div>
       )}

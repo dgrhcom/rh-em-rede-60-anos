@@ -237,15 +237,22 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
     }
   }, [isIndex]);
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   // Fullscreen toggle
   const toggleFullscreen = () => {
+    soundFx.playCardTick();
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().catch(() => {});
-        setIsFullscreen(false);
       }
     }
   };
@@ -296,25 +303,39 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
           <div ref={bottomBarRef} className="w-full flex items-center justify-between pt-6 px-1 shrink-0">
             <button
               onClick={onBackToTimeline}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 hover:scale-105 active:scale-95"
               title="Voltar à Linha do Tempo Contínua"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Linha do Tempo</span>
             </button>
 
-            <button
-              onClick={() => {
-                soundFx.playCardTick();
-                setCurrentSlideIndex(0);
-              }}
-              className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 group"
-              title="Iniciar Apresentação a partir do 1º gráfico"
-            >
-              <Play className="w-4 h-4 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
-              <span>Iniciar Apresentação</span>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleFullscreen}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-slate-900 hover:scale-105 active:scale-95"
+                title={isFullscreen ? "Sair da Tela Cheia (Esc)" : "Entrar em Tela Cheia (F11)"}
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4 text-[#105e7b]" /> : <Maximize2 className="w-4 h-4 text-[#105e7b]" />}
+                <span className="hidden sm:inline">{isFullscreen ? "Sair da Tela Cheia" : "Tela Cheia"}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  soundFx.playCardTick();
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                  }
+                  setCurrentSlideIndex(0);
+                }}
+                className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 group hover:scale-105 active:scale-95"
+                title="Iniciar Apresentação em Tela Cheia a partir do 1º gráfico"
+              >
+                <Play className="w-4 h-4 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
+                <span>Iniciar Apresentação</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
           </div>
         </div>
       ) : (

@@ -699,9 +699,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         >
           <div className={introStatus === 'idle_fan' || preAnimProgress >= 0.82 ? 'pointer-events-auto' : 'pointer-events-none'}>
             <button
-              onClick={() => executeOpeningAnimation(0)}
+              onClick={() => {
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(() => {});
+                }
+                executeOpeningAnimation(0);
+              }}
               className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-sm sm:text-base tracking-wide shadow-2xl border-2 border-white transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group"
-              title="Iniciar apresentação"
+              title="Iniciar apresentação em tela cheia"
             >
               <Play className="w-5 h-5 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
               <span>Iniciar apresentação</span>
