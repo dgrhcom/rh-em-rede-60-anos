@@ -1,0 +1,179 @@
+Alterações na Linha do Tempo:
+
+- aumentar tamanho do ano no cabeçalho dos cards selecionados
+
+
+-> 1983 - 1986
+--Separar em dois anos
+1983
+"Criação da DGRH (Portaria GR-121/1983)"
+1986
+"Estruturação da DGRH (Portaria GR 114/1986)"
+
+Substituir a foto do prédio DGRH por: Z:\→ RH em Rede 2026\16102026\história\images.jpeg (REMOVER MARCA D'AGUA)
+
+-> Ano 1989
+
+Substituir "Nova estruturação" por "Nova estruturação (Portaria GR-060/1989)"
+
+-> 1995-1997
+Substituir a segunda foto por:
+https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_1996_2.jpg
+
+-> Ano 2002
+
+Remover "(DPD)"
+
+-> Ano 2003
+
+Substituir segundo tópico por "Lançamento do Sistema de Consulta a Servidores"
+
+-> Ano 2006
+
+Substituir "são incorporados" por "dão origem"
+
+-> Ano 2008
+
+Remover "(DPD)"
+
+-> Ano 2014
+
+Remover "Projeto" de "Projeto RH em Rede"
+
+Substituir a foto por https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2014_2.jpg
+
+-> Ano 2017-2019
+Incluir foto https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2017_2.jpg
+
+-> Ano 2017
+
+Substituir o primeiro marco por "Implantação da Política de Saúde no Trabalho da Unicamp"
+
+2018
+
+Remover "Implantação de nova estrutura da carreira PAEPE"
+
+Remover "Realização de processo de progressão"
+
+2019
+
+Remover ponto final do primeiro marco.
+
+Incluir "Implantação da nova estrutura da carreira PAEPE"
+
+Incluir "Implantação do processo de progressão PAEPE"
+
+-> Incluir novo Card com o período: 2020-2022
+Nele, incluir fotos:
+https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2020_2.png
+https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2020_1.jpg
+
+Incluir -> Ano 2020
+
+Marcos:
+Adequação para o ambiente digital devido à Pandemia Covid-19
+
+Lançamento do Sistema de Frequência, Afastamento e Licença Prêmio (FALP) e da nova versão do Vida Funcional Online
+
+-> Card 2022-2025 -> Alterar período para: 2024-2026
+Incluir foto: Z:\BANCO DE IMAGENS\Portal DGRH\2025-0530 - Melhorias no ponto eletrônico\2025-0530-melhorias-ponto-eletrônico.png
+
+-> Ano 2024
+
+Remover "Início do projeto piloto de trabalho híbrido com servidores da DAC e de TIC"
+
+Incluir "Recadastramento anual de servidores ativos passa a ser feito na plataforma SOU.SP"
+
+-> Ano 2025
+
+Substituir segunda frase por "Implantação da Política de Segurança no Trabalho da Unicamp"
+
+-> Ano 2026 (incluir)
+
+- Implantação do trabalho híbrido
+
+- Implantação do banco de horas e escala móvel
+
+- Concessão de horário especial de trabalho PcD
+
+ 
+
+Alterações nos Gráficos:
+
+Por área:
+
+Aumentar porcentagens
+
+Aumentar a legenda lateral
+
+Ranking 20 maiores cargos:
+
+Trocar título para "Ranking dos 20 Cargos com Mais Servidores em 2026"
+
+Remover linha fina
+
+Aumentar legenda lateral
+
+Trocar "Carreiras" por "Áreas"
+
+Trocar "Administração e RH" por "Técnica-Administrativa"
+
+Trocar "Educação, Pesquisa e Ciência" por "Ensino e Pesquisa"
+
+Colocar no grupo Técnica-Administrativa: 11, 12, 15, 18, 19 e 20
+
+Criar nova tela com tabela dos cargos com quantidades
+
+Mover esses gráficos para o final da apresentação
+
+Gênero:
+
+Alterar título para "Distribuição por Gênero"
+
+Remover linha fina
+
+Remover título do gráfico por carreira
+
+Inverter legendas do gráfico pizza e aumentar fonte
+
+Trocar legenda do gráfico barras para "Homens" e "Mulheres"
+
+Manter mesma ordem da cor nos dois gráficos
+
+Aumentar fonte eixo X
+
+Perfil Etário:
+
+Remover linha fina
+
+Aumentar legenda lateral
+
+Aumentar fonte eixo X
+
+Étnico Racial:
+
+Remover linha fina
+
+Aumentar fonte eixo Y
+
+Remover título do gráfico por carreira
+
+Remover gráfico pizza
+
+Escolaridade:
+
+Remover linha fina
+
+Aumentar as legendas
+
+Colocar a legenda na direita
+
+Nacionalidade:
+
+Remover linha fina
+
+Aumentar fonte eixo X
+
+Remover título do gráfico de barras
+
+Deixar legendas do gráfico pizza do mesmo tamanho
