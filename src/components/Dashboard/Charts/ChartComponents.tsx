@@ -1989,15 +1989,16 @@ export const NacionalidadesCharts: React.FC = () => {
               const isMobile = chartInstance.width < 500;
               const padX = isMobile ? 14 : 22;
               const padY = isMobile ? 8 : 12;
+              const badgeFontSize = isMobile ? 24 : 36;
               const items = [
-                { label: 'Brasileiros', pct: '94,9%', total: NACIONALIDADES_DATA.totalNatoOuNaturalizado, size: isMobile ? 26 : 44 },
-                { label: 'Estrangeiros', pct: '5,1%', total: NACIONALIDADES_DATA.totalEstrangeiro, size: isMobile ? 22 : 34 },
+                { label: 'Brasileiros', pct: '94,9%', total: NACIONALIDADES_DATA.totalNatoOuNaturalizado },
+                { label: 'Estrangeiros', pct: '5,1%', total: NACIONALIDADES_DATA.totalEstrangeiro },
               ];
 
               meta.data.forEach((element: any, i: number) => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                const text = isMobile ? items[i].pct : `${items[i].label}: ${items[i].pct}`;
+                const text = items[i].pct;
                 drawBadge(
                   c,
                   text,
@@ -2005,7 +2006,7 @@ export const NacionalidadesCharts: React.FC = () => {
                   pos.y,
                   'rgba(15, 23, 42, 0.92)',
                   '#ffffff',
-                  items[i].size,
+                  badgeFontSize,
                   padX,
                   padY,
                   10,
@@ -2174,33 +2175,61 @@ export const NacionalidadesCharts: React.FC = () => {
           <canvas ref={pieRef} />
         </div>
 
-        {/* Resumo Absoluto e Percentual no Rodapé da Coluna Esquerda */}
-        <div className="w-full max-w-[460px] grid grid-cols-2 gap-2.5 sm:gap-3 mt-2.5">
-          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#105e7b] flex flex-col items-center justify-center shadow-xs">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Brasileiros</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-base sm:text-lg lg:text-xl font-black text-[#105e7b]">
-                {NACIONALIDADES_DATA.totalNatoOuNaturalizado.toLocaleString('pt-BR')}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-[#105e7b]/80">(94,9%)</span>
+        {/* Resumo Inferior Padronizado com a mesma formatação das legendas laterais dos outros gráficos */}
+        <div className="w-full max-w-[480px] flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 mt-2.5">
+          <div className="flex flex-col divide-y divide-slate-100">
+            {/* Brasileiros */}
+            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.primary }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
+                  Brasileiros
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
+                  {NACIONALIDADES_DATA.totalNatoOuNaturalizado.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  (94,9%)
+                </span>
+              </div>
+            </div>
+
+            {/* Estrangeiros */}
+            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.secondary }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
+                  Estrangeiros
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
+                  {NACIONALIDADES_DATA.totalEstrangeiro.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  (5,1%)
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="px-3.5 py-2.5 rounded-2xl bg-white border-2 border-[#e5a93a] flex flex-col items-center justify-center shadow-xs">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estrangeiros</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-base sm:text-lg lg:text-xl font-black text-[#b45309]">
-                {NACIONALIDADES_DATA.totalEstrangeiro.toLocaleString('pt-BR')}
-              </span>
-              <span className="text-xs sm:text-sm font-bold text-[#b45309]/80">(5,1%)</span>
-            </div>
+          {/* Total Geral de Docentes e Pesquisadores */}
+          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+            <span className="text-base sm:text-lg font-normal text-slate-600">
+              Total Geral
+            </span>
+            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
+              {(NACIONALIDADES_DATA.totalNatoOuNaturalizado + NACIONALIDADES_DATA.totalEstrangeiro).toLocaleString('pt-BR')}
+            </span>
           </div>
-        </div>
-
-        <div className="text-center mt-2">
-          <span className="text-xs sm:text-sm font-semibold text-slate-600">
-            Total de Docentes e Pesquisadores: <strong className="text-slate-900 font-black">2.084</strong>
-          </span>
         </div>
       </div>
 
