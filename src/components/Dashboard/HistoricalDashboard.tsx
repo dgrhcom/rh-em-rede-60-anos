@@ -289,7 +289,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                 >
                   <div>
                     {/* Título */}
-                    <h3 className="text-base sm:text-lg font-black text-white leading-snug tracking-tight">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug tracking-tight">
                       {slide.title}
                     </h3>
 
