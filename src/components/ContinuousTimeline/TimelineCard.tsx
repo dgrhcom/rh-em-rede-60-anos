@@ -159,19 +159,19 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                 <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
                   {yearGroups.map(([year, milestones], gIdx) => (
                     <div key={year} className="flex flex-col text-left">
-                      {/* Cabeçalho do Ano */}
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <span className="text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
+                      {/* Cabeçalho do Ano: 20px */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[20px] font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
                           {year}
                         </span>
                       </div>
 
-                      {/* Tópicos dos marcos para o ano: tipografia ampliada para 28-31px */}
-                      <ul className="space-y-4 list-disc pl-6 sm:pl-7">
+                      {/* Tópicos dos marcos para o ano: 26px */}
+                      <ul className="space-y-3.5 list-disc pl-5 sm:pl-6">
                         {milestones.map((m) => (
                           <li
                             key={m.id}
-                            className="text-xl sm:text-2xl lg:text-[28px] xl:text-[30px] 2xl:text-[31px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
+                            className="text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
                           >
                             {m.text}
                           </li>
