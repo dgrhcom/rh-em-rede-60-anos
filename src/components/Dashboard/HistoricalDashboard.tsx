@@ -287,8 +287,8 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                   className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[200px] sm:min-h-[225px]`}
                 >
                   <div>
-                    {/* Título com fonte ampliada */}
-                    <h3 className="text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-bold text-white leading-snug tracking-tight">
+                    {/* Título com fonte ampliada e peso menos pesado (font-semibold) */}
+                    <h3 className="text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-semibold text-white leading-snug tracking-tight">
                       {slide.title}
                     </h3>
 
@@ -358,7 +358,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
             {/* Header of the Current Slide (Sem subtítulo conforme solicitado) */}
             <div className="border-b border-black/10 pb-2.5 mb-2.5 shrink-0 flex items-center justify-between">
               <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-950 tracking-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
                   {currentSlide?.title}
                 </h2>
               </div>
