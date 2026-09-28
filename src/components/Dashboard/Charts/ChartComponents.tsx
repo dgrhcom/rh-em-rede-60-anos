@@ -537,63 +537,94 @@ export const FaixaEtariaBarChart: React.FC = () => {
         </div>
 
         {/* 2. Legenda Padronizada com Tipografia Ampliada */}
-        <div className="flex flex-col gap-2.5">
-          <span className="text-xs sm:text-sm font-black uppercase text-slate-500 tracking-wider px-1">
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+          <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
             Legenda por Carreira
           </span>
 
-          {/* Docentes */}
-          <div
-            onClick={() => toggleDataset(0)}
-            className="px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
-            style={{ borderLeftWidth: '6px', borderLeftColor: DS_COLORS.aux2 }}
-            title="Clique para alternar visibilidade de Docentes"
-          >
-            <div className="flex items-center gap-3">
-              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux2 }} />
-              <span className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 group-hover:text-slate-950">Docentes</span>
+          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+            {/* Docentes */}
+            <div
+              onClick={() => toggleDataset(0)}
+              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+              title="Clique para alternar visibilidade de Docentes"
+            >
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.aux2 }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
+                  Docentes
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
+                  {totalDocentes.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({((totalDocentes / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
+                </span>
+              </div>
             </div>
-            <div className="text-base sm:text-lg lg:text-xl font-black text-slate-900 px-3 py-1 rounded-xl bg-slate-100">
-              {totalDocentes.toLocaleString('pt-BR')}
-            </div>
-          </div>
 
-          {/* Pesquisadores */}
-          <div
-            onClick={() => toggleDataset(1)}
-            className="px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
-            style={{ borderLeftWidth: '6px', borderLeftColor: DS_COLORS.aux1 }}
-            title="Clique para alternar visibilidade de Pesquisadores"
-          >
-            <div className="flex items-center gap-3">
-              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux1 }} />
-              <span className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 group-hover:text-slate-950">Pesquisadores (PQ)</span>
+            {/* Pesquisadores */}
+            <div
+              onClick={() => toggleDataset(1)}
+              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+              title="Clique para alternar visibilidade de Pesquisadores"
+            >
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.aux1 }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
+                  Pesquisadores (PQ)
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
+                  {totalPesquisadores.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({((totalPesquisadores / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
+                </span>
+              </div>
             </div>
-            <div className="text-base sm:text-lg lg:text-xl font-black text-slate-900 px-3 py-1 rounded-xl bg-slate-100">
-              {totalPesquisadores.toLocaleString('pt-BR')}
-            </div>
-          </div>
 
-          {/* Técnicos (PAEPE) */}
-          <div
-            onClick={() => toggleDataset(2)}
-            className="px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md cursor-pointer group select-none"
-            style={{ borderLeftWidth: '6px', borderLeftColor: DS_COLORS.primary }}
-            title="Clique para alternar visibilidade de PAEPE"
-          >
-            <div className="flex items-center gap-3">
-              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.primary }} />
-              <span className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 group-hover:text-slate-950">PAEPE</span>
-            </div>
-            <div className="text-base sm:text-lg lg:text-xl font-black text-slate-900 px-3 py-1 rounded-xl bg-slate-100">
-              {totalTecnicos.toLocaleString('pt-BR')}
+            {/* Técnicos (PAEPE) */}
+            <div
+              onClick={() => toggleDataset(2)}
+              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+              title="Clique para alternar visibilidade de PAEPE"
+            >
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.primary }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
+                  PAEPE
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
+                  {totalTecnicos.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({((totalTecnicos / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Total Geral */}
-          <div className="px-4 py-3 rounded-2xl bg-slate-950 text-white flex items-center justify-between shadow-xs mt-1">
-            <span className="text-xs sm:text-sm lg:text-base font-bold text-slate-300">Total Analisado</span>
-            <span className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-amber-400">
+          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+              Total Geral
+            </span>
+            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {totalGeral.toLocaleString('pt-BR')}
             </span>
           </div>
@@ -1058,35 +1089,49 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
       </div>
 
       {/* Legenda Padronizada em Coluna à Direita */}
-      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-1.5 sm:gap-2 w-full p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-500 pb-1.5 border-b border-slate-200">
+      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2 sm:gap-2.5 w-full p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+        <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
           Níveis de Escolaridade (2026)
         </span>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col divide-y divide-slate-100 pt-1">
           {ESCOLARIDADE_EVOLUCAO.series.map((s) => {
             const val2026 = s.valores[s.valores.length - 1];
             const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
             return (
               <div
                 key={s.nivel}
-                className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between hover:bg-slate-100 transition-colors"
-                style={{ borderLeftWidth: '5px', borderLeftColor: s.cor }}
+                className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg"
               >
-                <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                  <span className="w-3.5 h-3.5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: s.cor }} />
-                  <span className="text-xs sm:text-sm lg:text-base font-bold text-slate-900 truncate">{s.nivel}</span>
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                  <span
+                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: s.cor }}
+                  />
+                  <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 tracking-tight truncate">
+                    {s.nivel}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-xs sm:text-sm lg:text-base font-black text-slate-900">
+                <div className="flex items-baseline gap-1.5 shrink-0">
+                  <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-900">
                     {val2026.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-bold text-slate-500">
+                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Total PAEPE */}
+        <div className="pt-2.5 sm:pt-3 mt-1 flex items-center justify-between px-1.5 border-t border-slate-200">
+          <span className="text-xs sm:text-sm lg:text-base font-normal text-slate-600">
+            Total PAEPE (2026)
+          </span>
+          <span className="text-base sm:text-lg lg:text-xl font-semibold text-[#105e7b] tracking-wider">
+            {totalPAEPE2026.toLocaleString('pt-BR')}
+          </span>
         </div>
       </div>
     </div>
@@ -1202,35 +1247,49 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
       </div>
 
       {/* Legenda Padronizada em Coluna à Direita */}
-      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2 sm:gap-2.5 w-full p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-500 pb-1.5 border-b border-slate-200">
+      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3 sm:gap-3.5 w-full p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+        <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
           Categorias em Destaque (Zoom)
         </span>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col divide-y divide-slate-100 pt-1">
           {ESCOLARIDADE_ZOOM_SERIES.map((s) => {
             const val2026 = s.valores[s.valores.length - 1];
             const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
             return (
               <div
                 key={s.nivel}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between hover:bg-slate-100 transition-colors"
-                style={{ borderLeftWidth: '5px', borderLeftColor: s.cor }}
+                className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
               >
-                <div className="flex items-center gap-3 min-w-0 pr-2">
-                  <span className="w-4 h-4 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: s.cor }} />
-                  <span className="text-sm sm:text-base font-bold text-slate-900 truncate">{s.nivel}</span>
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                  <span
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: s.cor }}
+                  />
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                    {s.nivel}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-sm sm:text-base font-black text-slate-900">
+                <div className="flex items-baseline gap-2 shrink-0">
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
                     {val2026.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-xs font-bold text-slate-500">
+                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Total Selecionado do Zoom */}
+        <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+            Total Selecionado (2026)
+          </span>
+          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
+            {ESCOLARIDADE_ZOOM_SERIES.reduce((acc, s) => acc + s.valores[s.valores.length - 1], 0).toLocaleString('pt-BR')}
+          </span>
         </div>
       </div>
     </div>
