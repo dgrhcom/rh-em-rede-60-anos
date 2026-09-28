@@ -1685,12 +1685,12 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
+                className="py-2.5 sm:py-3.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
               >
-                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
                   <span
-                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-normal shrink-0 ${
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm lg:text-base font-normal shrink-0 ${
                       rank === 1
                         ? 'bg-amber-100 text-amber-900 border border-amber-300'
                         : rank === 2
@@ -1703,16 +1703,16 @@ export const TopCargosTable: React.FC = () => {
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Classificação na MESMA linha */}
-                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                  {/* Nome do Cargo e Classificação na MESMA linha com Fonte Ampliada */}
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
-                      className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 truncate"
+                      className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
                       title={item.cargo}
                     >
                       {item.cargo}
                     </span>
                     <span
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm lg:text-[14.5px] font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
                       style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
                     >
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
@@ -1723,10 +1723,10 @@ export const TopCargosTable: React.FC = () => {
 
                 {/* Quantidade e Porcentagem */}
                 <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
-                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-900">
+                  <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
+                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
@@ -1744,24 +1744,24 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
+                className="py-2.5 sm:py-3.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
               >
-                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-normal shrink-0 bg-slate-100 text-slate-600">
+                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm lg:text-base font-normal shrink-0 bg-slate-100 text-slate-600">
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Classificação na MESMA linha */}
-                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                  {/* Nome do Cargo e Classificação na MESMA linha com Fonte Ampliada */}
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
-                      className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 truncate"
+                      className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
                       title={item.cargo}
                     >
                       {item.cargo}
                     </span>
                     <span
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm lg:text-[14.5px] font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
                       style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
                     >
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
@@ -1772,10 +1772,10 @@ export const TopCargosTable: React.FC = () => {
 
                 {/* Quantidade e Porcentagem */}
                 <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
-                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-900">
+                  <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
+                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
