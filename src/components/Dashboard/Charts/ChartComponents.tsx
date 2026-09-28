@@ -133,8 +133,8 @@ export const GeneroCharts: React.FC = () => {
               const padX = isMobile ? 12 : 20;
               const padY = isMobile ? 8 : 12;
               const items = [
-                { label: 'Mulheres', pct: GENERO_DATA.total.pctFeminino, total: GENERO_DATA.total.feminino },
                 { label: 'Homens', pct: GENERO_DATA.total.pctMasculino, total: GENERO_DATA.total.masculino },
+                { label: 'Mulheres', pct: GENERO_DATA.total.pctFeminino, total: GENERO_DATA.total.feminino },
               ];
 
               meta.data.forEach((element: any, i: number) => {
@@ -161,12 +161,12 @@ export const GeneroCharts: React.FC = () => {
           pieChart = new Chart(ctx1, {
             type: 'pie',
             data: {
-              labels: ['Mulheres', 'Homens'],
+              labels: ['Homens', 'Mulheres'],
               datasets: [
                 {
-                  data: [GENERO_DATA.total.feminino, GENERO_DATA.total.masculino],
-                  backgroundColor: [DS_COLORS.aux2, DS_COLORS.primary],
-                  hoverBackgroundColor: [DS_COLORS.aux2Hover, DS_COLORS.primaryHover],
+                  data: [GENERO_DATA.total.masculino, GENERO_DATA.total.feminino],
+                  backgroundColor: [DS_COLORS.primary, DS_COLORS.aux2],
+                  hoverBackgroundColor: [DS_COLORS.primaryHover, DS_COLORS.aux2Hover],
                   borderWidth: 3,
                   borderColor: '#ffffff',
                 },
@@ -189,7 +189,7 @@ export const GeneroCharts: React.FC = () => {
                   callbacks: {
                     label: (ctx: any) => {
                       const val = Number(ctx.raw);
-                      const pct = ctx.dataIndex === 0 ? GENERO_DATA.total.pctFeminino : GENERO_DATA.total.pctMasculino;
+                      const pct = ctx.dataIndex === 0 ? GENERO_DATA.total.pctMasculino : GENERO_DATA.total.pctFeminino;
                       return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct.toFixed(1).replace('.', ',')}%)`;
                     },
                   },
@@ -330,29 +330,8 @@ export const GeneroCharts: React.FC = () => {
         {/* Resumo Inferior Padronizado com a mesma formatação das legendas laterais dos outros gráficos */}
         <div className="w-full max-w-[480px] flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 mt-2.5">
           <div className="flex flex-col divide-y divide-slate-100">
-            {/* Mulheres */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                <span
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.aux2 }}
-                />
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
-                  Mulheres
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
-                  {GENERO_DATA.total.feminino.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({GENERO_DATA.total.pctFeminino.toFixed(1).replace('.', ',')}%)
-                </span>
-              </div>
-            </div>
-
             {/* Homens */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
+            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
@@ -368,6 +347,27 @@ export const GeneroCharts: React.FC = () => {
                 </span>
                 <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
                   ({GENERO_DATA.total.pctMasculino.toFixed(1).replace('.', ',')}%)
+                </span>
+              </div>
+            </div>
+
+            {/* Mulheres */}
+            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: DS_COLORS.aux2 }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
+                  Mulheres
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
+                  {GENERO_DATA.total.feminino.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({GENERO_DATA.total.pctFeminino.toFixed(1).replace('.', ',')}%)
                 </span>
               </div>
             </div>
