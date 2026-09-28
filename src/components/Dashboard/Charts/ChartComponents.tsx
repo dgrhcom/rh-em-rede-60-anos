@@ -1652,8 +1652,6 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
 export const TopCargosTable: React.FC = () => {
   const top20 = TOP_CARGOS_2026.slice(0, 20);
   const totalGeral = TOTAL_SERVIDORES_ATIVOS; // 9416
-  const totalTop20 = top20.reduce((acc, c) => acc + c.quantidade, 0); // 7246
-  const pctTop20 = ((totalTop20 / totalGeral) * 100).toFixed(1).replace('.', ',');
 
   const getAreaColor = (categoria: string) => {
     switch (categoria) {
@@ -1673,7 +1671,7 @@ export const TopCargosTable: React.FC = () => {
   const col2 = top20.slice(10, 20);
 
   return (
-    <div className="w-full h-full flex flex-col justify-between py-1 min-h-0 gap-3 sm:gap-4">
+    <div className="w-full h-full flex flex-col py-1 min-h-0">
       {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 xl:gap-6 flex-1 min-h-0 overflow-y-auto pr-1">
         {/* Coluna 1: 1º ao 10º */}
@@ -1782,21 +1780,6 @@ export const TopCargosTable: React.FC = () => {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Banner de Rodapé: Síntese Estatística do Top 20 */}
-      <div className="px-5 py-3 rounded-2xl bg-slate-950 text-white flex flex-wrap items-center justify-between gap-3 shadow-md shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm sm:text-base font-normal text-slate-300">
-            Total dos 20 Maiores Cargos:
-          </span>
-          <span className="text-base sm:text-lg font-medium text-amber-400">
-            {totalTop20.toLocaleString('pt-BR')} servidores ({pctTop20}% do quadro geral)
-          </span>
-        </div>
-        <div className="text-xs sm:text-sm font-normal text-slate-400">
-          Total da Universidade: <strong className="text-white font-medium">{totalGeral.toLocaleString('pt-BR')}</strong> servidores ativos
         </div>
       </div>
     </div>
