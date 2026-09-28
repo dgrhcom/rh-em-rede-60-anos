@@ -2203,16 +2203,6 @@ export const NacionalidadesCharts: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Total Geral de Docentes e Pesquisadores */}
-          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-            <span className="text-base sm:text-lg font-normal text-slate-600">
-              Total Geral
-            </span>
-            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-              {(NACIONALIDADES_DATA.totalNatoOuNaturalizado + NACIONALIDADES_DATA.totalEstrangeiro).toLocaleString('pt-BR')}
-            </span>
-          </div>
         </div>
       </div>
 
