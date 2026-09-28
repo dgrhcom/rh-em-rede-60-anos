@@ -25,6 +25,7 @@ export const DS_COLORS = {
   secondaryHover: '#b8801a',
   secondarySurface: '#fffaec',
   aux1: '#477b2f',          // Verde DGRH Auxiliar 1
+  aux1Hover: '#5a993c',
   aux2: '#5e2a6b',          // Roxo DGRH Auxiliar 2
   aux2Hover: '#743484',
   aux3: '#d67b27',          // Laranja/Terracota DGRH Auxiliar 3
@@ -2104,8 +2105,8 @@ export const NacionalidadesCharts: React.FC = () => {
                     NACIONALIDADES_DATA.totalNatoOuNaturalizado,
                     NACIONALIDADES_DATA.totalEstrangeiro,
                   ],
-                  backgroundColor: [DS_COLORS.primary, DS_COLORS.secondary],
-                  hoverBackgroundColor: [DS_COLORS.primaryHover, DS_COLORS.secondaryHover],
+                  backgroundColor: [DS_COLORS.aux1, DS_COLORS.aux2],
+                  hoverBackgroundColor: [DS_COLORS.aux1Hover, DS_COLORS.aux2Hover],
                   borderWidth: 3,
                   borderColor: '#ffffff',
                 },
@@ -2261,7 +2262,7 @@ export const NacionalidadesCharts: React.FC = () => {
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.primary }}
+                  style={{ backgroundColor: DS_COLORS.aux1 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
                   Brasileiros
@@ -2282,7 +2283,7 @@ export const NacionalidadesCharts: React.FC = () => {
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.secondary }}
+                  style={{ backgroundColor: DS_COLORS.aux2 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
                   Estrangeiros
