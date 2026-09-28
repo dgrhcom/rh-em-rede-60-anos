@@ -284,23 +284,22 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                     soundFx.playCardTick();
                     setCurrentSlideIndex(idx);
                   }}
-                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[200px] sm:min-h-[220px]`}
+                  className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[200px] sm:min-h-[225px]`}
                 >
                   <div>
-                    {/* Título */}
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug tracking-tight">
+                    {/* Título com fonte ampliada */}
+                    <h3 className="text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-bold text-white leading-snug tracking-tight">
                       {slide.title}
                     </h3>
 
                     {/* Subtítulo em tom claro */}
-                    <p className="text-xs sm:text-[13px] text-white/85 font-medium leading-relaxed mt-2 line-clamp-3">
+                    <p className="text-xs sm:text-[13px] md:text-sm text-white/85 font-medium leading-relaxed mt-2 line-clamp-3">
                       {slide.subtitle}
                     </p>
                   </div>
 
-                  {/* Rodapé do Card: Tag e Ação (Sem ícones) */}
-                  <div className="pt-3 border-t border-white/20 flex items-center justify-between mt-4 text-xs font-bold text-white/90">
-                    <span className="truncate">{slide.tag}</span>
+                  {/* Rodapé do Card: Apenas Ação Ver gráfico */}
+                  <div className="pt-3 border-t border-white/20 flex items-center justify-end mt-4 text-xs sm:text-sm font-bold text-white/90">
                     <span className="shrink-0 font-black text-white group-hover:translate-x-1 transition-transform">
                       Ver gráfico →
                     </span>
