@@ -1791,7 +1791,7 @@ export const TopCargosTable: React.FC = () => {
       {/* Grid com 2 colunas: 1 a 10 e 11 a 20 (Sem cards envolventes para ganho de espaço) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-10 flex-1 min-h-0 overflow-y-auto px-1">
         {/* Coluna 1: 1º ao 10º */}
-        <div className="flex flex-col divide-y divide-slate-200/80">
+        <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col1.map((item, index) => {
             const rank = index + 1;
             const areaStyle = getAreaColor(item.categoria);
@@ -1799,7 +1799,7 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2.5 sm:py-3.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
+                className="py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
@@ -1848,7 +1848,7 @@ export const TopCargosTable: React.FC = () => {
         </div>
 
         {/* Coluna 2: 11º ao 20º */}
-        <div className="flex flex-col divide-y divide-slate-200/80">
+        <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col2.map((item, index) => {
             const rank = index + 11;
             const areaStyle = getAreaColor(item.categoria);
@@ -1856,7 +1856,7 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2.5 sm:py-3.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
+                className="py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
