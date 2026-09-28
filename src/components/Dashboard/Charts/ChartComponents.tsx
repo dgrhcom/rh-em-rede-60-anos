@@ -1702,27 +1702,6 @@ export const TopCargosTable: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col py-1 min-h-0">
-      {/* Mini Legenda de Áreas (Pontos Coloridos) */}
-      <div className="flex flex-wrap items-center justify-end gap-3.5 sm:gap-5 px-3 pb-2 text-xs sm:text-sm font-normal text-slate-600 shrink-0">
-        <span className="text-slate-400 font-medium mr-1">Áreas:</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#105e7b' }} />
-          <span>Técnica-Administrativa</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#d67b27' }} />
-          <span>Saúde</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#477b2f' }} />
-          <span>Ensino e Pesquisa</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#e5a93a' }} />
-          <span>Tecnologia da Informação (TI)</span>
-        </div>
-      </div>
-
       {/* Grid com 2 colunas: 1 a 10 e 11 a 20 (Sem cards envolventes para ganho de espaço) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-10 flex-1 min-h-0 overflow-y-auto px-1">
         {/* Coluna 1: 1º ao 10º */}
@@ -1827,6 +1806,27 @@ export const TopCargosTable: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Mini Legenda de Áreas (Pontos Coloridos) - Abaixo da tabela e centralizada */}
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-3 pt-3.5 pb-1 text-xs sm:text-sm font-normal text-slate-600 shrink-0">
+        <span className="text-slate-400 font-medium mr-1">Áreas:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#105e7b' }} />
+          <span>Técnica-Administrativa</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#d67b27' }} />
+          <span>Saúde</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#477b2f' }} />
+          <span>Ensino e Pesquisa</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#e5a93a' }} />
+          <span>Tecnologia da Informação (TI)</span>
         </div>
       </div>
     </div>
