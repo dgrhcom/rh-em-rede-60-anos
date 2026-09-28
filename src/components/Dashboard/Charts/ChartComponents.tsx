@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, TrendingUp } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
   TOTAL_SERVIDORES_ATIVOS,
@@ -1174,54 +1174,65 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-center w-full h-full min-h-0">
       {/* Canvas da Linha Geral */}
-      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[360px] sm:h-[420px] lg:h-[470px] xl:h-[510px]">
+      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[600px]">
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Legenda Padronizada em Coluna à Direita */}
-      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2 sm:gap-2.5 w-full p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-        <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
-          Níveis de Escolaridade (2026)
-        </span>
-        <div className="flex flex-col divide-y divide-slate-100 pt-1">
-          {ESCOLARIDADE_EVOLUCAO.series.map((s) => {
-            const val2026 = s.valores[s.valores.length - 1];
-            const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
-            return (
-              <div
-                key={s.nivel}
-                className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg"
-              >
-                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
-                  <span
-                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs"
-                    style={{ backgroundColor: s.cor }}
-                  />
-                  <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 tracking-tight truncate">
-                    {s.nivel}
-                  </span>
+      {/* Coluna Direita: Legenda Padronizada + Destaque Histórico Abaixo da Legenda */}
+      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2.5 sm:gap-3.5 w-full">
+        {/* 1. Legenda Padronizada */}
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
+            Níveis de Escolaridade (2026)
+          </span>
+          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+            {ESCOLARIDADE_EVOLUCAO.series.map((s) => {
+              const val2026 = s.valores[s.valores.length - 1];
+              const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
+              return (
+                <div
+                  key={s.nivel}
+                  className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg"
+                >
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <span
+                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs"
+                      style={{ backgroundColor: s.cor }}
+                    />
+                    <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 tracking-tight truncate">
+                      {s.nivel}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5 shrink-0">
+                    <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-900">
+                      {val2026.toLocaleString('pt-BR')}
+                    </span>
+                    <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
+                      ({pct}%)
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-1.5 shrink-0">
-                  <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-900">
-                    {val2026.toLocaleString('pt-BR')}
-                  </span>
-                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
-                    ({pct}%)
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Total PAEPE */}
+          <div className="pt-2.5 sm:pt-3 mt-1 flex items-center justify-between px-1.5 border-t border-slate-200">
+            <span className="text-xs sm:text-sm lg:text-base font-normal text-slate-600">
+              Total PAEPE (2026)
+            </span>
+            <span className="text-base sm:text-lg lg:text-xl font-semibold text-[#105e7b] tracking-wider">
+              {totalPAEPE2026.toLocaleString('pt-BR')}
+            </span>
+          </div>
         </div>
 
-        {/* Total PAEPE */}
-        <div className="pt-2.5 sm:pt-3 mt-1 flex items-center justify-between px-1.5 border-t border-slate-200">
-          <span className="text-xs sm:text-sm lg:text-base font-normal text-slate-600">
-            Total PAEPE (2026)
-          </span>
-          <span className="text-base sm:text-lg lg:text-xl font-semibold text-[#105e7b] tracking-wider">
-            {totalPAEPE2026.toLocaleString('pt-BR')}
-          </span>
+        {/* 2. Destaque Histórico (Abaixo da Legenda) */}
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
+          <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
+            <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
+          </div>
         </div>
       </div>
     </div>
@@ -1332,54 +1343,65 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-center w-full h-full min-h-0">
       {/* Canvas do Gráfico de Zoom */}
-      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[360px] sm:h-[420px] lg:h-[470px] xl:h-[510px]">
+      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[600px]">
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Legenda Padronizada em Coluna à Direita */}
-      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3 sm:gap-3.5 w-full p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-        <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
-          Categorias em Destaque (Zoom)
-        </span>
-        <div className="flex flex-col divide-y divide-slate-100 pt-1">
-          {ESCOLARIDADE_ZOOM_SERIES.map((s) => {
-            const val2026 = s.valores[s.valores.length - 1];
-            const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
-            return (
-              <div
-                key={s.nivel}
-                className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
-              >
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                  <span
-                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                    style={{ backgroundColor: s.cor }}
-                  />
-                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
-                    {s.nivel}
-                  </span>
+      {/* Coluna Direita: Legenda Padronizada + Destaque Abaixo da Legenda */}
+      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2.5 sm:gap-3.5 w-full">
+        {/* 1. Legenda Padronizada */}
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
+            Categorias em Destaque (Zoom)
+          </span>
+          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+            {ESCOLARIDADE_ZOOM_SERIES.map((s) => {
+              const val2026 = s.valores[s.valores.length - 1];
+              const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
+              return (
+                <div
+                  key={s.nivel}
+                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
+                >
+                  <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                    <span
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                      style={{ backgroundColor: s.cor }}
+                    />
+                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                      {s.nivel}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 shrink-0">
+                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
+                      {val2026.toLocaleString('pt-BR')}
+                    </span>
+                    <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                      ({pct}%)
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2 shrink-0">
-                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
-                    {val2026.toLocaleString('pt-BR')}
-                  </span>
-                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                    ({pct}%)
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Total Selecionado do Zoom */}
+          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+              Total Selecionado (2026)
+            </span>
+            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
+              {ESCOLARIDADE_ZOOM_SERIES.reduce((acc, s) => acc + s.valores[s.valores.length - 1], 0).toLocaleString('pt-BR')}
+            </span>
+          </div>
         </div>
 
-        {/* Total Selecionado do Zoom */}
-        <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-            Total Selecionado (2026)
-          </span>
-          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-            {ESCOLARIDADE_ZOOM_SERIES.reduce((acc, s) => acc + s.valores[s.valores.length - 1], 0).toLocaleString('pt-BR')}
-          </span>
+        {/* 2. Destaque em Zoom (Abaixo da Legenda) */}
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
+          <Sparkles className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
+            <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
+          </div>
         </div>
       </div>
     </div>

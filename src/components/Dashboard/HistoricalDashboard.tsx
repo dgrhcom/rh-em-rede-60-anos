@@ -7,7 +7,6 @@ import {
   Maximize2,
   Minimize2,
   Sparkles,
-  TrendingUp,
   LayoutGrid,
   Play,
 } from 'lucide-react';
@@ -407,37 +406,15 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
 
           {/* ================= SLIDE 5 (Index 4): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
           {currentSlideIndex === 4 && (
-            <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
-              {/* All education levels Line Chart */}
-              <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
-                <EscolaridadeEvolucaoLineChart />
-              </div>
-
-              {/* Highlight callout box (Abaixo do Gráfico) */}
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-center gap-3 shrink-0 shadow-xs">
-                <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0" />
-                <div className="text-xs sm:text-sm md:text-base leading-relaxed">
-                  <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
-                </div>
-              </div>
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <EscolaridadeEvolucaoLineChart />
             </div>
           )}
 
           {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
           {currentSlideIndex === 5 && (
-            <div className="flex-1 flex flex-col justify-between min-h-0 py-1 gap-2 sm:gap-3 overflow-hidden">
-              {/* Zoom Line Chart */}
-              <div className="flex-1 flex flex-col justify-center min-h-0 overflow-hidden">
-                <EscolaridadeZoomLineChart />
-              </div>
-
-              {/* Highlight callout box (Abaixo do Gráfico) */}
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-center gap-3 shrink-0 shadow-xs">
-                <Sparkles className="w-5 h-5 text-sky-700 shrink-0" />
-                <div className="text-xs sm:text-sm md:text-base leading-relaxed">
-                  <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
-                </div>
-              </div>
+            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
+              <EscolaridadeZoomLineChart />
             </div>
           )}
 
