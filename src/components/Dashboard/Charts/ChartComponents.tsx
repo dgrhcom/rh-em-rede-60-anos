@@ -1729,10 +1729,10 @@ export const TopCargosTable: React.FC = () => {
         </div>
       </div>
 
-      {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 xl:gap-6 flex-1 min-h-0 overflow-y-auto pr-1">
+      {/* Grid com 2 colunas: 1 a 10 e 11 a 20 (Sem cards envolventes para ganho de espaço) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-10 flex-1 min-h-0 overflow-y-auto px-1">
         {/* Coluna 1: 1º ao 10º */}
-        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+        <div className="flex flex-col divide-y divide-slate-200/80">
           {col1.map((item, index) => {
             const rank = index + 1;
             const areaStyle = getAreaColor(item.categoria);
@@ -1789,7 +1789,7 @@ export const TopCargosTable: React.FC = () => {
         </div>
 
         {/* Coluna 2: 11º ao 20º */}
-        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+        <div className="flex flex-col divide-y divide-slate-200/80">
           {col2.map((item, index) => {
             const rank = index + 11;
             const areaStyle = getAreaColor(item.categoria);
@@ -1915,12 +1915,12 @@ export const TopCargosBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 170, top: 4, bottom: 4 },
+            padding: { right: 50, top: 4, bottom: 4 },
           },
           scales: {
             x: {
-              max: 1650,
-              suggestedMax: 1650,
+              max: 1550,
+              suggestedMax: 1550,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 stepSize: 200,
@@ -1993,7 +1993,7 @@ export const TopCargosBarChart: React.FC = () => {
   }));
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between gap-5 xl:gap-8 min-h-0">
+    <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-4 lg:gap-5 min-h-0">
       {/* Gráfico de Barras com Altura Aumentada e Nomes dos Cargos Maiores */}
       <div className="flex-1 w-full h-[520px] sm:h-[580px] lg:h-[640px] xl:h-[680px] min-h-0">
         <canvas ref={canvasRef} />
@@ -2030,6 +2030,16 @@ export const TopCargosBarChart: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Total dos 20 Cargos */}
+        <div className="pt-3 sm:pt-3.5 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+            Total
+          </span>
+          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
+            {totalTop20.toLocaleString('pt-BR')}
+          </span>
         </div>
       </div>
     </div>
