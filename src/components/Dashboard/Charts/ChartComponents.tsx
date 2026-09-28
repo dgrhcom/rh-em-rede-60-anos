@@ -49,9 +49,14 @@ function drawBadge(
   paddingX: number = 9,
   paddingY: number = 5,
   radius: number = 6,
-  borderColor: string = 'transparent'
+  borderColor: string = 'transparent',
+  opacity: number = 1
 ) {
+  if (opacity <= 0.01) return;
   ctx.save();
+  if (opacity < 1) {
+    ctx.globalAlpha = opacity;
+  }
   ctx.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1076,6 +1081,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
   useEffect(() => {
     let chart: any = null;
     let active = true;
+    let isInitialAnimation = true;
 
     getChartJS().then((Chart) => {
       if (!active || !canvasRef.current || !Chart) return;
@@ -1088,6 +1094,8 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         id: 'lineEndPercentageBadges',
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
+          const yBottom = chartInstance.scales?.y?.bottom;
+
           chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
             const meta = chartInstance.getDatasetMeta(dIdx);
             const lastElement = meta.data[meta.data.length - 1];
@@ -1096,7 +1104,17 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6);
+            let opacity = 1;
+            if (isInitialAnimation && yBottom) {
+              const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
+              const totalDist = yBottom - targetY;
+              if (totalDist > 0) {
+                const currentDist = yBottom - lastElement.y;
+                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+              }
+            }
+
+            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6, 'transparent', opacity);
           });
         },
       };
@@ -1119,6 +1137,33 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 1100,
+            easing: 'easeOutQuart',
+            onComplete: () => {
+              isInitialAnimation = false;
+            },
+          },
+          animations: {
+            y: {
+              type: 'number',
+              duration: 900,
+              easing: 'easeOutQuart',
+              from: (ctx: any) => {
+                if (isInitialAnimation && ctx.type === 'data') {
+                  return ctx.chart.scales?.y ? ctx.chart.scales.y.bottom : undefined;
+                }
+                return undefined;
+              },
+              delay: (ctx: any) => {
+                if (isInitialAnimation && ctx.type === 'data') {
+                  const idx = ctx.dataIndex ?? ctx.index ?? 0;
+                  return idx * 55;
+                }
+                return 0;
+              },
+            },
+          },
           layout: {
             padding: { right: 75, top: 10, bottom: 6 },
           },
@@ -1243,6 +1288,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
   useEffect(() => {
     let chart: any = null;
     let active = true;
+    let isInitialAnimation = true;
 
     getChartJS().then((Chart) => {
       if (!active || !canvasRef.current || !Chart) return;
@@ -1255,6 +1301,8 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         id: 'zoomLineEndPercentages',
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
+          const yBottom = chartInstance.scales?.y?.bottom;
+
           chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
             const meta = chartInstance.getDatasetMeta(dIdx);
             const lastElement = meta.data[meta.data.length - 1];
@@ -1263,7 +1311,17 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
 
-            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6);
+            let opacity = 1;
+            if (isInitialAnimation && yBottom) {
+              const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
+              const totalDist = yBottom - targetY;
+              if (totalDist > 0) {
+                const currentDist = yBottom - lastElement.y;
+                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+              }
+            }
+
+            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6, 'transparent', opacity);
           });
         },
       };
@@ -1286,6 +1344,33 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 1100,
+            easing: 'easeOutQuart',
+            onComplete: () => {
+              isInitialAnimation = false;
+            },
+          },
+          animations: {
+            y: {
+              type: 'number',
+              duration: 900,
+              easing: 'easeOutQuart',
+              from: (ctx: any) => {
+                if (isInitialAnimation && ctx.type === 'data') {
+                  return ctx.chart.scales?.y ? ctx.chart.scales.y.bottom : undefined;
+                }
+                return undefined;
+              },
+              delay: (ctx: any) => {
+                if (isInitialAnimation && ctx.type === 'data') {
+                  const idx = ctx.dataIndex ?? ctx.index ?? 0;
+                  return idx * 55;
+                }
+                return 0;
+              },
+            },
+          },
           layout: {
             padding: { right: 75, top: 10, bottom: 6 },
           },
