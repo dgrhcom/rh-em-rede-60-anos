@@ -26,6 +26,7 @@ export const DS_COLORS = {
   secondarySurface: '#fffaec',
   aux1: '#477b2f',          // Verde DGRH Auxiliar 1
   aux2: '#5e2a6b',          // Roxo DGRH Auxiliar 2
+  aux2Hover: '#743484',
   aux3: '#d67b27',          // Laranja/Terracota DGRH Auxiliar 3
   // Cores harmônicas complementares do Design System
   cobalt: '#1a508b',        // Azul Cobalto
@@ -163,8 +164,8 @@ export const GeneroCharts: React.FC = () => {
               datasets: [
                 {
                   data: [GENERO_DATA.total.feminino, GENERO_DATA.total.masculino],
-                  backgroundColor: [DS_COLORS.secondary, DS_COLORS.primary],
-                  hoverBackgroundColor: [DS_COLORS.secondaryHover, DS_COLORS.primaryHover],
+                  backgroundColor: [DS_COLORS.aux2, DS_COLORS.primary],
+                  hoverBackgroundColor: [DS_COLORS.aux2Hover, DS_COLORS.primaryHover],
                   borderWidth: 3,
                   borderColor: '#ffffff',
                 },
@@ -239,8 +240,8 @@ export const GeneroCharts: React.FC = () => {
                 {
                   label: 'Mulheres',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctFeminino),
-                  backgroundColor: DS_COLORS.secondary,
-                  hoverBackgroundColor: DS_COLORS.secondaryHover,
+                  backgroundColor: DS_COLORS.aux2,
+                  hoverBackgroundColor: DS_COLORS.aux2Hover,
                   borderRadius: 8,
                   borderSkipped: false,
                 },
@@ -286,14 +287,7 @@ export const GeneroCharts: React.FC = () => {
               },
               plugins: {
                 legend: {
-                  position: 'top',
-                  labels: {
-                    boxWidth: 20,
-                    boxHeight: 20,
-                    font: { weight: 'bold', size: 18 },
-                    color: '#0f172a',
-                    padding: 20,
-                  },
+                  display: false,
                 },
                 tooltip: {
                   padding: 14,
@@ -340,7 +334,7 @@ export const GeneroCharts: React.FC = () => {
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.secondary }}
+                  style={{ backgroundColor: DS_COLORS.aux2 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
                   Mulheres
