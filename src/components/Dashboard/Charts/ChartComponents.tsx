@@ -529,23 +529,9 @@ export const FaixaEtariaBarChart: React.FC = () => {
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Coluna Direita: Destaque Demográfico e Legenda Padronizada com Tipografia Ampliada */}
+      {/* Coluna Direita: Legenda Padronizada + Destaque Demográfico Abaixo da Legenda */}
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
-        {/* 1. Destaque Demográfico */}
-        <div className="p-4 sm:p-4.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-          <div className="min-w-0">
-            <span className="text-xs sm:text-sm font-black uppercase text-amber-900 tracking-wider block mb-1">
-              Destaque Demográfico
-            </span>
-            <div className="text-sm sm:text-base font-bold text-amber-950 leading-relaxed space-y-1">
-              <p>• {DESTAQUE_FAIXA_ETARIA.jovem}</p>
-              <p>• {DESTAQUE_FAIXA_ETARIA.velho}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* 2. Legenda Padronizada com Tipografia Ampliada */}
+        {/* 1. Legenda Padronizada com Tipografia Ampliada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
             Legenda por Carreira
@@ -636,6 +622,20 @@ export const FaixaEtariaBarChart: React.FC = () => {
             <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {totalGeral.toLocaleString('pt-BR')}
             </span>
+          </div>
+        </div>
+
+        {/* 2. Destaque Demográfico (Abaixo da Legenda) */}
+        <div className="p-4 sm:p-4.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3 shadow-xs">
+          <Sparkles className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <span className="text-xs sm:text-sm font-black uppercase text-amber-900 tracking-wider block mb-1">
+              Destaque Demográfico
+            </span>
+            <div className="text-sm sm:text-base font-bold text-amber-950 leading-relaxed space-y-1">
+              <p>• {DESTAQUE_FAIXA_ETARIA.jovem}</p>
+              <p>• {DESTAQUE_FAIXA_ETARIA.velho}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -811,16 +811,8 @@ export const RacaCorCharts: React.FC = () => {
         <canvas ref={barRef} />
       </div>
 
-      {/* Coluna Direita: Legenda Lateral sem negrito, com fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+      {/* Coluna Direita: Legenda Lateral + Destaque Étnico-Racial Abaixo da Legenda */}
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
-        {/* Destaque Étnico-Racial */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
-            <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 71,9% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 18,3% <span className="font-semibold text-slate-900">Pardos</span> e 5,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
-          </div>
-        </div>
-
         {/* Linhas de Carreira: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
@@ -867,6 +859,14 @@ export const RacaCorCharts: React.FC = () => {
             <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {totalGeralRaca.toLocaleString('pt-BR')}
             </span>
+          </div>
+        </div>
+
+        {/* Destaque Étnico-Racial (Abaixo da Legenda) */}
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 71,9% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 18,3% <span className="font-semibold text-slate-900">Pardos</span> e 5,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
           </div>
         </div>
       </div>
@@ -1625,16 +1625,8 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
         </div>
       </div>
 
-      {/* Coluna Direita: Legenda Lateral sem negrito, com fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+      {/* Coluna Direita: Legenda Lateral + Destaque Institucional Abaixo da Legenda */}
       <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center gap-3 sm:gap-4">
-        {/* Destaque Institucional */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
-            <span className="font-semibold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-semibold text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-semibold text-slate-900">Área da Saúde (32,1%)</span>.
-          </div>
-        </div>
-
         {/* Linhas de Áreas: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           {SERVIDORES_POR_AREA.map((item) => (
@@ -1670,6 +1662,14 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
             <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {TOTAL_SERVIDORES_ATIVOS.toLocaleString('pt-BR')}
             </span>
+          </div>
+        </div>
+
+        {/* Destaque Institucional (Abaixo da Legenda) */}
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-semibold text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-semibold text-slate-900">Área da Saúde (32,1%)</span>.
           </div>
         </div>
       </div>
