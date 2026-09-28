@@ -138,8 +138,7 @@ export const GeneroCharts: React.FC = () => {
               meta.data.forEach((element: any, i: number) => {
                 const pos = element.tooltipPosition();
                 if (!pos) return;
-                const pctText = `${items[i].pct.toFixed(1).replace('.', ',')}%`;
-                const text = isMobile ? pctText : `${items[i].label}: ${pctText}`;
+                const text = `${items[i].pct.toFixed(1).replace('.', ',')}%`;
                 drawBadge(
                   ctx,
                   text,
@@ -200,7 +199,7 @@ export const GeneroCharts: React.FC = () => {
         }
       }
 
-      // 2. Bar Chart por Carreira com legendas "Homens" e "Mulheres", mesmas cores da pizza e eixo X padronizado
+      // 2. Bar Chart por Carreira com Mulheres primeiro e Homens depois
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
@@ -238,18 +237,18 @@ export const GeneroCharts: React.FC = () => {
               ],
               datasets: [
                 {
-                  label: 'Homens',
-                  data: GENERO_DATA.porCarreira.map((c) => c.pctMasculino),
-                  backgroundColor: DS_COLORS.primary,
-                  hoverBackgroundColor: DS_COLORS.primaryHover,
-                  borderRadius: 8,
-                  borderSkipped: false,
-                },
-                {
                   label: 'Mulheres',
                   data: GENERO_DATA.porCarreira.map((c) => c.pctFeminino),
                   backgroundColor: DS_COLORS.secondary,
                   hoverBackgroundColor: DS_COLORS.secondaryHover,
+                  borderRadius: 8,
+                  borderSkipped: false,
+                },
+                {
+                  label: 'Homens',
+                  data: GENERO_DATA.porCarreira.map((c) => c.pctMasculino),
+                  backgroundColor: DS_COLORS.primary,
+                  hoverBackgroundColor: DS_COLORS.primaryHover,
                   borderRadius: 8,
                   borderSkipped: false,
                 },
@@ -304,7 +303,7 @@ export const GeneroCharts: React.FC = () => {
                     label: (ctx: any) => {
                       const careerIdx = ctx.dataIndex;
                       const career = GENERO_DATA.porCarreira[careerIdx];
-                      const count = ctx.datasetIndex === 0 ? career.masculino : career.feminino;
+                      const count = ctx.datasetIndex === 0 ? career.feminino : career.masculino;
                       return ` ${ctx.dataset.label}: ${Number(ctx.raw).toFixed(1).replace('.', ',')}% (${count.toLocaleString('pt-BR')} servidores)`;
                     },
                   },
@@ -1331,8 +1330,6 @@ export const EscolaridadeComparisonChart: React.FC = () => {
 export const ServidoresPorAreaPieChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const hiddenAreas = SERVIDORES_POR_AREA.filter((a) => a.percentual < 5.0);
-
   useEffect(() => {
     let chart: any = null;
     let active = true;
@@ -1348,29 +1345,55 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
           const c = chartInstance.ctx;
           const meta = chartInstance.getDatasetMeta(0);
           const isMobile = chartInstance.width < 500;
-          const badgeFontSize = isMobile ? 26 : 42; // Dobrado o tamanho da porcentagem
-          const padX = isMobile ? 14 : 22;
-          const padY = isMobile ? 8 : 12;
 
           SERVIDORES_POR_AREA.forEach((area, i) => {
-            if (area.percentual < 5.0) return; // Fatias ocultadas para exibição abaixo do gráfico
             const element = meta.data[i];
             if (!element) return;
-            const pos = element.tooltipPosition();
-            if (!pos) return;
+
+            const midAngle = (element.startAngle + element.endAngle) / 2;
+            const R = element.outerRadius;
+            const centerX = element.x;
+            const centerY = element.y;
+
+            let rRatio = 0.58;
+            let badgeFontSize = isMobile ? 22 : 38;
+            let padX = isMobile ? 12 : 20;
+            let padY = isMobile ? 6 : 10;
+
+            if (area.percentual === 4.6) {
+              // Centros e Núcleos: fatia estreita, posicionada em raio intermediário
+              rRatio = 0.60;
+              badgeFontSize = isMobile ? 15 : 21;
+              padX = isMobile ? 8 : 11;
+              padY = isMobile ? 4 : 5;
+            } else if (area.percentual === 2.6) {
+              // Colégios: fatia menor, posicionada mais para a borda externa para não sobrepor
+              rRatio = 0.85;
+              badgeFontSize = isMobile ? 14 : 19;
+              padX = isMobile ? 7 : 10;
+              padY = isMobile ? 4 : 5;
+            } else if (area.percentual < 25) {
+              // Administração Central (22.2%)
+              rRatio = 0.60;
+              badgeFontSize = isMobile ? 20 : 34;
+            }
+
+            const posX = centerX + Math.cos(midAngle) * (R * rRatio);
+            const posY = centerY + Math.sin(midAngle) * (R * rRatio);
+
             const text = `${area.percentual.toFixed(1).replace('.', ',')}%`;
             drawBadge(
               c,
               text,
-              pos.x,
-              pos.y,
+              posX,
+              posY,
               'rgba(15, 23, 42, 0.92)',
               '#ffffff',
               badgeFontSize,
               padX,
               padY,
-              10,
-              'rgba(255, 255, 255, 0.5)'
+              8,
+              'rgba(255, 255, 255, 0.6)'
             );
           });
         },
@@ -1429,71 +1452,56 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
-      {/* Coluna Esquerda: Gráfico de Pizza Ampliado + Badges abaixo para fatias menores ocultadas */}
+      {/* Coluna Esquerda: Gráfico de Pizza com Altura Ampliada e Todas as 5 Porcentagens nele */}
       <div className="lg:col-span-7 xl:col-span-7 flex flex-col items-center justify-center relative w-full">
-        <div className="w-full h-[360px] sm:h-[430px] lg:h-[490px] xl:h-[540px] relative flex items-center justify-center">
+        <div className="w-full h-[440px] sm:h-[520px] lg:h-[580px] xl:h-[640px] relative flex items-center justify-center">
           <canvas ref={canvasRef} />
-        </div>
-
-        {/* Porcentagens que ficaram ocultas na pizza colocadas abaixo do gráfico */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mt-3 px-2">
-          {hiddenAreas.map((item) => (
-            <div
-              key={item.tipoOrgao}
-              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white border-2 shadow-xs transition-all hover:shadow-sm"
-              style={{ borderColor: item.cor }}
-            >
-              <span className="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: item.cor }} />
-              <span className="text-xs sm:text-sm font-bold text-slate-800">
-                {item.tipoOrgao}:{' '}
-                <strong className="font-black text-sm sm:text-base" style={{ color: item.cor }}>
-                  {item.percentual.toFixed(1).replace('.', ',')}%
-                </strong>
-              </span>
-              <span className="text-xs text-slate-500 font-semibold">
-                ({item.total.toLocaleString('pt-BR')} servidores)
-              </span>
-            </div>
-          ))}
         </div>
       </div>
 
-      {/* Coluna Direita: Cards com Legenda Lateral e Tipografia Muito Ampliada */}
-      <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center gap-3 sm:gap-3.5">
+      {/* Coluna Direita: Legenda Lateral sem negrito, com fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+      <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center gap-3 sm:gap-4">
         {/* Destaque Institucional */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
           <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-medium text-slate-700">
-            <span className="font-bold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-bold text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-bold text-slate-900">Área da Saúde (32,1%)</span>.
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-semibold text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-semibold text-slate-900">Área da Saúde (32,1%)</span>.
           </div>
         </div>
 
-        {/* 5 Cards de Áreas com Tipografia Bem Grande */}
-        <div className="flex flex-col gap-2 sm:gap-2.5">
+        {/* Linhas de Áreas: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           {SERVIDORES_POR_AREA.map((item) => (
             <div
               key={item.tipoOrgao}
-              className="px-4 py-3 sm:py-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md"
-              style={{ borderLeftWidth: '6px', borderLeftColor: item.cor }}
+              className="py-3 sm:py-3.5 flex items-center justify-between first:pt-1 last:pb-1 transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
             >
-              <div className="min-w-0 pr-3">
-                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-slate-900 tracking-tight">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: item.cor }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
                   {item.tipoOrgao}
-                </div>
+                </span>
               </div>
-              <div
-                className="px-4 py-1.5 sm:py-2 rounded-xl text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-white shrink-0 shadow-xs tracking-wider"
-                style={{ backgroundColor: item.cor }}
-              >
-                {item.total.toLocaleString('pt-BR')}
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
+                  {item.total.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({item.percentual.toFixed(1).replace('.', ',')}%)
+                </span>
               </div>
             </div>
           ))}
 
           {/* Total Geral da Universidade */}
-          <div className="px-4 py-3 sm:py-3.5 rounded-2xl bg-slate-950 text-white flex items-center justify-between shadow-md mt-1">
-            <span className="text-xs sm:text-sm lg:text-base font-bold text-slate-200">Total Geral da Universidade</span>
-            <span className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black text-amber-400 tracking-wider">
+          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2">
+            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+              Total Geral da Universidade
+            </span>
+            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {TOTAL_SERVIDORES_ATIVOS.toLocaleString('pt-BR')}
             </span>
           </div>

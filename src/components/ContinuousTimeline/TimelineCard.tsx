@@ -1,6 +1,6 @@
 import React from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
-import { isTopAlignedPhoto } from '../../types/timeline';
+import { isTopAlignedPhoto, getPhotoPositionClass } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { 
   Image as ImageIcon, X 
@@ -119,10 +119,10 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                       <img
                         src={photo.url}
                         alt={photo.title}
-                        className={`w-full h-full group-hover:scale-105 transition-transform duration-500 ${
+                        className={`group-hover:scale-105 transition-transform duration-500 ${
                           photo.objectFit === 'contain'
-                            ? 'object-contain p-1.5 sm:p-2'
-                            : `object-cover ${isTopAlignedPhoto(photo) ? 'object-top' : 'object-center'}`
+                            ? 'h-full w-auto max-w-full object-contain object-center p-1 sm:p-2'
+                            : `w-full h-full object-cover ${getPhotoPositionClass(photo)}`
                         }`}
                       />
                     ) : (
@@ -145,46 +145,73 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
 
           {/* ================= COLUNA 2: MARCOS HISTÓRICOS ================= */}
           <div className={`flex flex-col justify-between h-full min-h-0 min-w-0 ${hasPhotos ? 'sm:pl-2 lg:pl-3' : 'w-full max-w-5xl mx-auto'} text-left`}>
-            {/* Lista de Marcos agrupados por ano em tópicos com tipografia ampliada, entrelinha compacta e margem direita protegida */}
-            <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
-              {(() => {
-                const groupedMilestones = period.milestones.reduce((acc, m) => {
-                  const y = m.year || period.period;
-                  if (!acc[y]) acc[y] = [];
-                  acc[y].push(m);
-                  return acc;
-                }, {} as Record<string, typeof period.milestones>);
-                const yearGroups = Object.entries(groupedMilestones);
+            {/* Lista de Marcos agrupados por ano em tópicos com tipografia ampliada */}
+            {(() => {
+              const isPeriod2024 = period.period === '2024 - 2026';
+              const groupedMilestones = period.milestones.reduce((acc, m) => {
+                const y = m.year || period.period;
+                if (!acc[y]) acc[y] = [];
+                acc[y].push(m);
+                return acc;
+              }, {} as Record<string, typeof period.milestones>);
+              const yearGroups = Object.entries(groupedMilestones);
 
-                return yearGroups.map(([year, milestones], gIdx) => (
-                  <div key={year} className="flex flex-col text-left">
-                    {/* Cabeçalho do Ano */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg sm:text-xl lg:text-2xl font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
-                        {year}
-                      </span>
-                    </div>
-
-                    {/* Tópicos dos marcos para o ano: fonte ainda maior (25-26px), line-height reduzido (1.28) e sem cortes */}
-                    <ul className="space-y-3.5 list-disc pl-5">
-                      {milestones.map((m) => (
-                        <li
-                          key={m.id}
-                          className="text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] font-normal text-white/95 leading-[1.28] tracking-normal break-words"
+              return (
+                <div
+                  className={`flex-1 ${
+                    isPeriod2024
+                      ? 'overflow-hidden py-0 pr-2 sm:pr-4 space-y-2'
+                      : 'overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4'
+                  }`}
+                >
+                  {yearGroups.map(([year, milestones], gIdx) => (
+                    <div key={year} className="flex flex-col text-left">
+                      {/* Cabeçalho do Ano */}
+                      <div className={`flex items-center gap-2 ${isPeriod2024 ? 'mb-1' : 'mb-2'}`}>
+                        <span
+                          className={`${
+                            isPeriod2024
+                              ? 'text-base sm:text-lg lg:text-xl'
+                              : 'text-lg sm:text-xl lg:text-2xl'
+                          } font-black text-[#e5a93a] tracking-wider drop-shadow-xs`}
                         >
-                          {m.text}
-                        </li>
-                      ))}
-                    </ul>
+                          {year}
+                        </span>
+                      </div>
 
-                    {/* Separador horizontal entre anos */}
-                    {gIdx < yearGroups.length - 1 && (
-                      <hr className="border-t border-white/20 mt-4" />
-                    )}
-                  </div>
-                ));
-              })()}
-            </div>
+                      {/* Tópicos dos marcos para o ano */}
+                      <ul
+                        className={`${
+                          isPeriod2024 ? 'space-y-1 sm:space-y-1.5' : 'space-y-3.5'
+                        } list-disc pl-5`}
+                      >
+                        {milestones.map((m) => (
+                          <li
+                            key={m.id}
+                            className={`${
+                              isPeriod2024
+                                ? 'text-sm sm:text-base lg:text-[18px] xl:text-[19px] leading-[1.22]'
+                                : 'text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28]'
+                            } font-normal text-white/95 tracking-normal break-words`}
+                          >
+                            {m.text}
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Separador horizontal entre anos */}
+                      {gIdx < yearGroups.length - 1 && (
+                        <hr
+                          className={`border-t border-white/20 ${
+                            isPeriod2024 ? 'mt-2 mb-1' : 'mt-4'
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

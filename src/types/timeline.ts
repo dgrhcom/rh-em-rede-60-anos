@@ -5,9 +5,18 @@ export interface MilestonePhoto {
   url?: string;
   aspectRatio?: 'landscape' | 'portrait' | 'square';
   credit?: string;
-  objectPosition?: 'top' | 'center' | 'bottom';
+  objectPosition?: 'top' | 'center' | 'bottom' | 'left' | 'right';
   objectFit?: 'contain' | 'cover';
 }
+
+export const getPhotoPositionClass = (photo?: MilestonePhoto | null): string => {
+  if (!photo) return 'object-center';
+  if (photo.objectPosition === 'left') return 'object-left';
+  if (photo.objectPosition === 'right') return 'object-right';
+  if (photo.objectPosition === 'bottom') return 'object-bottom';
+  if (photo.objectPosition === 'top' || isTopAlignedPhoto(photo)) return 'object-top';
+  return 'object-center';
+};
 
 export const isTopAlignedPhoto = (
   photoOrUrl?: { url?: string; title?: string; credit?: string; caption?: string; objectPosition?: string } | string | null,
