@@ -639,6 +639,27 @@ export const FaixaEtariaBarChart: React.FC = () => {
    ========================================================================= */
 export const RacaCorCharts: React.FC = () => {
   const barRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstanceRef = useRef<any>(null);
+
+  const totalDocentes = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.docentes, 0);
+  const totalPesquisadores = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.pesquisadores, 0);
+  const totalTecnicos = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.tecnicos, 0);
+  const totalExtraQuadro = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.extraQuadro, 0);
+  const totalGeralRaca = totalDocentes + totalPesquisadores + totalTecnicos + totalExtraQuadro;
+
+  const categorias = [
+    { label: 'Docentes', total: totalDocentes, color: DS_COLORS.aux2, datasetIndex: 0 },
+    { label: 'Pesquisadores (PQ)', total: totalPesquisadores, color: DS_COLORS.aux1, datasetIndex: 1 },
+    { label: 'PAEPE', total: totalTecnicos, color: DS_COLORS.primary, datasetIndex: 2 },
+    { label: 'Extra-quadro', total: totalExtraQuadro, color: DS_COLORS.secondary, datasetIndex: 3 },
+  ];
+
+  const toggleDataset = (datasetIndex: number) => {
+    if (!chartInstanceRef.current) return;
+    const isVisible = chartInstanceRef.current.isDatasetVisible(datasetIndex);
+    chartInstanceRef.current.setDatasetVisibility(datasetIndex, !isVisible);
+    chartInstanceRef.current.update();
+  };
 
   useEffect(() => {
     let barChart: any = null;
@@ -647,7 +668,6 @@ export const RacaCorCharts: React.FC = () => {
     getChartJS().then((Chart) => {
       if (!active || !Chart) return;
 
-      // Barras Empilhadas por Carreira Funcional - Ocupa todo o slide
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
@@ -657,7 +677,7 @@ export const RacaCorCharts: React.FC = () => {
               const c = chartInstance.ctx;
               const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
               const isMobile = chartInstance.width < 500;
-              const fontSize = isMobile ? 18 : 24;
+              const fontSize = isMobile ? 14 : 17;
 
               RACA_COR_TABELA_2.forEach((item, index) => {
                 const element = metaLast.data[index];
@@ -671,7 +691,7 @@ export const RacaCorCharts: React.FC = () => {
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
                 c.fillStyle = '#0f172a';
-                c.fillText(text, element.x + 12, element.y);
+                c.fillText(text, element.x + 10, element.y);
                 c.restore();
               });
             },
@@ -713,7 +733,7 @@ export const RacaCorCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { right: 230, top: 10, bottom: 10 },
+                padding: { right: 165, top: 10, bottom: 10 },
               },
               scales: {
                 x: {
@@ -730,7 +750,7 @@ export const RacaCorCharts: React.FC = () => {
                   stacked: true,
                   grid: { display: false },
                   ticks: {
-                    font: { weight: 'bold', size: 22 }, // Tipografia do eixo Y ampliada e destacada
+                    font: { weight: 'bold', size: 22 },
                     color: '#0f172a',
                     padding: 12,
                   },
@@ -738,14 +758,7 @@ export const RacaCorCharts: React.FC = () => {
               },
               plugins: {
                 legend: {
-                  position: 'top',
-                  labels: {
-                    boxWidth: 20,
-                    boxHeight: 20,
-                    font: { weight: 'bold', size: 17 },
-                    color: '#0f172a',
-                    padding: 22,
-                  },
+                  display: false,
                 },
                 tooltip: {
                   padding: 14,
@@ -769,21 +782,84 @@ export const RacaCorCharts: React.FC = () => {
             },
             plugins: [horizontalStackLabelsPlugin],
           });
+
+          chartInstanceRef.current = barChart;
         }
       }
     });
 
     return () => {
       active = false;
+      chartInstanceRef.current = null;
       barChart?.destroy();
     };
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col justify-center min-h-0">
-      {/* Gráfico de Barras Empilhadas ocupa o espaço todo, sem subtítulo de carreira */}
-      <div className="flex-1 w-full h-[450px] sm:h-[530px] lg:h-[600px] xl:h-[650px] relative">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
+      {/* Coluna Esquerda: Gráfico de Barras Empilhadas */}
+      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[600px]">
         <canvas ref={barRef} />
+      </div>
+
+      {/* Coluna Direita: Legenda Lateral sem negrito, com fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
+        {/* Destaque Étnico-Racial */}
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 71,9% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 18,3% <span className="font-semibold text-slate-900">Pardos</span> e 5,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
+          </div>
+        </div>
+
+        {/* Linhas de Carreira: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
+          <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
+            Carreira Funcional
+          </span>
+
+          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+            {categorias.map((item) => {
+              const pct = ((item.total / totalGeralRaca) * 100).toFixed(1).replace('.', ',');
+              return (
+                <div
+                  key={item.label}
+                  onClick={() => toggleDataset(item.datasetIndex)}
+                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+                  title={`Clique para alternar visibilidade de ${item.label}`}
+                >
+                  <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                    <span
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                      {item.label}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2 shrink-0">
+                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
+                      {item.total.toLocaleString('pt-BR')}
+                    </span>
+                    <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                      ({pct}%)
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Total Geral */}
+          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
+            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+              Total Geral
+            </span>
+            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
+              {totalGeralRaca.toLocaleString('pt-BR')}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
