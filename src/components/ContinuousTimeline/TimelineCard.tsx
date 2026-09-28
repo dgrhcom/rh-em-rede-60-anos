@@ -147,7 +147,6 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
           <div className={`flex flex-col justify-between h-full min-h-0 min-w-0 ${hasPhotos ? 'sm:pl-2 lg:pl-3' : 'w-full max-w-5xl mx-auto'} text-left`}>
             {/* Lista de Marcos agrupados por ano em tópicos com tipografia ampliada */}
             {(() => {
-              const isPeriod2024 = period.period === '2024 - 2026';
               const groupedMilestones = period.milestones.reduce((acc, m) => {
                 const y = m.year || period.period;
                 if (!acc[y]) acc[y] = [];
@@ -157,42 +156,22 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               const yearGroups = Object.entries(groupedMilestones);
 
               return (
-                <div
-                  className={`flex-1 ${
-                    isPeriod2024
-                      ? 'overflow-hidden py-0 pr-2 sm:pr-4 space-y-2'
-                      : 'overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4'
-                  }`}
-                >
+                <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
                   {yearGroups.map(([year, milestones], gIdx) => (
                     <div key={year} className="flex flex-col text-left">
                       {/* Cabeçalho do Ano */}
-                      <div className={`flex items-center gap-2 ${isPeriod2024 ? 'mb-1' : 'mb-2'}`}>
-                        <span
-                          className={`${
-                            isPeriod2024
-                              ? 'text-base sm:text-lg lg:text-xl'
-                              : 'text-lg sm:text-xl lg:text-2xl'
-                          } font-black text-[#e5a93a] tracking-wider drop-shadow-xs`}
-                        >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg sm:text-xl lg:text-2xl font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
                           {year}
                         </span>
                       </div>
 
                       {/* Tópicos dos marcos para o ano */}
-                      <ul
-                        className={`${
-                          isPeriod2024 ? 'space-y-1 sm:space-y-1.5' : 'space-y-3.5'
-                        } list-disc pl-5`}
-                      >
+                      <ul className="space-y-3.5 list-disc pl-5">
                         {milestones.map((m) => (
                           <li
                             key={m.id}
-                            className={`${
-                              isPeriod2024
-                                ? 'text-sm sm:text-base lg:text-[18px] xl:text-[19px] leading-[1.22]'
-                                : 'text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28]'
-                            } font-normal text-white/95 tracking-normal break-words`}
+                            className="text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
                           >
                             {m.text}
                           </li>
@@ -201,11 +180,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
 
                       {/* Separador horizontal entre anos */}
                       {gIdx < yearGroups.length - 1 && (
-                        <hr
-                          className={`border-t border-white/20 ${
-                            isPeriod2024 ? 'mt-2 mb-1' : 'mt-4'
-                          }`}
-                        />
+                        <hr className="border-t border-white/20 mt-4" />
                       )}
                     </div>
                   ))}
