@@ -1597,11 +1597,11 @@ export const TopCargosTable: React.FC = () => {
   const col2 = top20.slice(10, 20);
 
   return (
-    <div className="w-full h-full flex flex-col justify-between py-1 min-h-0 gap-2.5 sm:gap-3">
+    <div className="w-full h-full flex flex-col justify-between py-1 min-h-0 gap-3 sm:gap-4">
       {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 xl:gap-5 flex-1 min-h-0 overflow-y-auto pr-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 xl:gap-6 flex-1 min-h-0 overflow-y-auto pr-1">
         {/* Coluna 1: 1º ao 10º */}
-        <div className="flex flex-col gap-1.5 sm:gap-2">
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           {col1.map((item, index) => {
             const rank = index + 1;
             const areaStyle = getAreaColor(item.categoria);
@@ -1609,46 +1609,49 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between gap-2.5"
+                className="py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                   {/* Badge de Posição */}
                   <span
-                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm shrink-0 shadow-2xs ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-normal shrink-0 ${
                       rank === 1
-                        ? 'bg-amber-400 text-slate-950 font-black ring-2 ring-amber-300'
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
                         : rank === 2
-                        ? 'bg-slate-300 text-slate-900 font-black ring-2 ring-slate-200'
+                        ? 'bg-slate-200 text-slate-800'
                         : rank === 3
-                        ? 'bg-amber-700 text-white font-black'
-                        : 'bg-slate-100 text-slate-700'
+                        ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                        : 'bg-slate-100 text-slate-600'
                     }`}
                   >
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Área */}
-                  <div className="min-w-0">
-                    <div className="text-xs sm:text-sm lg:text-[14.5px] font-black text-slate-900 truncate">
-                      {item.cargo}
-                    </div>
+                  {/* Nome do Cargo e Classificação na MESMA linha */}
+                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                     <span
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-md mt-0.5"
+                      className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 truncate"
+                      title={item.cargo}
+                    >
+                      {item.cargo}
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
                       style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: areaStyle.dot }} />
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
                       {item.categoria}
                     </span>
                   </div>
                 </div>
 
                 {/* Quantidade e Porcentagem */}
-                <div className="flex flex-col items-end shrink-0 pl-2">
-                  <span className="text-sm sm:text-base lg:text-lg font-black text-slate-950">
+                <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
+                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-[11px] font-bold text-slate-500">
-                    {pct}%
+                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
+                    ({pct}%)
                   </span>
                 </div>
               </div>
@@ -1657,7 +1660,7 @@ export const TopCargosTable: React.FC = () => {
         </div>
 
         {/* Coluna 2: 11º ao 20º */}
-        <div className="flex flex-col gap-1.5 sm:gap-2">
+        <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           {col2.map((item, index) => {
             const rank = index + 11;
             const areaStyle = getAreaColor(item.categoria);
@@ -1665,36 +1668,39 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between gap-2.5"
+                className="py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0 last:pb-0"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                   {/* Badge de Posição */}
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm shrink-0 bg-slate-100 text-slate-700 shadow-2xs">
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-normal shrink-0 bg-slate-100 text-slate-600">
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Área */}
-                  <div className="min-w-0">
-                    <div className="text-xs sm:text-sm lg:text-[14.5px] font-black text-slate-900 truncate">
-                      {item.cargo}
-                    </div>
+                  {/* Nome do Cargo e Classificação na MESMA linha */}
+                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                     <span
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-md mt-0.5"
+                      className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 truncate"
+                      title={item.cargo}
+                    >
+                      {item.cargo}
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
                       style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
                     >
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: areaStyle.dot }} />
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
                       {item.categoria}
                     </span>
                   </div>
                 </div>
 
                 {/* Quantidade e Porcentagem */}
-                <div className="flex flex-col items-end shrink-0 pl-2">
-                  <span className="text-sm sm:text-base lg:text-lg font-black text-slate-950">
+                <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
+                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-[11px] font-bold text-slate-500">
-                    {pct}%
+                  <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
+                    ({pct}%)
                   </span>
                 </div>
               </div>
@@ -1704,17 +1710,17 @@ export const TopCargosTable: React.FC = () => {
       </div>
 
       {/* Banner de Rodapé: Síntese Estatística do Top 20 */}
-      <div className="px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-950 text-white flex flex-wrap items-center justify-between gap-3 shadow-md shrink-0">
+      <div className="px-5 py-3 rounded-2xl bg-slate-950 text-white flex flex-wrap items-center justify-between gap-3 shadow-md shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm lg:text-base font-bold text-slate-200">
+          <span className="text-sm sm:text-base font-normal text-slate-300">
             Total dos 20 Maiores Cargos:
           </span>
-          <span className="text-sm sm:text-base lg:text-lg font-black text-amber-400">
+          <span className="text-base sm:text-lg font-medium text-amber-400">
             {totalTop20.toLocaleString('pt-BR')} servidores ({pctTop20}% do quadro geral)
           </span>
         </div>
-        <div className="text-xs sm:text-sm font-semibold text-slate-400">
-          Total da Universidade: <strong className="text-white font-black">{totalGeral.toLocaleString('pt-BR')}</strong> servidores ativos
+        <div className="text-xs sm:text-sm font-normal text-slate-400">
+          Total da Universidade: <strong className="text-white font-medium">{totalGeral.toLocaleString('pt-BR')}</strong> servidores ativos
         </div>
       </div>
     </div>
