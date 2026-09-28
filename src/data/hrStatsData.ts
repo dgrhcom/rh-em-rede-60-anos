@@ -121,7 +121,7 @@ export const TOP_CARGOS_2026 = [
   { cargo: 'Médico (PAEPE)', quantidade: 432, categoria: 'Saúde' },
   { cargo: 'Professor Titular', quantidade: 394, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Profissional de Administração (PAEPE)', quantidade: 330, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Analista de Desenv. de Sistemas (PAEPE)', quantidade: 228, categoria: 'Tecnologia da Informação (TI)' },
+  { cargo: 'Analista de Desenvolvimento de Sistemas (PAEPE)', quantidade: 228, categoria: 'Tecnologia da Informação (TI)' },
   { cargo: 'Prof. Magistério Secundário Técnico', quantidade: 181, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Técnico de Laboratório (PAEPE)', quantidade: 162, categoria: 'Técnica-Administrativa' },
   { cargo: 'Biologista (PAEPE)', quantidade: 132, categoria: 'Técnica-Administrativa' },

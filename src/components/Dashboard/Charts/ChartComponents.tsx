@@ -738,7 +738,7 @@ export const RacaCorCharts: React.FC = () => {
               scales: {
                 x: {
                   stacked: true,
-                  suggestedMax: 12500,
+                  max: 12000,
                   grid: { color: 'rgba(0,0,0,0.06)' },
                   ticks: {
                     font: { weight: 'bold', size: 14 },
@@ -1672,6 +1672,27 @@ export const TopCargosTable: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col py-1 min-h-0">
+      {/* Mini Legenda de Áreas (Pontos Coloridos) */}
+      <div className="flex flex-wrap items-center justify-end gap-3.5 sm:gap-5 px-3 pb-2 text-xs sm:text-sm font-normal text-slate-600 shrink-0">
+        <span className="text-slate-400 font-medium mr-1">Áreas:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#105e7b' }} />
+          <span>Técnica-Administrativa</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#d67b27' }} />
+          <span>Saúde</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#477b2f' }} />
+          <span>Ensino e Pesquisa</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#e5a93a' }} />
+          <span>Tecnologia da Informação (TI)</span>
+        </div>
+      </div>
+
       {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 xl:gap-6 flex-1 min-h-0 overflow-y-auto pr-1">
         {/* Coluna 1: 1º ao 10º */}
@@ -1701,21 +1722,19 @@ export const TopCargosTable: React.FC = () => {
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Classificação na MESMA linha com Fonte Ampliada */}
+                  {/* Nome do Cargo e Ponto Colorido de Classificação */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
                       className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
-                      title={item.cargo}
+                      title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
                     </span>
                     <span
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm lg:text-[14.5px] font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
-                      style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
-                      {item.categoria}
-                    </span>
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 shadow-xs"
+                      style={{ backgroundColor: areaStyle.dot }}
+                      title={item.categoria}
+                    />
                   </div>
                 </div>
 
@@ -1750,21 +1769,19 @@ export const TopCargosTable: React.FC = () => {
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Classificação na MESMA linha com Fonte Ampliada */}
+                  {/* Nome do Cargo e Ponto Colorido de Classificação */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
                       className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
-                      title={item.cargo}
+                      title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
                     </span>
                     <span
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm lg:text-[14.5px] font-normal px-2.5 py-0.5 rounded-md shrink-0 whitespace-nowrap"
-                      style={{ backgroundColor: areaStyle.bg, color: areaStyle.text, border: `1px solid ${areaStyle.border}40` }}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: areaStyle.dot }} />
-                      {item.categoria}
-                    </span>
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 shadow-xs"
+                      style={{ backgroundColor: areaStyle.dot }}
+                      title={item.categoria}
+                    />
                   </div>
                 </div>
 
