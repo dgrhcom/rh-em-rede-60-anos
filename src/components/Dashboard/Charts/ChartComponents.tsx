@@ -1963,35 +1963,73 @@ export const TopCargosBarChart: React.FC = () => {
     };
   }, []);
 
+  const top20 = TOP_CARGOS_2026.slice(0, 20);
+  const totalTop20 = top20.reduce((acc, c) => acc + c.quantidade, 0); // 7246
+
+  const areasSummary = [
+    {
+      nome: 'Técnica-Administrativa',
+      cor: DS_COLORS.primary,
+      total: top20.filter((c) => c.categoria === 'Técnica-Administrativa').reduce((acc, c) => acc + c.quantidade, 0),
+    },
+    {
+      nome: 'Saúde',
+      cor: DS_COLORS.aux3,
+      total: top20.filter((c) => c.categoria === 'Saúde').reduce((acc, c) => acc + c.quantidade, 0),
+    },
+    {
+      nome: 'Ensino e Pesquisa',
+      cor: DS_COLORS.aux1,
+      total: top20.filter((c) => c.categoria === 'Ensino e Pesquisa').reduce((acc, c) => acc + c.quantidade, 0),
+    },
+    {
+      nome: 'Tecnologia da Informação (TI)',
+      cor: DS_COLORS.secondary,
+      total: top20.filter((c) => c.categoria === 'Tecnologia da Informação (TI)').reduce((acc, c) => acc + c.quantidade, 0),
+    },
+  ].map((a) => ({
+    ...a,
+    pct: ((a.total / totalTop20) * 100).toFixed(1).replace('.', ','),
+  }));
+
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 min-h-0">
+    <div className="w-full h-full flex flex-col lg:flex-row items-center justify-between gap-5 xl:gap-8 min-h-0">
       {/* Gráfico de Barras com Altura Aumentada e Nomes dos Cargos Maiores */}
       <div className="flex-1 w-full h-[520px] sm:h-[580px] lg:h-[640px] xl:h-[680px] min-h-0">
         <canvas ref={canvasRef} />
       </div>
 
-      {/* Legenda Oficial Vertical à Direita com Tipografia Bem Grande */}
-      <div className="flex flex-col gap-3.5 p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm shrink-0 self-center w-full lg:w-auto min-w-[260px] xl:min-w-[280px]">
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-200">
+      {/* Legenda Padronizada em Coluna à Direita com Tipografia Ampliada e Valores Somados */}
+      <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 shrink-0 w-full lg:w-[410px] xl:w-[460px]">
+        <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
           Áreas
         </span>
-        <div className="flex flex-col gap-3 text-sm sm:text-base lg:text-lg font-bold text-slate-800">
-          <span className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.primary }} />
-            <span>Técnica-Administrativa</span>
-          </span>
-          <span className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux3 }} />
-            <span>Saúde</span>
-          </span>
-          <span className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.aux1 }} />
-            <span>Ensino e Pesquisa</span>
-          </span>
-          <span className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded-md shrink-0 shadow-xs" style={{ backgroundColor: DS_COLORS.secondary }} />
-            <span>Tecnologia da Informação (TI)</span>
-          </span>
+
+        <div className="flex flex-col divide-y divide-slate-100 pt-1">
+          {areasSummary.map((area) => (
+            <div
+              key={area.nome}
+              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
+            >
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <span
+                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                  style={{ backgroundColor: area.cor }}
+                />
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                  {area.nome}
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
+                  {area.total.toLocaleString('pt-BR')}
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  ({area.pct}%)
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
