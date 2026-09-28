@@ -898,7 +898,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
         url: '/ponto-eletronico-2025.png',
         aspectRatio: 'landscape',
         credit: 'Portal DGRH',
-        objectFit: 'contain',
+        objectFit: 'cover',
         objectPosition: 'center',
       },
     ],
