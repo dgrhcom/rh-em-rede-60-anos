@@ -1272,26 +1272,20 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     {/* Topo: Título e Subtítulo (Anos) */}
                     <div className="text-center py-1 flex flex-col items-center">
                       <h2 className="text-base sm:text-lg md:text-[19px] font-black text-white tracking-tight leading-snug">
-                        A gestão de pessoas nos 60 anos da Unicamp
+                        A Gestão de Pessoas nos 60 anos da Unicamp
                       </h2>
                       <span className="text-xs sm:text-[13px] text-white/85 font-bold tracking-wider mt-1">
                         1983 – 2026
                       </span>
                     </div>
 
-                    {/* Centro: Foto do Prédio da DGRH */}
+                    {/* Centro: Foto da Capa (Zeferino Vaz) */}
                     <div className="relative w-full aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-md my-auto group shrink-0">
                       <img
-                        src="/capa.jpg"
-                        alt="Prédio da DGRH - Reitoria IV"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        src="/zeferino_capa.jpg"
+                        alt="Zeferino Vaz - 60 Anos Unicamp"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute bottom-2 left-2 right-2 text-left">
-                        <span className="text-[11px] font-bold text-white drop-shadow-md">
-                          Prédio da Reitoria IV
-                        </span>
-                      </div>
                     </div>
 
                     {/* Rodapé: Selo Comemorativo */}
