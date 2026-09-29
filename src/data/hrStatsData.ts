@@ -113,26 +113,26 @@ export const ESCOLARIDADE_ZOOM_SERIES = [
 ];
 
 export const TOP_CARGOS_2026 = [
-  { cargo: 'Técnico em Administração (PAEPE)', quantidade: 1430, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Técnico de Enfermagem (PAEPE)', quantidade: 1322, categoria: 'Saúde' },
+  { cargo: 'Técnico em Administração', quantidade: 1430, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Técnico de Enfermagem', quantidade: 1322, categoria: 'Saúde' },
   { cargo: 'Professor Associado', quantidade: 818, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Professor Doutor', quantidade: 563, categoria: 'Ensino e Pesquisa' },
-  { cargo: 'Enfermeiro (PAEPE)', quantidade: 554, categoria: 'Saúde' },
-  { cargo: 'Médico (PAEPE)', quantidade: 432, categoria: 'Saúde' },
+  { cargo: 'Enfermeiro', quantidade: 554, categoria: 'Saúde' },
+  { cargo: 'Médico', quantidade: 432, categoria: 'Saúde' },
   { cargo: 'Professor Titular', quantidade: 394, categoria: 'Ensino e Pesquisa' },
-  { cargo: 'Profissional de Administração (PAEPE)', quantidade: 330, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Analista de Desenvolvimento de Sistemas (PAEPE)', quantidade: 228, categoria: 'Tecnologia da Informação (TI)' },
+  { cargo: 'Profissional de Administração', quantidade: 330, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Analista de Desenvolvimento de Sistemas', quantidade: 228, categoria: 'Tecnologia da Informação (TI)' },
   { cargo: 'Prof. Magistério Secundário Técnico', quantidade: 181, categoria: 'Ensino e Pesquisa' },
-  { cargo: 'Técnico de Laboratório (PAEPE)', quantidade: 162, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Biologista (PAEPE)', quantidade: 132, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Técnico de Laboratório', quantidade: 162, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Biologista', quantidade: 132, categoria: 'Técnica-Administrativa' },
   { cargo: 'Prof. Educação Infantil e Fundamental', quantidade: 129, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Analista de Suporte Computacional', quantidade: 103, categoria: 'Tecnologia da Informação (TI)' },
-  { cargo: 'Bibliotecário (PAEPE)', quantidade: 97, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Pesquisador (PQ)', quantidade: 92, categoria: 'Ensino e Pesquisa' },
+  { cargo: 'Bibliotecário', quantidade: 97, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Pesquisador', quantidade: 92, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Profissional de Pesquisa', quantidade: 79, categoria: 'Ensino e Pesquisa' },
   { cargo: 'Técnico em Biblioteconomia', quantidade: 72, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Biólogo (PAEPE)', quantidade: 65, categoria: 'Técnica-Administrativa' },
-  { cargo: 'Assistente Social (PAEPE)', quantidade: 63, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Biólogo', quantidade: 65, categoria: 'Técnica-Administrativa' },
+  { cargo: 'Assistente Social', quantidade: 63, categoria: 'Técnica-Administrativa' },
 ];
 
 export const NACIONALIDADES_DATA = {
