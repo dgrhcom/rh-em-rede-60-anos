@@ -629,16 +629,10 @@ export const FaixaEtariaBarChart: React.FC = () => {
         </div>
 
         {/* 2. Destaque Demográfico (Abaixo da Legenda) */}
-        <div className="p-4 sm:p-4.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3 shadow-xs">
-          <Cake className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-          <div className="min-w-0">
-            <span className="text-xs sm:text-sm font-black uppercase text-amber-900 tracking-wider block mb-1">
-              Destaque Demográfico
-            </span>
-            <div className="text-sm sm:text-base font-bold text-amber-950 leading-relaxed space-y-1">
-              <p>• {DESTAQUE_FAIXA_ETARIA.jovem}</p>
-              <p>• {DESTAQUE_FAIXA_ETARIA.velho}</p>
-            </div>
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <Cake className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Destaque Demográfico:</span> {DESTAQUE_FAIXA_ETARIA.jovem.split('18')[0]}<span className="font-semibold text-slate-900">18 anos</span> e {DESTAQUE_FAIXA_ETARIA.velho.toLowerCase().split('89')[0]}<span className="font-semibold text-slate-900">89 anos</span>.
           </div>
         </div>
       </div>
@@ -1364,10 +1358,10 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         </div>
 
         {/* 2. Destaque Histórico (Abaixo da Legenda) */}
-        <div className="p-3 sm:p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
-          <TrendingUp className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
-            <strong>Evolução Histórica (2016 - 2026):</strong> Salto contínuo de Especialização (<strong>1.139 ➔ 1.697, +49%</strong>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <TrendingUp className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Evolução Histórica (2016 - 2026):</span> Salto contínuo de Especialização (<span className="font-semibold text-slate-900">1.139 ➔ 1.697, +49%</span>) e consolidação da formação acadêmica e pós-graduação no PAEPE.
           </div>
         </div>
       </div>
@@ -1641,10 +1635,10 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         </div>
 
         {/* 2. Destaque em Zoom (Abaixo da Legenda) */}
-        <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-sky-300 text-sky-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
-          <TrendingUp className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
-            <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+          <TrendingUp className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
+            <span className="font-semibold text-slate-900">Visão em Zoom (Escala 0 a 500):</span> Crescimento expressivo em <span className="font-semibold text-slate-900">Mestrado (+17%)</span>, <span className="font-semibold text-slate-900">Doutorado (+47%)</span> e <span className="font-semibold text-slate-900">Maior que Doutorado (+211%)</span>, com redução nos níveis Fundamental e Fundamental Incompleto (<span className="font-semibold text-slate-900">-65%</span>).
           </div>
         </div>
       </div>
