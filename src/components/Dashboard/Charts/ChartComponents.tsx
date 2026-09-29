@@ -1951,7 +1951,7 @@ export const TopCargosTable: React.FC = () => {
         {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-12 px-1">
           {/* Coluna 1: 1º ao 10º */}
-          <div className="flex flex-col space-y-1 sm:space-y-1.5">
+          <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col1.map((item, index) => {
             const rank = index + 1;
             const areaStyle = getAreaColor(item.categoria);
@@ -1959,7 +1959,7 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-1.5 sm:py-2 xl:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
+                className="py-1 sm:py-1.5 xl:py-1.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
@@ -2008,7 +2008,7 @@ export const TopCargosTable: React.FC = () => {
         </div>
 
         {/* Coluna 2: 11º ao 20º */}
-        <div className="flex flex-col space-y-1 sm:space-y-1.5">
+        <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col2.map((item, index) => {
             const rank = index + 11;
             const areaStyle = getAreaColor(item.categoria);
@@ -2016,7 +2016,7 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-1.5 sm:py-2 xl:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
+                className="py-1 sm:py-1.5 xl:py-1.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
