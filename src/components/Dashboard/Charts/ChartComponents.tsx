@@ -1959,12 +1959,12 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
+                className="py-1.5 sm:py-2 xl:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
                   <span
-                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm lg:text-base font-normal shrink-0 ${
+                    className={`w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base lg:text-lg font-normal shrink-0 ${
                       rank === 1
                         ? 'bg-amber-100 text-amber-900 border border-amber-300'
                         : rank === 2
@@ -1980,7 +1980,7 @@ export const TopCargosTable: React.FC = () => {
                   {/* Nome do Cargo e Ponto Colorido de Classificação */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
-                      className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
+                      className="text-lg sm:text-xl lg:text-2xl xl:text-[24px] 2xl:text-[26px] font-normal text-slate-800 tracking-tight truncate"
                       title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
@@ -1995,10 +1995,10 @@ export const TopCargosTable: React.FC = () => {
 
                 {/* Quantidade e Porcentagem */}
                 <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
-                  <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
@@ -2016,18 +2016,18 @@ export const TopCargosTable: React.FC = () => {
             return (
               <div
                 key={item.cargo}
-                className="py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
+                className="py-1.5 sm:py-2 xl:py-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-slate-50/80 px-2.5 rounded-xl"
               >
                 <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                   {/* Badge de Posição */}
-                  <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm lg:text-base font-normal shrink-0 bg-slate-100 text-slate-600">
+                  <span className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base lg:text-lg font-normal shrink-0 bg-slate-100 text-slate-600">
                     {rank}º
                   </span>
 
                   {/* Nome do Cargo e Ponto Colorido de Classificação */}
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <span
-                      className="text-base sm:text-lg lg:text-xl xl:text-[22px] 2xl:text-[24px] font-normal text-slate-800 tracking-tight truncate"
+                      className="text-lg sm:text-xl lg:text-2xl xl:text-[24px] 2xl:text-[26px] font-normal text-slate-800 tracking-tight truncate"
                       title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
@@ -2042,10 +2042,10 @@ export const TopCargosTable: React.FC = () => {
 
                 {/* Quantidade e Porcentagem */}
                 <div className="flex items-baseline gap-1.5 sm:gap-2 shrink-0 pl-2">
-                  <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-normal text-slate-900">
                     {item.quantidade.toLocaleString('pt-BR')}
                   </span>
-                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                  <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-500">
                     ({pct}%)
                   </span>
                 </div>
@@ -2057,7 +2057,7 @@ export const TopCargosTable: React.FC = () => {
     </div>
 
       {/* Mini Legenda de Áreas (Pontos Coloridos) - Abaixo da tabela e centralizada */}
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-3 pt-3.5 pb-1 text-xs sm:text-sm font-normal text-slate-600 shrink-0">
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-3 pt-3.5 pb-1 text-sm sm:text-base font-normal text-slate-600 shrink-0">
         <span className="text-slate-400 font-medium mr-1">Áreas:</span>
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#105e7b' }} />
@@ -2156,7 +2156,7 @@ export const TopCargosBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 50, top: 4, bottom: 4 },
+            padding: { right: 75, top: 4, bottom: 4 },
           },
           scales: {
             x: {
@@ -2165,7 +2165,7 @@ export const TopCargosBarChart: React.FC = () => {
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 stepSize: 200,
-                font: { weight: 'bold', size: 13 },
+                font: { weight: 'normal', size: 14 },
                 color: '#64748b',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
@@ -2173,7 +2173,7 @@ export const TopCargosBarChart: React.FC = () => {
             y: {
               grid: { display: false },
               ticks: {
-                font: { weight: 'bold', size: 16 },
+                font: { weight: 'normal', size: 18 },
                 color: '#0f172a',
               },
             },
