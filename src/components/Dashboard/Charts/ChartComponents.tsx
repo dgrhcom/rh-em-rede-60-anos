@@ -758,8 +758,9 @@ export const RacaCorCharts: React.FC = () => {
                   stacked: true,
                   grid: { color: 'rgba(0,0,0,0.06)' },
                   ticks: {
-                    font: { weight: 'bold', size: 14 },
-                    color: '#475569',
+                    font: { weight: 'bold', size: 20 },
+                    color: '#0f172a',
+                    padding: 8,
                     callback: function (val: any) {
                       const num = Number(val);
                       if (num === 1 || num === 10 || num === 100 || num === 1000 || num === 10000) {
@@ -771,9 +772,9 @@ export const RacaCorCharts: React.FC = () => {
                   title: {
                     display: true,
                     text: '* Eixo horizontal em escala logarítmica (base 10)',
-                    color: '#64748b',
-                    font: { size: 12.5, style: 'italic', weight: 'normal' },
-                    padding: { top: 8, bottom: 2 },
+                    color: '#475569',
+                    font: { size: 13.5, style: 'italic', weight: 'normal' },
+                    padding: { top: 10, bottom: 4 },
                   },
                 },
                 y: {
@@ -950,8 +951,8 @@ export const RacaCorTabela2BarChart: React.FC = () => {
               stacked: true,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
+                font: { weight: 'bold', size: 14 },
+                color: '#0f172a',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
@@ -1050,8 +1051,8 @@ export const RacaCorBarChart: React.FC = () => {
             x: {
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
-                font: { weight: 'bold', size: 11 },
-                color: '#64748b',
+                font: { weight: 'bold', size: 14 },
+                color: '#0f172a',
                 callback: (val: any) => Number(val).toLocaleString('pt-BR'),
               },
             },
