@@ -57,12 +57,12 @@ export const GENERO_DATA = {
 };
 
 export const FAIXA_ETARIA_DATA = [
-  { faixa: '< 30 anos', docentes: 10, pesquisadores: 2, tecnicos: 442, total: 454, pct: 4.8 },
-  { faixa: '30 a 39 anos', docentes: 404, pesquisadores: 29, tecnicos: 1825, total: 2258, pct: 24.0 },
-  { faixa: '40 a 49 anos', docentes: 641, pesquisadores: 65, tecnicos: 2350, total: 3056, pct: 32.5 },
-  { faixa: '50 a 59 anos', docentes: 462, pesquisadores: 42, tecnicos: 1782, total: 2286, pct: 24.3 },
-  { faixa: '60 a 69 anos', docentes: 377, pesquisadores: 16, tecnicos: 792, total: 1185, pct: 12.6 },
-  { faixa: '70 anos ou mais', docentes: 98, pesquisadores: 1, tecnicos: 78, total: 177, pct: 1.9 },
+  { faixa: '<30 anos', docentes: 10, pesquisadores: 2, tecnicos: 442, total: 454, pct: 4.8 },
+  { faixa: '30 a 39', docentes: 404, pesquisadores: 29, tecnicos: 1825, total: 2258, pct: 24.0 },
+  { faixa: '40 a 49', docentes: 641, pesquisadores: 65, tecnicos: 2350, total: 3056, pct: 32.5 },
+  { faixa: '50 a 59', docentes: 462, pesquisadores: 42, tecnicos: 1782, total: 2286, pct: 24.3 },
+  { faixa: '60 a 69', docentes: 377, pesquisadores: 16, tecnicos: 792, total: 1185, pct: 12.6 },
+  { faixa: '70 ou mais', docentes: 98, pesquisadores: 1, tecnicos: 78, total: 177, pct: 1.9 },
 ];
 
 export const DESTAQUE_FAIXA_ETARIA = {
