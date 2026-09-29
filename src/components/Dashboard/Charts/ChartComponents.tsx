@@ -2138,10 +2138,100 @@ export const TopCargosBarChart: React.FC = () => {
         },
       };
 
+      const yAxisRankingBadgesPlugin = {
+        id: 'yAxisRankingBadges',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          const meta = chartInstance.getDatasetMeta(0);
+
+          const isMobile = chartInstance.width < 550;
+          const badgeW = isMobile ? 32 : 38;
+          const badgeH = isMobile ? 18 : 22;
+          const radius = 6;
+          const badgeFontSize = isMobile ? 11 : 12.5;
+          const cargoFontSize = isMobile ? 13 : 17;
+          const gap = isMobile ? 7 : 10;
+
+          const startX = (chartInstance.scales?.y?.left ?? 0) + 8;
+          const textStartX = startX + badgeW + gap;
+          const maxTextWidth = (chartInstance.chartArea?.left ?? 350) - textStartX - 8;
+
+          top20.forEach((cargo, index) => {
+            const element = meta.data[index];
+            if (!element) return;
+            const rank = index + 1;
+            const y = element.y;
+
+            let bgColor = '#f1f5f9';
+            let textColor = '#475569';
+            let borderColor: string | null = null;
+
+            if (rank === 1) {
+              bgColor = '#fef3c7';
+              textColor = '#78350f';
+              borderColor = '#fcd34d';
+            } else if (rank === 2) {
+              bgColor = '#e2e8f0';
+              textColor = '#1e293b';
+              borderColor = null;
+            } else if (rank === 3) {
+              bgColor = '#fffbeb';
+              textColor = '#92400e';
+              borderColor = '#fde68a';
+            }
+
+            c.save();
+            const rx = startX;
+            const ry = y - badgeH / 2;
+
+            // Fundo do badge com cantos arredondados
+            c.fillStyle = bgColor;
+            c.beginPath();
+            if ((c as any).roundRect) {
+              (c as any).roundRect(rx, ry, badgeW, badgeH, radius);
+            } else {
+              c.rect(rx, ry, badgeW, badgeH);
+            }
+            c.fill();
+
+            // Borda do badge (1º e 3º lugares conforme a tabela)
+            if (borderColor) {
+              c.strokeStyle = borderColor;
+              c.lineWidth = 1;
+              c.stroke();
+            }
+
+            // Número da posição centralizado dentro do badge
+            c.font = `600 ${badgeFontSize}px Inter, -apple-system, sans-serif`;
+            c.fillStyle = textColor;
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText(`${rank}º`, rx + badgeW / 2, y);
+
+            // Nome do cargo alinhado à esquerda
+            c.font = `normal ${cargoFontSize}px Inter, -apple-system, sans-serif`;
+            c.fillStyle = '#0f172a';
+            c.textAlign = 'left';
+            c.textBaseline = 'middle';
+
+            let labelText = cargo.cargo;
+            if (maxTextWidth > 0 && c.measureText(labelText).width > maxTextWidth) {
+              while (labelText.length > 3 && c.measureText(labelText + '...').width > maxTextWidth) {
+                labelText = labelText.slice(0, -1);
+              }
+              labelText += '...';
+            }
+
+            c.fillText(labelText, textStartX, y);
+            c.restore();
+          });
+        },
+      };
+
       chart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: top20.map((c, i) => `${i + 1}º ${c.cargo}`),
+          labels: top20.map((c, i) => `   ${i + 1}º   ${c.cargo}`),
           datasets: [
             {
               label: 'Total de Profissionais',
@@ -2156,7 +2246,7 @@ export const TopCargosBarChart: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: { right: 75, top: 4, bottom: 4 },
+            padding: { left: 4, right: 75, top: 4, bottom: 4 },
           },
           scales: {
             x: {
@@ -2174,7 +2264,7 @@ export const TopCargosBarChart: React.FC = () => {
               grid: { display: false },
               ticks: {
                 font: { weight: 'normal', size: 18 },
-                color: '#0f172a',
+                color: 'transparent',
               },
             },
           },
@@ -2185,6 +2275,12 @@ export const TopCargosBarChart: React.FC = () => {
               titleFont: { size: 15, weight: 'bold' },
               bodyFont: { size: 14 },
               callbacks: {
+                title: (items: any) => {
+                  if (!items || !items.length) return '';
+                  const idx = items[0].dataIndex;
+                  const cargo = top20[idx];
+                  return `${idx + 1}º ${cargo.cargo}`;
+                },
                 label: (ctx: any) => {
                   const cargo = top20[ctx.dataIndex];
                   const pct = ((cargo.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
@@ -2194,7 +2290,7 @@ export const TopCargosBarChart: React.FC = () => {
             },
           },
         },
-        plugins: [horizontalPercentageLabelsPlugin],
+        plugins: [horizontalPercentageLabelsPlugin, yAxisRankingBadgesPlugin],
       });
     });
 
