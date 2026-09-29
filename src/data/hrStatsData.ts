@@ -46,7 +46,7 @@ export const GENERO_DATA = {
       pctMasculino: 59.8,
     },
     {
-      carreira: 'Pesquisadores (PQ)',
+      carreira: 'Pesquisadores',
       feminino: 65,
       masculino: 90,
       total: 155,

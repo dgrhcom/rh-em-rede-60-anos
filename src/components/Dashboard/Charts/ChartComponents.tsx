@@ -240,7 +240,7 @@ export const GeneroCharts: React.FC = () => {
               labels: [
                 ['Técnico-administrativos', '(PAEPE)'],
                 'Docentes',
-                ['Pesquisadores', '(PQ)'],
+                'Pesquisadores',
               ],
               datasets: [
                 {
@@ -452,7 +452,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
               borderRadius: 6,
             },
             {
-              label: 'Pesquisadores (PQ)',
+              label: 'Pesquisadores',
               data: FAIXA_ETARIA_DATA.map((f) => f.pesquisadores),
               backgroundColor: DS_COLORS.aux1, // Verde DGRH
               borderRadius: 6,
@@ -574,7 +574,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
                   style={{ backgroundColor: DS_COLORS.aux1 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
-                  Pesquisadores (PQ)
+                  Pesquisadores
                 </span>
               </div>
               <div className="flex items-baseline gap-2 shrink-0">
@@ -651,7 +651,7 @@ export const RacaCorCharts: React.FC = () => {
 
   const categorias = [
     { label: 'Docentes', total: totalDocentes, color: DS_COLORS.aux2, datasetIndex: 0 },
-    { label: 'Pesquisadores (PQ)', total: totalPesquisadores, color: DS_COLORS.aux1, datasetIndex: 1 },
+    { label: 'Pesquisadores', total: totalPesquisadores, color: DS_COLORS.aux1, datasetIndex: 1 },
     { label: 'PAEPE', total: totalTecnicos, color: DS_COLORS.primary, datasetIndex: 2 },
     { label: 'Extra-quadro', total: totalExtraQuadro, color: DS_COLORS.secondary, datasetIndex: 3 },
   ];
@@ -720,7 +720,7 @@ export const RacaCorCharts: React.FC = () => {
                   borderRadius: 6,
                 },
                 {
-                  label: 'Pesquisadores (PQ)',
+                  label: 'Pesquisadores',
                   data: RACA_COR_TABELA_2.map((r) => (r.pesquisadores > 0 ? r.pesquisadores : null)),
                   backgroundColor: DS_COLORS.aux1, // Verde DGRH
                   borderRadius: 6,
@@ -915,7 +915,7 @@ export const RacaCorTabela2BarChart: React.FC = () => {
               borderRadius: 4,
             },
             {
-              label: 'Pesquisadores (PQ)',
+              label: 'Pesquisadores',
               data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
               backgroundColor: DS_COLORS.aux1,
               borderRadius: 4,
