@@ -689,13 +689,22 @@ export const RacaCorCharts: React.FC = () => {
             id: 'horizontalStackPercentageLabels',
             afterDatasetsDraw(chartInstance: any) {
               const c = chartInstance.ctx;
-              const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
               const isMobile = chartInstance.width < 500;
               const fontSize = isMobile ? 18 : 24;
 
               RACA_COR_TABELA_2.forEach((item, index) => {
-                const element = metaLast.data[index];
-                if (!element) return;
+                let lastElement: any = null;
+                for (let d = chartInstance.data.datasets.length - 1; d >= 0; d--) {
+                  if (chartInstance.isDatasetVisible(d)) {
+                    const meta = chartInstance.getDatasetMeta(d);
+                    if (meta.data && meta.data[index]) {
+                      lastElement = meta.data[index];
+                      break;
+                    }
+                  }
+                }
+                if (!lastElement) return;
+
                 const racaGeral = RACA_COR_DATA.find((r) => r.raca === item.raca);
                 const pct = racaGeral ? racaGeral.pct.toFixed(1).replace('.', ',') : '0';
                 const text = `${pct}% (${item.total.toLocaleString('pt-BR')})`;
@@ -705,7 +714,7 @@ export const RacaCorCharts: React.FC = () => {
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
                 c.fillStyle = '#0f172a';
-                c.fillText(text, element.x + 12, element.y);
+                c.fillText(text, lastElement.x + 12, lastElement.y);
                 c.restore();
               });
             },
@@ -718,25 +727,25 @@ export const RacaCorCharts: React.FC = () => {
               datasets: [
                 {
                   label: 'Docentes',
-                  data: RACA_COR_TABELA_2.map((r) => r.docentes),
+                  data: RACA_COR_TABELA_2.map((r) => (r.docentes > 0 ? r.docentes : null)),
                   backgroundColor: DS_COLORS.aux2, // Roxo DGRH
                   borderRadius: 6,
                 },
                 {
                   label: 'Pesquisadores (PQ)',
-                  data: RACA_COR_TABELA_2.map((r) => r.pesquisadores),
+                  data: RACA_COR_TABELA_2.map((r) => (r.pesquisadores > 0 ? r.pesquisadores : null)),
                   backgroundColor: DS_COLORS.aux1, // Verde DGRH
                   borderRadius: 6,
                 },
                 {
                   label: 'Técnicos-administrativos (PAEPE)',
-                  data: RACA_COR_TABELA_2.map((r) => r.tecnicos),
+                  data: RACA_COR_TABELA_2.map((r) => (r.tecnicos > 0 ? r.tecnicos : null)),
                   backgroundColor: DS_COLORS.primary, // Azul Primário
                   borderRadius: 6,
                 },
                 {
                   label: 'Extra-quadro',
-                  data: RACA_COR_TABELA_2.map((r) => r.extraQuadro),
+                  data: RACA_COR_TABELA_2.map((r) => (r.extraQuadro > 0 ? r.extraQuadro : null)),
                   backgroundColor: DS_COLORS.secondary, // Dourado Secundário
                   borderRadius: 6,
                 },
@@ -747,17 +756,32 @@ export const RacaCorCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { right: 195, top: 10, bottom: 10 },
+                padding: { right: 205, top: 10, bottom: 12 },
               },
               scales: {
                 x: {
+                  type: 'logarithmic',
+                  min: 1,
+                  max: 25000,
                   stacked: true,
-                  max: 12000,
                   grid: { color: 'rgba(0,0,0,0.06)' },
                   ticks: {
                     font: { weight: 'bold', size: 14 },
                     color: '#475569',
-                    callback: (val: any) => Number(val).toLocaleString('pt-BR'),
+                    callback: function (val: any) {
+                      const num = Number(val);
+                      if (num === 1 || num === 10 || num === 100 || num === 1000 || num === 10000) {
+                        return num.toLocaleString('pt-BR');
+                      }
+                      return '';
+                    },
+                  },
+                  title: {
+                    display: true,
+                    text: '* Eixo horizontal em escala logarítmica (base 10)',
+                    color: '#64748b',
+                    font: { size: 12.5, style: 'italic', weight: 'normal' },
+                    padding: { top: 8, bottom: 2 },
                   },
                 },
                 y: {
