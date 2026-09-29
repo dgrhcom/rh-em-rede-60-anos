@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Sparkles, TrendingUp } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Cake } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
   TOTAL_SERVIDORES_ATIVOS,
@@ -630,7 +630,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
 
         {/* 2. Destaque Demográfico (Abaixo da Legenda) */}
         <div className="p-4 sm:p-4.5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <Cake className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <div className="min-w-0">
             <span className="text-xs sm:text-sm font-black uppercase text-amber-900 tracking-wider block mb-1">
               Destaque Demográfico
@@ -891,7 +891,7 @@ export const RacaCorCharts: React.FC = () => {
 
         {/* Destaque Étnico-Racial (Abaixo da Legenda) */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <Users className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
             <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 71,9% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 18,3% <span className="font-semibold text-slate-900">Pardos</span> e 5,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
           </div>
@@ -1642,7 +1642,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
 
         {/* 2. Destaque em Zoom (Abaixo da Legenda) */}
         <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-sky-300 text-sky-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
+          <TrendingUp className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
           <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
             <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
           </div>
