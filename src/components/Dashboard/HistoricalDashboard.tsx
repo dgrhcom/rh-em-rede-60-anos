@@ -216,7 +216,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
   const cardsGridRef = useRef<HTMLDivElement | null>(null);
   const bottomBarRef = useRef<HTMLDivElement | null>(null);
 
-  // Staggered entrance animation for Index cards and bottom bar
+  // Animação de entrada dos cards subindo a partir da base da tela, sem alteração de opacidade
   useEffect(() => {
     if (isIndex && cardsGridRef.current) {
       const cards = cardsGridRef.current.children;
@@ -224,25 +224,38 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
       gsap.fromTo(
         cards,
         {
-          opacity: 0,
-          y: 40,
-          scale: 0.93,
+          y: (_index, target) => {
+            const rect = (target as HTMLElement).getBoundingClientRect();
+            const winH = window.innerHeight || 900;
+            return Math.max(winH - rect.top + 80, 200);
+          },
         },
         {
-          opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.55,
-          stagger: 0.06,
+          duration: 0.7,
+          stagger: 0.05,
           ease: 'power3.out',
+          clearProps: 'transform',
         }
       );
       if (bottomBarRef.current) {
         gsap.killTweensOf(bottomBarRef.current);
         gsap.fromTo(
           bottomBarRef.current,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.45, delay: 0.3, ease: 'power2.out' }
+          {
+            y: (_index, target) => {
+              const rect = (target as HTMLElement).getBoundingClientRect();
+              const winH = window.innerHeight || 900;
+              return Math.max(winH - rect.top + 80, 150);
+            },
+          },
+          {
+            y: 0,
+            duration: 0.7,
+            delay: 0.2,
+            ease: 'power3.out',
+            clearProps: 'transform',
+          }
         );
       }
     }
@@ -320,32 +333,21 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
               <span>Linha do Tempo</span>
             </button>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={toggleFullscreen}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 hover:bg-white text-slate-800 font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-slate-900 hover:scale-105 active:scale-95"
-                title={isFullscreen ? "Sair da Tela Cheia (Esc)" : "Entrar em Tela Cheia (F11)"}
-              >
-                {isFullscreen ? <Minimize2 className="w-4 h-4 text-[#105e7b]" /> : <Maximize2 className="w-4 h-4 text-[#105e7b]" />}
-                <span className="hidden sm:inline">{isFullscreen ? "Sair da Tela Cheia" : "Tela Cheia"}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  soundFx.playCardTick();
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  }
-                  setCurrentSlideIndex(0);
-                }}
-                className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 group hover:scale-105 active:scale-95"
-                title="Iniciar Apresentação em Tela Cheia a partir do 1º gráfico"
-              >
-                <Play className="w-4 h-4 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
-                <span>Iniciar Apresentação</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                soundFx.playCardTick();
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(() => {});
+                }
+                setCurrentSlideIndex(0);
+              }}
+              className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer border-2 border-white/80 group hover:scale-105 active:scale-95"
+              title="Iniciar Apresentação em Tela Cheia a partir do 1º gráfico"
+            >
+              <Play className="w-4 h-4 fill-[#e5a93a] text-[#e5a93a] group-hover:scale-110 transition-transform" />
+              <span>Iniciar Apresentação</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
         </div>
       ) : (
