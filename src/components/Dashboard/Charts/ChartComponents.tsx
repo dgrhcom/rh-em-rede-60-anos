@@ -1909,11 +1909,13 @@ export const TopCargosTable: React.FC = () => {
   const col2 = top20.slice(10, 20);
 
   return (
-    <div className="w-full h-full flex flex-col py-1 min-h-0">
-      {/* Grid com 2 colunas: 1 a 10 e 11 a 20 (Sem cards envolventes para ganho de espaço) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-10 flex-1 min-h-0 overflow-y-auto px-1">
-        {/* Coluna 1: 1º ao 10º */}
-        <div className="flex flex-col space-y-0.5 sm:space-y-1">
+    <div className="w-full h-full flex flex-col justify-between py-1 min-h-0">
+      {/* Container Centralizado da Tabela entre o Título e a Legenda */}
+      <div className="my-auto w-full min-h-0 overflow-y-auto py-1">
+        {/* Grid com 2 colunas: 1 a 10 e 11 a 20 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 xl:gap-12 px-1">
+          {/* Coluna 1: 1º ao 10º */}
+          <div className="flex flex-col space-y-1 sm:space-y-1.5">
           {col1.map((item, index) => {
             const rank = index + 1;
             const areaStyle = getAreaColor(item.categoria);
@@ -1970,7 +1972,7 @@ export const TopCargosTable: React.FC = () => {
         </div>
 
         {/* Coluna 2: 11º ao 20º */}
-        <div className="flex flex-col space-y-0.5 sm:space-y-1">
+        <div className="flex flex-col space-y-1 sm:space-y-1.5">
           {col2.map((item, index) => {
             const rank = index + 11;
             const areaStyle = getAreaColor(item.categoria);
@@ -2016,6 +2018,7 @@ export const TopCargosTable: React.FC = () => {
           })}
         </div>
       </div>
+    </div>
 
       {/* Mini Legenda de Áreas (Pontos Coloridos) - Abaixo da tabela e centralizada */}
       <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-3 pt-3.5 pb-1 text-xs sm:text-sm font-normal text-slate-600 shrink-0">
