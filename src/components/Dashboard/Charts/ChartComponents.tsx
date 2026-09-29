@@ -536,15 +536,11 @@ export const FaixaEtariaBarChart: React.FC = () => {
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
         {/* 1. Legenda Padronizada com Tipografia Ampliada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-          <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
-            Legenda por Carreira
-          </span>
-
-          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+          <div className="flex flex-col divide-y divide-slate-100">
             {/* Docentes */}
             <div
               onClick={() => toggleDataset(0)}
-              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
               title="Clique para alternar visibilidade de Docentes"
             >
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
@@ -837,18 +833,14 @@ export const RacaCorCharts: React.FC = () => {
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
         {/* Linhas de Carreira: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-          <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
-            Carreira Funcional
-          </span>
-
-          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+          <div className="flex flex-col divide-y divide-slate-100">
             {categorias.map((item) => {
               const pct = ((item.total / totalGeralRaca) * 100).toFixed(1).replace('.', ',');
               return (
                 <div
                   key={item.label}
                   onClick={() => toggleDataset(item.datasetIndex)}
-                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
+                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
                   title={`Clique para alternar visibilidade de ${item.label}`}
                 >
                   <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
@@ -1313,17 +1305,14 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2.5 sm:gap-3.5 w-full">
         {/* 1. Legenda Padronizada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
-            Níveis de Escolaridade (2026)
-          </span>
-          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+          <div className="flex flex-col divide-y divide-slate-100">
             {ESCOLARIDADE_EVOLUCAO.series.map((s) => {
               const val2026 = s.valores[s.valores.length - 1];
               const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
               return (
                 <div
                   key={s.nivel}
-                  className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg"
+                  className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg first:pt-0"
                 >
                   <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
                     <span
@@ -1590,17 +1579,14 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
       <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-2.5 sm:gap-3.5 w-full">
         {/* 1. Legenda Padronizada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-500 pb-2">
-            Categorias em Destaque (Zoom)
-          </span>
-          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+          <div className="flex flex-col divide-y divide-slate-100">
             {ESCOLARIDADE_ZOOM_SERIES.map((s) => {
               const val2026 = s.valores[s.valores.length - 1];
               const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
               return (
                 <div
                   key={s.nivel}
-                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
+                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
                 >
                   <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                     <span
@@ -2339,11 +2325,7 @@ export const TopCargosBarChart: React.FC = () => {
 
       {/* Legenda Padronizada em Coluna à Direita com Tipografia Ampliada e Valores Somados */}
       <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 shrink-0 w-full lg:w-[410px] xl:w-[460px]">
-        <span className="text-xs sm:text-sm font-semibold uppercase text-slate-500 tracking-wider pb-2">
-          Áreas
-        </span>
-
-        <div className="flex flex-col divide-y divide-slate-100 pt-1">
+        <div className="flex flex-col divide-y divide-slate-100">
           {areasSummary.map((area) => (
             <div
               key={area.nome}
