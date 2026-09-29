@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Sparkles, TrendingUp, Users, Cake } from 'lucide-react';
+import { School, TrendingUp, Users, Cake } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
   TOTAL_SERVIDORES_ATIVOS,
@@ -1916,7 +1916,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
 
         {/* Destaque Institucional (Abaixo da Legenda) */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
-          <Sparkles className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
+          <School className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
             <span className="font-semibold text-slate-900">Concentração Funcional:</span> 70,6% de todo o quadro concentra-se em <span className="font-semibold text-slate-900">Faculdades e Institutos (38,5%)</span> e na <span className="font-semibold text-slate-900">Área da Saúde (32,1%)</span>.
           </div>
