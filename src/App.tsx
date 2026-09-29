@@ -29,6 +29,7 @@ export function App() {
   const [hasIntroCompleted, setHasIntroCompleted] = useState<boolean>(false);
   const [timelineResetTrigger, setTimelineResetTrigger] = useState<number>(0);
   const [timelineFocusTrigger, setTimelineFocusTrigger] = useState<{ index: number; timestamp: number } | null>(null);
+  const [dashboardInitialSlide, setDashboardInitialSlide] = useState<number | undefined>(undefined);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -103,17 +104,23 @@ export function App() {
     setIsLogoVisible(true);
     setIsLogoInCenterScreen(true);
     setIsPreAnimating(false);
+    setDashboardInitialSlide(undefined);
     setTimelineResetTrigger((prev) => prev + 1);
   }, []);
 
   // Open Historical Dashboard
-  const handleOpenDashboard = useCallback(() => {
+  const handleOpenDashboard = useCallback((slideIndex?: number) => {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.set('view', 'dashboard');
-      url.searchParams.set('slide', 'index');
+      if (slideIndex !== undefined) {
+        url.searchParams.set('slide', String(slideIndex + 1));
+      } else {
+        url.searchParams.set('slide', 'index');
+      }
       window.history.replaceState(null, '', url.toString());
     }
+    setDashboardInitialSlide(slideIndex);
     setCurrentView('dashboard');
   }, []);
 
@@ -189,6 +196,7 @@ export function App() {
         {currentView === 'dashboard' && (
           <div className="w-full min-h-screen pt-16 sm:pt-20 pb-2 sm:pb-3 flex flex-col justify-center">
             <HistoricalDashboard
+              initialSlideIndex={dashboardInitialSlide}
               onBackToTimeline={handleBackToTimeline}
               onNavigateToOpeningLogo={handleNavigateToOpeningLogo}
             />

@@ -23,9 +23,10 @@ import {
   NacionalidadesCharts,
 } from './Charts/ChartComponents';
 
-interface HistoricalDashboardProps {
+export interface HistoricalDashboardProps {
   onBackToTimeline: () => void;
   onNavigateToOpeningLogo?: () => void;
+  initialSlideIndex?: number;
 }
 
 interface SlideDefinition {
@@ -115,11 +116,18 @@ const SLIDES: SlideDefinition[] = [
   },
 ];
 
+export const TOTAL_DASHBOARD_SLIDES = SLIDES.length;
+export const LAST_DASHBOARD_SLIDE_INDEX = SLIDES.length - 1;
+
 export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
   onBackToTimeline,
   onNavigateToOpeningLogo,
+  initialSlideIndex,
 }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(() => {
+    if (initialSlideIndex !== undefined && initialSlideIndex >= -1 && initialSlideIndex < SLIDES.length) {
+      return initialSlideIndex;
+    }
     if (typeof window !== 'undefined') {
       const search = new URLSearchParams(window.location.search);
       const slideParam = search.get('slide');
@@ -135,6 +143,12 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
     }
     return -1;
   });
+
+  useEffect(() => {
+    if (initialSlideIndex !== undefined && initialSlideIndex >= -1 && initialSlideIndex < SLIDES.length) {
+      setCurrentSlideIndex(initialSlideIndex);
+    }
+  }, [initialSlideIndex]);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const totalSlides = SLIDES.length;

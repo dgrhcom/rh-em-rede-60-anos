@@ -6,6 +6,7 @@ import {
   ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sparkles, Volume2, VolumeX, BarChart3 
 } from 'lucide-react';
 import gsap from 'gsap';
+import { LAST_DASHBOARD_SLIDE_INDEX } from '../Dashboard/HistoricalDashboard';
 
 interface ContinuousTimelineProps {
   periods: HistoricalPeriod[];
@@ -13,7 +14,7 @@ interface ContinuousTimelineProps {
   onSelectPeriod: (index: number | null) => void;
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
   onFanIdleChange?: (isIdle: boolean) => void;
-  onOpenDashboard?: () => void;
+  onOpenDashboard?: (slideIndex?: number) => void;
   onLogoVisibilityChange?: (visible: boolean) => void;
   onPreAnimatingChange?: (isPreAnimating: boolean) => void;
   onLogoPositionChange?: (inCenterScreen: boolean) => void;
@@ -512,36 +513,58 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (introStatus === 'logo_pause') {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault();
+          soundFx.playCardTick();
+          onOpenDashboard?.(LAST_DASHBOARD_SLIDE_INDEX);
+          return;
+        }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
           e.preventDefault();
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
           }
           continueFromLogo();
+          return;
         }
         return;
       }
 
       if (isPreAnimating) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault();
+          soundFx.playCardTick();
+          onOpenDashboard?.(LAST_DASHBOARD_SLIDE_INDEX);
+          return;
+        }
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape' || e.key === 'ArrowRight') {
           e.preventDefault();
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
           }
           skipPreAnim();
+          return;
         }
         return;
       }
 
       if (isFanIdle) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault();
+          soundFx.playCardTick();
+          onOpenDashboard?.(LAST_DASHBOARD_SLIDE_INDEX);
+          return;
+        }
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
           e.preventDefault();
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
           }
           executeOpeningAnimation(0);
+          return;
         } else if (e.key === 'Escape') {
           skipIntro();
+          return;
         }
         return;
       }
