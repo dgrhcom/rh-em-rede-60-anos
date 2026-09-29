@@ -2354,12 +2354,21 @@ export const NacionalidadesCharts: React.FC = () => {
       if (barRef.current) {
         const ctx2 = barRef.current.getContext('2d');
         if (ctx2) {
+          // Escala monocromática harmônica baseada nos tons de claro e escuro do roxo da pizza (DS_COLORS.aux2 = #5e2a6b)
           const continentColors = [
-            DS_COLORS.primary,   // América Latina
-            DS_COLORS.secondary, // Europa
-            DS_COLORS.aux1,      // América do Norte
-            DS_COLORS.aux2,      // Ásia
-            DS_COLORS.aux3,      // Outros
+            '#461e50', // América Latina (48 - tom mais escuro e profundo)
+            DS_COLORS.aux2, // Europa (31 - #5e2a6b, tom de roxo base do gráfico de pizza)
+            '#7d3e8e', // América do Norte (11 - tom médio)
+            '#9e5eb2', // Ásia (10 - tom claro)
+            '#c287d5', // Outros (3 - tom mais suave)
+          ];
+
+          const continentHoverColors = [
+            '#34143c',
+            DS_COLORS.aux2Hover, // #743484
+            '#6a3279',
+            '#8a4e9c',
+            '#ab71be',
           ];
 
           const barPercentageLabelsPlugin = {
@@ -2401,6 +2410,7 @@ export const NacionalidadesCharts: React.FC = () => {
                   label: 'Estrangeiros por Continente',
                   data: NACIONALIDADES_DATA.regioesEstrangeiros.map((r) => r.total),
                   backgroundColor: continentColors,
+                  hoverBackgroundColor: continentHoverColors,
                   borderRadius: 8,
                 },
               ],
