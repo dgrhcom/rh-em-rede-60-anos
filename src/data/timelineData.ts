@@ -351,23 +351,29 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm6-2',
         year: '1999',
-        text: 'Implantação do Sistema de Avaliação de Desempenho e extinção do "Banquinho" (pessoas em disponibilidade)',
+        text: 'Implantação do Sistema de Avaliação de Desempenho',
         category: 'carreira',
       },
       {
         id: 'm6-3',
         year: '1999',
+        text: 'Extinção do "Banquinho" (pessoas em disponibilidade)',
+        category: 'carreira',
+      },
+      {
+        id: 'm6-4',
+        year: '1999',
         text: 'Lançamento da primeira versão do Programa de Pré-Aposentadoria',
         category: 'desenvolvimento',
       },
       {
-        id: 'm6-4',
+        id: 'm6-5',
         year: '2000',
         text: 'Transferência do PASS (Programa de Assistência à Saúde do Servidor) do CECOM para a DAB/DGRH',
         category: 'saude',
       },
       {
-        id: 'm6-5',
+        id: 'm6-6',
         year: '2000',
         text: 'Início da parceria com a empresa Sênior Sistemas para administração dos sistemas integrados de RH - atual Sistema de Gestão de Pessoas',
         category: 'informatizacao',
