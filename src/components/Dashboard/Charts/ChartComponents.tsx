@@ -249,7 +249,6 @@ export const GeneroCharts: React.FC = () => {
                   backgroundColor: DS_COLORS.aux2,
                   hoverBackgroundColor: DS_COLORS.aux2Hover,
                   borderRadius: 8,
-                  borderSkipped: false,
                 },
                 {
                   label: 'Homens',
@@ -257,7 +256,6 @@ export const GeneroCharts: React.FC = () => {
                   backgroundColor: DS_COLORS.primary,
                   hoverBackgroundColor: DS_COLORS.primaryHover,
                   borderRadius: 8,
-                  borderSkipped: false,
                 },
               ],
             },
