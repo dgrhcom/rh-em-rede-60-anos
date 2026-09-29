@@ -1126,32 +1126,11 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
           const bottom = Math.max(y0, y500);
           const height = bottom - top;
           const width = chartArea.right - chartArea.left;
-          const isMobile = chartInstance.width < 500;
 
           c.save();
-          // Fundo azul bem claro na faixa de 0 até 500
-          c.fillStyle = '#e0f2fe';
+          // Fundo azul bem claro baseado no azul DGRH #105e7b apenas entre os eixos na faixa de 0 até 500
+          c.fillStyle = 'rgba(16, 94, 123, 0.08)';
           c.fillRect(chartArea.left, top, width, height);
-
-          // Linha divisória tracejada indicando o teto de 500
-          c.strokeStyle = '#38bdf8'; // Sky 400
-          c.lineWidth = 1.5;
-          c.setLineDash([5, 4]);
-          c.beginPath();
-          c.moveTo(chartArea.left, top);
-          c.lineTo(chartArea.right, top);
-          c.stroke();
-          c.setLineDash([]);
-
-          // Indicador visual discreto da faixa correspondente ao Zoom
-          const labelText = isMobile ? 'Zoom (0 - 500)' : 'Faixa de Zoom (0 a 500)';
-          const labelFontSize = isMobile ? 10 : 12;
-          c.font = `bold ${labelFontSize}px Inter, -apple-system, sans-serif`;
-          c.fillStyle = '#0369a1'; // Sky 700
-          c.textAlign = 'right';
-          c.textBaseline = 'bottom';
-          c.fillText(labelText, chartArea.right - 8, top - 4);
-
           c.restore();
         },
       };
@@ -1414,14 +1393,14 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
 
       const totalPAEPE2026 = 7333;
 
-      // Plugin que preenche toda a área do gráfico com o azul claro (#e0f2fe) idêntico à faixa do slide anterior
+      // Plugin que preenche a área do gráfico entre os eixos x e y com o azul claro baseado no #105e7b
       const zoomFullBackgroundPlugin = {
         id: 'zoomFullBackground',
         beforeDatasetsDraw(chartInstance: any) {
           const { ctx: c, chartArea } = chartInstance;
           if (!chartArea) return;
           c.save();
-          c.fillStyle = '#e0f2fe';
+          c.fillStyle = 'rgba(16, 94, 123, 0.08)';
           c.fillRect(
             chartArea.left,
             chartArea.top,
