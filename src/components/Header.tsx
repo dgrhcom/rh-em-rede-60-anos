@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BarChart3, Clock, Maximize2, Minimize2 } from 'lucide-react';
 import { soundFx } from '../utils/soundEffects';
 
@@ -20,6 +20,25 @@ export const Header: React.FC<HeaderProps> = ({
   isLogoInCenterScreen = false,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const [logoWidth, setLogoWidth] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!logoRef.current) return;
+    const updateWidth = () => {
+      if (logoRef.current) {
+        setLogoWidth(logoRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    const ro = new ResizeObserver(updateWidth);
+    ro.observe(logoRef.current);
+    window.addEventListener('resize', updateWidth);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, [isLogoInCenterScreen]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -42,18 +61,19 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
       <div
-        className={`fixed z-40 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`fixed z-40 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-center ${
           isCentered
             ? isLogoInCenterScreen
-              ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-              : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2 translate-y-0'
-            : 'top-0 left-0 translate-x-0 translate-y-0'
+              ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
+              : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
+            : 'top-0 left-0 translate-x-0 translate-y-0 w-auto'
         }`}
         style={{
           padding: isCentered ? '0px' : '48px',
         }}
       >
         <img
+          ref={logoRef}
           src="/logo_dgrh.svg"
           alt="DGRH - Diretoria Geral de Recursos Humanos"
           className={`w-auto object-contain select-none pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
@@ -70,6 +90,28 @@ export const Header: React.FC<HeaderProps> = ({
               : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
           }`}
         />
+
+        {/* Citação do Prof. Dr. Zeferino Vaz na abertura inicial */}
+        <div
+          style={{
+            maxWidth: logoWidth ? `${logoWidth}px` : undefined,
+          }}
+          className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col text-left w-full max-w-[485px] sm:max-w-[647px] md:max-w-[809px] px-0 ${
+            isLogoInCenterScreen
+              ? 'opacity-100 translate-y-0 mt-5 sm:mt-7 md:mt-8'
+              : 'opacity-0 -translate-y-4 pointer-events-none max-h-0 overflow-hidden mt-0'
+          }`}
+        >
+          <blockquote className="text-left text-slate-950 text-sm sm:text-base md:text-lg lg:text-[19px] leading-relaxed tracking-tight select-none">
+            <span className="font-medium italic">
+              “As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios”
+            </span>
+            {' '}
+            <span className="not-italic font-black text-black uppercase tracking-wider text-xs sm:text-sm md:text-base inline-block whitespace-nowrap align-baseline ml-1.5 sm:ml-2">
+              — Prof. Dr. Zeferino Vaz
+            </span>
+          </blockquote>
+        </div>
       </div>
 
       {/* Top-Right Navigation Pill (Visible only after opening is completed or on dashboard) */}

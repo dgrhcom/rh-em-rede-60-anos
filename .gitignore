@@ -27,5 +27,5 @@ dist-ssr
 .env*
 
 scratch/
-save-the-date.png
+save-the-date*.png
 save_the_date.ai
