@@ -1269,16 +1269,13 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   }}
                 >
                   <div className="relative w-[210px] sm:w-[235px] md:w-[250px] h-[350px] sm:h-[390px] md:h-[420px] lg:h-[440px] rounded-3xl p-4 flex flex-col justify-between overflow-hidden shadow-2xl border-2.5 border-slate-950 bg-[#105e7b] text-white select-none ring-2 ring-white/60">
-                    {/* Topo: Identificação e Título */}
+                    {/* Topo: Título e Subtítulo (Anos) */}
                     <div className="text-center py-1 flex flex-col items-center">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-white/30 mb-1 shadow-xs">
-                        DGRH • UNICAMP
-                      </span>
-                      <div className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
-                        60 Anos Unicamp
-                      </div>
-                      <span className="text-[11px] text-white/85 font-bold mt-0.5">
-                        A Gestão de Pessoas (1983 - 2026)
+                      <h2 className="text-base sm:text-lg md:text-[19px] font-black text-white tracking-tight leading-snug">
+                        A gestão de pessoas nos 60 anos da Unicamp
+                      </h2>
+                      <span className="text-xs sm:text-[13px] text-white/85 font-bold tracking-wider mt-1">
+                        1983 – 2026
                       </span>
                     </div>
 
@@ -1298,23 +1295,15 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     </div>
 
                     {/* Rodapé: Selo Comemorativo */}
-                    <div className="pt-2 border-t border-white/20 flex items-center justify-between text-left gap-2 shrink-0">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="w-6 h-6 rounded-lg bg-[#e5a93a] text-slate-950 font-black text-xs flex items-center justify-center shadow-xs border border-slate-900 shrink-0">
-                          ★
+                    <div className="pt-2 border-t border-white/20 flex items-center justify-center text-center shrink-0">
+                      <div className="min-w-0">
+                        <h3 className="text-xs sm:text-sm font-black text-white tracking-tight truncate leading-snug">
+                          Linha do Tempo
+                        </h3>
+                        <span className="text-[10px] text-white/80 font-bold block truncate mt-0.5">
+                          Memória & Transformação
                         </span>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-xs sm:text-sm font-black text-white tracking-tight truncate leading-snug">
-                            Linha do Tempo
-                          </h3>
-                          <span className="text-[10px] text-white/80 font-bold block truncate mt-0.5">
-                            Memória & Transformação
-                          </span>
-                        </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-[10px] tracking-wide shadow-xs border border-white/30">
-                        CAPA
-                      </span>
                     </div>
                   </div>
                 </div>
