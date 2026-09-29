@@ -691,7 +691,7 @@ export const RacaCorCharts: React.FC = () => {
               const c = chartInstance.ctx;
               const metaLast = chartInstance.getDatasetMeta(chartInstance.data.datasets.length - 1);
               const isMobile = chartInstance.width < 500;
-              const fontSize = isMobile ? 14 : 17;
+              const fontSize = isMobile ? 18 : 24;
 
               RACA_COR_TABELA_2.forEach((item, index) => {
                 const element = metaLast.data[index];
@@ -705,7 +705,7 @@ export const RacaCorCharts: React.FC = () => {
                 c.textAlign = 'left';
                 c.textBaseline = 'middle';
                 c.fillStyle = '#0f172a';
-                c.fillText(text, element.x + 10, element.y);
+                c.fillText(text, element.x + 12, element.y);
                 c.restore();
               });
             },
@@ -747,7 +747,7 @@ export const RacaCorCharts: React.FC = () => {
               responsive: true,
               maintainAspectRatio: false,
               layout: {
-                padding: { right: 165, top: 10, bottom: 10 },
+                padding: { right: 195, top: 10, bottom: 10 },
               },
               scales: {
                 x: {
@@ -1095,26 +1095,76 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
           const yBottom = chartInstance.scales?.y?.bottom;
+          const isMobile = chartInstance.width < 500;
+          const badgeFontSize = isMobile ? 17 : 24;
+          const paddingX = isMobile ? 8 : 10;
+          const paddingY = isMobile ? 3 : 4;
+          const badgeOffsetX = isMobile ? 38 : 52;
+          const minDist = badgeFontSize + 7;
 
-          chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
+          const badges = chartInstance.data.datasets.map((dataset: any, dIdx: number) => {
             const meta = chartInstance.getDatasetMeta(dIdx);
             const lastElement = meta.data[meta.data.length - 1];
-            if (!lastElement) return;
+            if (!lastElement) return null;
 
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
+            const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
 
-            let opacity = 1;
-            if (isInitialAnimation && yBottom) {
-              const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
-              const totalDist = yBottom - targetY;
-              if (totalDist > 0) {
-                const currentDist = yBottom - lastElement.y;
-                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+            return {
+              dataset,
+              lastElement,
+              lastVal,
+              pct,
+              targetY,
+              finalY: targetY,
+            };
+          }).filter(Boolean);
+
+          // Resolve sobreposições verticais (anti-colisão para que todos os badges fiquem perfeitamente visíveis)
+          for (let i = 1; i < badges.length; i++) {
+            if (badges[i].finalY < badges[i - 1].finalY + minDist) {
+              badges[i].finalY = badges[i - 1].finalY + minDist;
+            }
+          }
+          if (yBottom && badges.length > 0) {
+            const maxAllowedY = yBottom - 8;
+            if (badges[badges.length - 1].finalY > maxAllowedY) {
+              badges[badges.length - 1].finalY = maxAllowedY;
+              for (let i = badges.length - 2; i >= 0; i--) {
+                if (badges[i].finalY > badges[i + 1].finalY - minDist) {
+                  badges[i].finalY = badges[i + 1].finalY - minDist;
+                }
               }
             }
+          }
 
-            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6, 'transparent', opacity);
+          badges.forEach((b: any) => {
+            let opacity = 1;
+            let drawY = b.finalY;
+            if (isInitialAnimation && yBottom) {
+              const totalDist = yBottom - b.targetY;
+              if (totalDist > 0) {
+                const currentDist = yBottom - b.lastElement.y;
+                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+              }
+              drawY = b.lastElement.y + (b.finalY - b.targetY) * opacity;
+            }
+
+            drawBadge(
+              c,
+              b.pct,
+              b.lastElement.x + badgeOffsetX,
+              drawY,
+              b.dataset.borderColor,
+              '#ffffff',
+              badgeFontSize,
+              paddingX,
+              paddingY,
+              7,
+              'transparent',
+              opacity
+            );
           });
         },
       };
@@ -1165,7 +1215,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             },
           },
           layout: {
-            padding: { right: 75, top: 10, bottom: 6 },
+            padding: { right: 115, top: 12, bottom: 8 },
           },
           scales: {
             y: {
@@ -1302,26 +1352,76 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         afterDatasetsDraw(chartInstance: any) {
           const c = chartInstance.ctx;
           const yBottom = chartInstance.scales?.y?.bottom;
+          const isMobile = chartInstance.width < 500;
+          const badgeFontSize = isMobile ? 17 : 24;
+          const paddingX = isMobile ? 8 : 10;
+          const paddingY = isMobile ? 3 : 4;
+          const badgeOffsetX = isMobile ? 38 : 52;
+          const minDist = badgeFontSize + 7;
 
-          chartInstance.data.datasets.forEach((dataset: any, dIdx: number) => {
+          const badges = chartInstance.data.datasets.map((dataset: any, dIdx: number) => {
             const meta = chartInstance.getDatasetMeta(dIdx);
             const lastElement = meta.data[meta.data.length - 1];
-            if (!lastElement) return;
+            if (!lastElement) return null;
 
             const lastVal = Number(dataset.data[dataset.data.length - 1]);
             const pct = ((lastVal / totalPAEPE2026) * 100).toFixed(1).replace('.', ',') + '%';
+            const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
 
-            let opacity = 1;
-            if (isInitialAnimation && yBottom) {
-              const targetY = chartInstance.scales.y.getPixelForValue(lastVal);
-              const totalDist = yBottom - targetY;
-              if (totalDist > 0) {
-                const currentDist = yBottom - lastElement.y;
-                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+            return {
+              dataset,
+              lastElement,
+              lastVal,
+              pct,
+              targetY,
+              finalY: targetY,
+            };
+          }).filter(Boolean);
+
+          // Resolve sobreposições verticais (anti-colisão para que todos os badges fiquem perfeitamente visíveis)
+          for (let i = 1; i < badges.length; i++) {
+            if (badges[i].finalY < badges[i - 1].finalY + minDist) {
+              badges[i].finalY = badges[i - 1].finalY + minDist;
+            }
+          }
+          if (yBottom && badges.length > 0) {
+            const maxAllowedY = yBottom - 8;
+            if (badges[badges.length - 1].finalY > maxAllowedY) {
+              badges[badges.length - 1].finalY = maxAllowedY;
+              for (let i = badges.length - 2; i >= 0; i--) {
+                if (badges[i].finalY > badges[i + 1].finalY - minDist) {
+                  badges[i].finalY = badges[i + 1].finalY - minDist;
+                }
               }
             }
+          }
 
-            drawBadge(c, pct, lastElement.x + 30, lastElement.y, dataset.borderColor, '#ffffff', 15.5, 9, 5, 6, 'transparent', opacity);
+          badges.forEach((b: any) => {
+            let opacity = 1;
+            let drawY = b.finalY;
+            if (isInitialAnimation && yBottom) {
+              const totalDist = yBottom - b.targetY;
+              if (totalDist > 0) {
+                const currentDist = yBottom - b.lastElement.y;
+                opacity = Math.min(1, Math.max(0, currentDist / totalDist));
+              }
+              drawY = b.lastElement.y + (b.finalY - b.targetY) * opacity;
+            }
+
+            drawBadge(
+              c,
+              b.pct,
+              b.lastElement.x + badgeOffsetX,
+              drawY,
+              b.dataset.borderColor,
+              '#ffffff',
+              badgeFontSize,
+              paddingX,
+              paddingY,
+              7,
+              'transparent',
+              opacity
+            );
           });
         },
       };
@@ -1372,7 +1472,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             },
           },
           layout: {
-            padding: { right: 75, top: 10, bottom: 6 },
+            padding: { right: 115, top: 12, bottom: 8 },
           },
           scales: {
             y: {
