@@ -354,8 +354,10 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
         /* ================= 2. APRESENTAÇÃO DO SLIDE ATUAL (COM CONTAINER DE FUNDO COM 96% DE OPACIDADE) ================= */
         <div className="w-full flex flex-col justify-center my-auto items-center pb-10 sm:pb-12">
           <div
-            className="bg-white/[0.96] backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.5rem)] min-h-[500px] max-h-[820px] flex flex-col justify-between"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.96)' }}
+            className="backdrop-blur-md rounded-3xl border-2 border-slate-950 p-4 sm:p-6 lg:p-7 shadow-2xl transition-all duration-300 relative overflow-hidden w-full max-w-[1720px] h-[calc(100vh-7.5rem)] min-h-[500px] max-h-[820px] flex flex-col justify-between"
+            style={{
+              backgroundColor: currentSlideIndex === 5 ? '#e0f2fe' : 'rgba(255, 255, 255, 0.96)',
+            }}
           >
             {/* Header of the Current Slide (Sem subtítulo conforme solicitado) */}
             <div className="border-b border-black/10 pb-2.5 mb-2.5 shrink-0 flex items-center justify-between">

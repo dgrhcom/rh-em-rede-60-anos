@@ -1112,6 +1112,50 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
 
       const totalPAEPE2026 = 7333; // Soma total dos servidores PAEPE em 2026
 
+      // 1. Plugin de faixa destacada em azul claro (0 a 500) correspondente ao slide de Zoom
+      const zoomBandBackgroundPlugin = {
+        id: 'zoomBandBackground',
+        beforeDatasetsDraw(chartInstance: any) {
+          const { ctx: c, chartArea, scales } = chartInstance;
+          if (!chartArea || !scales.y) return;
+
+          const y0 = scales.y.getPixelForValue(0);
+          const y500 = scales.y.getPixelForValue(500);
+
+          const top = Math.min(y0, y500);
+          const bottom = Math.max(y0, y500);
+          const height = bottom - top;
+          const width = chartArea.right - chartArea.left;
+          const isMobile = chartInstance.width < 500;
+
+          c.save();
+          // Fundo azul bem claro na faixa de 0 até 500
+          c.fillStyle = '#e0f2fe';
+          c.fillRect(chartArea.left, top, width, height);
+
+          // Linha divisória tracejada indicando o teto de 500
+          c.strokeStyle = '#38bdf8'; // Sky 400
+          c.lineWidth = 1.5;
+          c.setLineDash([5, 4]);
+          c.beginPath();
+          c.moveTo(chartArea.left, top);
+          c.lineTo(chartArea.right, top);
+          c.stroke();
+          c.setLineDash([]);
+
+          // Indicador visual discreto da faixa correspondente ao Zoom
+          const labelText = isMobile ? 'Zoom (0 - 500)' : 'Faixa de Zoom (0 a 500)';
+          const labelFontSize = isMobile ? 10 : 12;
+          c.font = `bold ${labelFontSize}px Inter, -apple-system, sans-serif`;
+          c.fillStyle = '#0369a1'; // Sky 700
+          c.textAlign = 'right';
+          c.textBaseline = 'bottom';
+          c.fillText(labelText, chartArea.right - 8, top - 4);
+
+          c.restore();
+        },
+      };
+
       const lineEndPercentageBadgesPlugin = {
         id: 'lineEndPercentageBadges',
         afterDatasetsDraw(chartInstance: any) {
@@ -1241,6 +1285,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
           },
           scales: {
             y: {
+              min: 0,
               grid: { color: 'rgba(0,0,0,0.05)' },
               ticks: {
                 font: { weight: 'bold', size: 14 },
@@ -1271,7 +1316,7 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
             },
           },
         },
-        plugins: [lineEndPercentageBadgesPlugin],
+        plugins: [zoomBandBackgroundPlugin, lineEndPercentageBadgesPlugin],
       });
     });
 
@@ -1368,6 +1413,24 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
       if (!ctx) return;
 
       const totalPAEPE2026 = 7333;
+
+      // Plugin que preenche toda a área do gráfico com o azul claro (#e0f2fe) idêntico à faixa do slide anterior
+      const zoomFullBackgroundPlugin = {
+        id: 'zoomFullBackground',
+        beforeDatasetsDraw(chartInstance: any) {
+          const { ctx: c, chartArea } = chartInstance;
+          if (!chartArea) return;
+          c.save();
+          c.fillStyle = '#e0f2fe';
+          c.fillRect(
+            chartArea.left,
+            chartArea.top,
+            chartArea.right - chartArea.left,
+            chartArea.bottom - chartArea.top
+          );
+          c.restore();
+        },
+      };
 
       const zoomLineEndPercentagePlugin = {
         id: 'zoomLineEndPercentages',
@@ -1530,7 +1593,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
             },
           },
         },
-        plugins: [zoomLineEndPercentagePlugin],
+        plugins: [zoomFullBackgroundPlugin, zoomLineEndPercentagePlugin],
       });
     });
 
@@ -1599,7 +1662,7 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         </div>
 
         {/* 2. Destaque em Zoom (Abaixo da Legenda) */}
-        <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 text-sky-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-sky-300 text-sky-950 flex items-start gap-2.5 sm:gap-3 shadow-xs">
           <Sparkles className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
           <div className="text-xs sm:text-[13px] md:text-sm leading-relaxed">
             <strong>Visão em Zoom (Escala 0 a 500):</strong> Crescimento expressivo em <strong>Mestrado (+17%)</strong>, <strong>Doutorado (+47%)</strong> e <strong>Maior que Doutorado (+211%)</strong>, com redução nos níveis Fundamental e Fundamental Incompleto (<strong>-65%</strong>).
