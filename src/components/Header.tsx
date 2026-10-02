@@ -132,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
               ? isLogoAtUpperThird
                 ? 'top-[18%] sm:top-[20%] md:top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
                 : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
-              : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
+              : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(15vh-40px)] md:top-[calc(16vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
             : 'top-0 left-0 translate-x-0 translate-y-0 w-auto'
         }`}
         style={{
@@ -159,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             isCentered
               ? isLogoInCenterScreen
                 ? 'h-12 sm:h-16 md:h-20 max-w-[85vw]'
-                : 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'
+                : 'h-12 sm:h-16 md:h-[75px] max-w-[85vw] drop-shadow-md'
               : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
           }`}
         />
