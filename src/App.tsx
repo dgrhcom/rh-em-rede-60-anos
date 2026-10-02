@@ -43,6 +43,37 @@ export function App() {
     return 'bg_only';
   });
 
+  // Fullscreen automático ao entrar no site (com fallback para primeiro clique/tecla caso o navegador bloqueie chamada direta)
+  useEffect(() => {
+    const triggerFullscreen = () => {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    };
+
+    triggerFullscreen();
+
+    const onFirstUserAction = () => {
+      triggerFullscreen();
+      window.removeEventListener('click', onFirstUserAction);
+      window.removeEventListener('keydown', onFirstUserAction);
+      window.removeEventListener('touchstart', onFirstUserAction);
+      window.removeEventListener('pointerdown', onFirstUserAction);
+    };
+
+    window.addEventListener('click', onFirstUserAction, { passive: true });
+    window.addEventListener('keydown', onFirstUserAction, { passive: true });
+    window.addEventListener('touchstart', onFirstUserAction, { passive: true });
+    window.addEventListener('pointerdown', onFirstUserAction, { passive: true });
+
+    return () => {
+      window.removeEventListener('click', onFirstUserAction);
+      window.removeEventListener('keydown', onFirstUserAction);
+      window.removeEventListener('touchstart', onFirstUserAction);
+      window.removeEventListener('pointerdown', onFirstUserAction);
+    };
+  }, []);
+
   // Orchestrate Opening Animation Sequence
   useEffect(() => {
     if (hasIntroCompleted || currentView === 'dashboard') {
@@ -53,7 +84,7 @@ export function App() {
     }
 
     if (openingPhase === 'bg_only') {
-      // 1. A tela inicial aparece com a imagem de fundo sem o bg amarelo, fica dois segundos
+      // 1. Tela inicial aparece com a imagem de fundo sem o bg amarelo por 2 segundos
       const timer = setTimeout(() => {
         setOpeningPhase('yellow_fade');
       }, 2000);
@@ -61,26 +92,36 @@ export function App() {
     }
 
     if (openingPhase === 'yellow_fade') {
-      // 2. Fundo amarelo e logotipo aparecem simultaneamente
+      // 2. Fundo amarelo e logotipo surgem simultaneamente no centro
       const timer = setTimeout(() => {
-        setOpeningPhase('logo_expand');
+        setOpeningPhase('logo_hold');
       }, 2000);
       return () => clearTimeout(timer);
     }
 
-    if (openingPhase === 'logo_fade') {
-      // 3. e em seguida o logotipo, gradualmente
+    if (openingPhase === 'logo_hold') {
+      // 3. Logotipo fica visível no centro por 2 segundos
       const timer = setTimeout(() => {
-        setOpeningPhase('logo_expand');
-      }, 2400);
+        setOpeningPhase('logo_fade_out');
+      }, 2000);
       return () => clearTimeout(timer);
     }
 
-    if (openingPhase === 'logo_expand') {
-      // 4. Depois O logotipo dobra de tamanho proporcionalmente e vai para o terço superior da tela
+    if (openingPhase === 'logo_fade_out') {
+      // 4. Logotipo desaparece gradualmente no centro (1.2s de transição)
       const timer = setTimeout(() => {
         setOpeningPhase('quote_typing');
-      }, 2400);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+
+    // 5. quote_typing é orquestrado pelo typewriter em Header.tsx, que chama onQuoteTypingComplete
+
+    if (openingPhase === 'logo_top_appear') {
+      // 6. Logotipo surge grande no topo da tela (1.8s de transição antes de liberar o botão de continuar)
+      const timer = setTimeout(() => {
+        setOpeningPhase('first_stop');
+      }, 1800);
       return () => clearTimeout(timer);
     }
   }, [openingPhase, hasIntroCompleted, currentView]);
@@ -255,7 +296,7 @@ export function App() {
         isPreAnimating={!hasIntroCompleted && isPreAnimating && currentView === 'timeline'}
         isLogoInCenterScreen={!hasIntroCompleted && isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
         openingPhase={openingPhase}
-        onQuoteTypingComplete={() => setOpeningPhase('first_stop')}
+        onQuoteTypingComplete={() => setOpeningPhase('logo_top_appear')}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}

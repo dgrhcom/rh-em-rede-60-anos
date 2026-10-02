@@ -5,9 +5,10 @@ import { soundFx } from '../utils/soundEffects';
 export type OpeningPhase =
   | 'bg_only'
   | 'yellow_fade'
-  | 'logo_fade'
-  | 'logo_expand'
+  | 'logo_hold'
+  | 'logo_fade_out'
   | 'quote_typing'
+  | 'logo_top_appear'
   | 'first_stop';
 
 interface HeaderProps {
@@ -45,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   });
 
   useEffect(() => {
-    if (openingPhase === 'first_stop') {
+    if (openingPhase === 'first_stop' || openingPhase === 'logo_top_appear') {
       setTypedCount(TOTAL_CHARS);
       return;
     }
@@ -110,23 +111,30 @@ export const Header: React.FC<HeaderProps> = ({
   const isLogoAtUpperThird =
     isCentered &&
     isLogoInCenterScreen &&
-    (openingPhase === 'logo_expand' ||
-      openingPhase === 'quote_typing' ||
+    (openingPhase === 'quote_typing' ||
+      openingPhase === 'logo_top_appear' ||
       openingPhase === 'first_stop');
 
   const isLogoAtCenter =
     isCentered &&
     isLogoInCenterScreen &&
-    (openingPhase === 'yellow_fade' || openingPhase === 'logo_fade');
+    (openingPhase === 'yellow_fade' || openingPhase === 'logo_hold');
+
+  const isLogoFadingOutAtCenter =
+    isCentered &&
+    isLogoInCenterScreen &&
+    openingPhase === 'logo_fade_out';
 
   const isLogoHiddenInIntro =
-    isCentered && isLogoInCenterScreen && openingPhase === 'bg_only';
+    isCentered &&
+    isLogoInCenterScreen &&
+    (openingPhase === 'bg_only' || openingPhase === 'quote_typing');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
       {/* Container do Logotipo DGRH */}
       <div
-        className={`fixed z-40 pointer-events-none transition-all duration-[2000ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-center ${
+        className={`fixed z-40 pointer-events-none transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-center ${
           isCentered
             ? isLogoInCenterScreen
               ? isLogoAtUpperThird
@@ -143,12 +151,12 @@ export const Header: React.FC<HeaderProps> = ({
           ref={logoRef}
           src="/logo_dgrh.svg"
           alt="DGRH - Diretoria Geral de Recursos Humanos"
-          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-[2000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isPreAnimating && isCentered
               ? 'animate-logo-reveal-bottom-up'
-              : isLogoHiddenInIntro
-              ? 'opacity-0 scale-90'
-              : isLogoAtUpperThird
+              : isLogoHiddenInIntro || isLogoFadingOutAtCenter
+              ? 'opacity-0 scale-95'
+              : (openingPhase === 'logo_top_appear' || openingPhase === 'first_stop') && isLogoAtUpperThird
               ? 'opacity-100 scale-[1.35] sm:scale-[1.58] md:scale-[1.8] origin-center drop-shadow-2xl'
               : isLogoAtCenter
               ? 'opacity-100 scale-100 origin-center drop-shadow-xl'
@@ -168,7 +176,11 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Citação do Prof. Dr. Zeferino Vaz na abertura inicial: efeito digitação, fonte ampliada, alinhada 125px mais à esquerda */}
       <div
         className={`fixed z-40 pointer-events-none transition-all duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isCentered && isLogoInCenterScreen && (openingPhase === 'quote_typing' || openingPhase === 'first_stop')
+          isCentered &&
+          isLogoInCenterScreen &&
+          (openingPhase === 'quote_typing' ||
+            openingPhase === 'logo_top_appear' ||
+            openingPhase === 'first_stop')
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 -translate-y-4 pointer-events-none'
         } top-[42%] sm:top-[44%] md:top-[46%] left-6 right-6 md:left-[calc(50%-125px)] md:right-10 lg:right-16 xl:right-24 2xl:right-32 text-left`}
