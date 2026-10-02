@@ -195,7 +195,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     title: 'Organização, Dados Acessíveis e Saúde',
     shortLabel: 'ORGANIZAÇÃO, DADOS & SAÚDE',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_1995_1.jpg',
-    summary: 'Organização ambiental, primeiro sistema online e comissão de readaptação (DSO).',
+    summary: 'Organização ambiental, primeiro sistema online e comissão de readaptação.',
     description: 'Transformação visual e metodológica com o programa Housekeeping, o nascimento pioneiro do Vida Funcional Online na web e a criação da Comissão de Readaptação Profissional.',
     iconName: 'LayoutGrid',
     themeColor: {
@@ -209,7 +209,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     },
     badge: {
       title: 'Inovação & Cuidado',
-      description: 'Lançamento do Vida Funcional Online e criação da primeira DSO.',
+      description: 'Lançamento do Vida Funcional Online e criação da Comissão de Readaptação.',
       icon: 'Sparkles',
     },
     milestones: [
@@ -228,7 +228,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm4-3',
         year: '1997',
-        text: 'Criação da Comissão de Readaptação (primeira DSO)',
+        text: 'Criação da Comissão de Readaptação',
         category: 'saude',
       },
     ],
