@@ -102,12 +102,12 @@ export const Header: React.FC<HeaderProps> = ({
               : 'opacity-0 -translate-y-4 pointer-events-none max-h-0 overflow-hidden mt-0'
           }`}
         >
-          <blockquote className="text-left text-slate-950 text-sm sm:text-base md:text-lg lg:text-[19px] leading-relaxed tracking-tight select-none">
+          <blockquote className="text-left text-slate-950 text-lg sm:text-xl md:text-2xl lg:text-[28px] leading-snug sm:leading-relaxed tracking-tight select-none">
             <span className="font-medium italic">
               “As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios”
             </span>
             {' '}
-            <span className="not-italic font-black text-black uppercase tracking-wider text-xs sm:text-sm md:text-base inline-block whitespace-nowrap align-baseline ml-1.5 sm:ml-2">
+            <span className="not-italic font-black text-black uppercase tracking-wider text-sm sm:text-base md:text-lg lg:text-xl inline-block whitespace-nowrap align-baseline ml-1.5 sm:ml-2">
               — Prof. Dr. Zeferino Vaz
             </span>
           </blockquote>

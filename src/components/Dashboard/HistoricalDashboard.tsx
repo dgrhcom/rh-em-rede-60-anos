@@ -54,7 +54,7 @@ const SLIDES: SlideDefinition[] = [
   {
     id: 'areas',
     category: 'Estrutura Institucional',
-    title: 'Servidores Ativos - Por Área da Universidade',
+    title: 'Servidores Ativos por Área da Universidade',
     subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
     tag: 'Áreas da Unicamp',
   },
@@ -68,15 +68,15 @@ const SLIDES: SlideDefinition[] = [
   {
     id: 'faixaEtaria',
     category: 'Demografia',
-    title: 'Perfil Etário dos Servidores por Categoria',
+    title: 'Perfil Etário',
     subtitle: 'Distribuição por faixas etárias diferenciando Docentes, Pesquisadores e Técnicos-Administrativos',
     tag: 'Faixa Etária',
   },
   {
     id: 'racaCor',
     category: 'Inclusão & Equidade',
-    title: 'Distribuição Étnico-Racial dos Servidores',
-    subtitle: 'Autodeclaração por carreira funcional na Universidade',
+    title: 'Perfil Étnico-Racial',
+    subtitle: 'Autodeclaração étnico-racial no quadro geral da Universidade',
     tag: 'Raça / Cor',
   },
   {

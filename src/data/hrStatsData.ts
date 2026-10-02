@@ -30,7 +30,7 @@ export const GENERO_DATA = {
   },
   porCarreira: [
     {
-      carreira: 'Técnico-administrativos (PAEPE)',
+      carreira: 'Técnico-administrativos',
       feminino: 4401,
       masculino: 2931,
       total: 7332,

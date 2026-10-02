@@ -238,7 +238,7 @@ export const GeneroCharts: React.FC = () => {
             type: 'bar',
             data: {
               labels: [
-                ['Técnico-administrativos', '(PAEPE)'],
+                'Técnico-administrativos',
                 'Docentes',
                 'Pesquisadores',
               ],
@@ -458,7 +458,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
               borderRadius: 6,
             },
             {
-              label: 'Técnicos-administrativos (PAEPE)',
+              label: 'Técnico-administrativos',
               data: FAIXA_ETARIA_DATA.map((f) => f.tecnicos),
               backgroundColor: DS_COLORS.primary, // Azul Primário DGRH
               borderRadius: 6,
@@ -587,11 +587,11 @@ export const FaixaEtariaBarChart: React.FC = () => {
               </div>
             </div>
 
-            {/* Técnicos (PAEPE) */}
+            {/* Técnicos (Técnico-administrativos) */}
             <div
               onClick={() => toggleDataset(2)}
               className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
-              title="Clique para alternar visibilidade de PAEPE"
+              title="Clique para alternar visibilidade de Técnico-administrativos"
             >
               <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
                 <span
@@ -599,7 +599,7 @@ export const FaixaEtariaBarChart: React.FC = () => {
                   style={{ backgroundColor: DS_COLORS.primary }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
-                  PAEPE
+                  Técnico-administrativos
                 </span>
               </div>
               <div className="flex items-baseline gap-2 shrink-0">
@@ -637,232 +637,203 @@ export const FaixaEtariaBarChart: React.FC = () => {
 };
 
 /* =========================================================================
-   3. RAÇA / COR INTEGRADO: Pizza Geral Ampliada (Esq) + Barras por Categoria (Dir)
+   3. RAÇA / COR: Gráfico de Pizza por Raça/Cor + Legenda Lateral
    ========================================================================= */
 export const RacaCorCharts: React.FC = () => {
-  const barRef = useRef<HTMLCanvasElement | null>(null);
+  const pieRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<any>(null);
 
-  const totalDocentes = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.docentes, 0);
-  const totalPesquisadores = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.pesquisadores, 0);
-  const totalTecnicos = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.tecnicos, 0);
-  const totalExtraQuadro = RACA_COR_TABELA_2.reduce((acc, r) => acc + r.extraQuadro, 0);
-  const totalGeralRaca = totalDocentes + totalPesquisadores + totalTecnicos + totalExtraQuadro;
-
-  const categorias = [
-    { label: 'Docentes', total: totalDocentes, color: DS_COLORS.aux2, datasetIndex: 0 },
-    { label: 'Pesquisadores', total: totalPesquisadores, color: DS_COLORS.aux1, datasetIndex: 1 },
-    { label: 'PAEPE', total: totalTecnicos, color: DS_COLORS.primary, datasetIndex: 2 },
-    { label: 'Extra-quadro', total: totalExtraQuadro, color: DS_COLORS.secondary, datasetIndex: 3 },
+  const racaCorSlices = [
+    { raca: 'Branca', total: 10302, pct: 71.9, cor: DS_COLORS.primary },        // #105e7b - Azul Primário DGRH
+    { raca: 'Parda', total: 1870, pct: 18.3, cor: DS_COLORS.secondary },       // #e5a93a - Dourado Secundário
+    { raca: 'Preta', total: 794, pct: 5.6, cor: DS_COLORS.aux2 },              // #5e2a6b - Roxo Auxiliar 2
+    { raca: 'Não Informado', total: 229, pct: 2.7, cor: DS_COLORS.slate },      // #475569 - Slate
+    { raca: 'Amarela', total: 332, pct: 1.3, cor: DS_COLORS.aux3 },            // #d67b27 - Laranja Auxiliar 3
+    { raca: 'Indígena', total: 27, pct: 0.3, cor: DS_COLORS.aux1 },            // #477b2f - Verde Auxiliar 1
   ];
 
-  const toggleDataset = (datasetIndex: number) => {
+  const totalGeralRaca = racaCorSlices.reduce((acc, r) => acc + r.total, 0); // 13.554
+
+  const toggleSlice = (index: number) => {
     if (!chartInstanceRef.current) return;
-    const isVisible = chartInstanceRef.current.isDatasetVisible(datasetIndex);
-    chartInstanceRef.current.setDatasetVisibility(datasetIndex, !isVisible);
-    chartInstanceRef.current.update();
+    const chart = chartInstanceRef.current;
+    chart.toggleDataVisibility(index);
+    chart.update();
   };
 
   useEffect(() => {
-    let barChart: any = null;
+    let pieChart: any = null;
     let active = true;
 
     getChartJS().then((Chart) => {
-      if (!active || !Chart) return;
+      if (!active || !Chart || !pieRef.current) return;
+      const ctx = pieRef.current.getContext('2d');
+      if (!ctx) return;
 
-      if (barRef.current) {
-        const ctx2 = barRef.current.getContext('2d');
-        if (ctx2) {
-          const horizontalStackLabelsPlugin = {
-            id: 'horizontalStackPercentageLabels',
-            afterDatasetsDraw(chartInstance: any) {
-              const c = chartInstance.ctx;
-              const isMobile = chartInstance.width < 500;
-              const fontSize = isMobile ? 18 : 24;
+      const pieSliceBadgePlugin = {
+        id: 'pieRacaSliceBadges',
+        afterDatasetsDraw(chartInstance: any) {
+          const c = chartInstance.ctx;
+          const meta = chartInstance.getDatasetMeta(0);
+          const isMobile = chartInstance.width < 500;
 
-              RACA_COR_TABELA_2.forEach((item, index) => {
-                let lastElement: any = null;
-                for (let d = chartInstance.data.datasets.length - 1; d >= 0; d--) {
-                  if (chartInstance.isDatasetVisible(d)) {
-                    const meta = chartInstance.getDatasetMeta(d);
-                    if (meta.data && meta.data[index]) {
-                      lastElement = meta.data[index];
-                      break;
-                    }
-                  }
-                }
-                if (!lastElement) return;
+          racaCorSlices.forEach((item, i) => {
+            if (!chartInstance.getDataVisibility(i)) return;
+            const element = meta.data[i];
+            if (!element) return;
 
-                const racaGeral = RACA_COR_DATA.find((r) => r.raca === item.raca);
-                const pct = racaGeral ? racaGeral.pct.toFixed(1).replace('.', ',') : '0';
-                const text = `${pct}% (${item.total.toLocaleString('pt-BR')})`;
+            const midAngle = (element.startAngle + element.endAngle) / 2;
+            const R = element.outerRadius;
+            const centerX = element.x;
+            const centerY = element.y;
 
-                c.save();
-                c.font = `bold ${fontSize}px Inter, -apple-system, sans-serif`;
-                c.textAlign = 'left';
-                c.textBaseline = 'middle';
-                c.fillStyle = '#0f172a';
-                c.fillText(text, lastElement.x + 12, lastElement.y);
-                c.restore();
-              });
-            },
-          };
+            let rRatio = 0.58;
+            let badgeFontSize = isMobile ? 22 : 36;
+            let padX = isMobile ? 12 : 20;
+            let padY = isMobile ? 6 : 10;
 
-          barChart = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-              labels: RACA_COR_TABELA_2.map((r) => r.raca),
-              datasets: [
-                {
-                  label: 'Docentes',
-                  data: RACA_COR_TABELA_2.map((r) => (r.docentes > 0 ? r.docentes : null)),
-                  backgroundColor: DS_COLORS.aux2, // Roxo DGRH
-                  borderRadius: 6,
-                },
-                {
-                  label: 'Pesquisadores',
-                  data: RACA_COR_TABELA_2.map((r) => (r.pesquisadores > 0 ? r.pesquisadores : null)),
-                  backgroundColor: DS_COLORS.aux1, // Verde DGRH
-                  borderRadius: 6,
-                },
-                {
-                  label: 'Técnicos-administrativos (PAEPE)',
-                  data: RACA_COR_TABELA_2.map((r) => (r.tecnicos > 0 ? r.tecnicos : null)),
-                  backgroundColor: DS_COLORS.primary, // Azul Primário
-                  borderRadius: 6,
-                },
-                {
-                  label: 'Extra-quadro',
-                  data: RACA_COR_TABELA_2.map((r) => (r.extraQuadro > 0 ? r.extraQuadro : null)),
-                  backgroundColor: DS_COLORS.secondary, // Dourado Secundário
-                  borderRadius: 6,
-                },
-              ],
-            },
-            options: {
-              indexAxis: 'y',
-              responsive: true,
-              maintainAspectRatio: false,
-              layout: {
-                padding: { right: 205, top: 10, bottom: 12 },
-              },
-              scales: {
-                x: {
-                  type: 'logarithmic',
-                  min: 1,
-                  max: 25000,
-                  stacked: true,
-                  grid: { color: 'rgba(0,0,0,0.06)' },
-                  ticks: {
-                    font: { weight: 'bold', size: 20 },
-                    color: '#0f172a',
-                    padding: 8,
-                    callback: function (val: any) {
-                      const num = Number(val);
-                      if (num === 1 || num === 10 || num === 100 || num === 1000 || num === 10000) {
-                        return num.toLocaleString('pt-BR');
-                      }
-                      return '';
-                    },
-                  },
-                  title: {
-                    display: true,
-                    text: '* Eixo horizontal em escala logarítmica (base 10)',
-                    color: '#475569',
-                    font: { size: 13.5, style: 'italic', weight: 'normal' },
-                    padding: { top: 10, bottom: 4 },
-                  },
-                },
-                y: {
-                  stacked: true,
-                  grid: { display: false },
-                  ticks: {
-                    font: { weight: 'bold', size: 22 },
-                    color: '#0f172a',
-                    padding: 12,
-                  },
-                },
-              },
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                tooltip: {
-                  padding: 14,
-                  titleFont: { size: 16, weight: 'bold' },
-                  bodyFont: { size: 14 },
-                  callbacks: {
-                    label: (ctx: any) => {
-                      const val = Number(ctx.raw);
-                      const item = RACA_COR_TABELA_2[ctx.dataIndex];
-                      const pct = item.total > 0 ? ((val / item.total) * 100).toFixed(1).replace('.', ',') : '0';
-                      return ` ${ctx.dataset.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
-                    },
-                    footer: (items: any[]) => {
-                      if (!items.length) return '';
-                      const item = RACA_COR_TABELA_2[items[0].dataIndex];
-                      return `Total no grupo: ${item.total.toLocaleString('pt-BR')} servidores`;
-                    },
-                  },
-                },
-              },
-            },
-            plugins: [horizontalStackLabelsPlugin],
+            if (item.pct > 50) {
+              rRatio = 0.55;
+              badgeFontSize = isMobile ? 24 : 38;
+              padX = isMobile ? 14 : 22;
+              padY = isMobile ? 6 : 10;
+            } else if (item.pct > 10) {
+              rRatio = 0.60;
+              badgeFontSize = isMobile ? 18 : 28;
+              padX = isMobile ? 10 : 16;
+              padY = isMobile ? 5 : 8;
+            } else if (item.pct > 4) {
+              rRatio = 0.72;
+              badgeFontSize = isMobile ? 15 : 22;
+              padX = isMobile ? 8 : 12;
+              padY = isMobile ? 4 : 6;
+            } else if (item.pct > 2) {
+              rRatio = 0.82;
+              badgeFontSize = isMobile ? 13 : 18;
+              padX = isMobile ? 7 : 10;
+              padY = isMobile ? 3 : 5;
+            } else if (item.pct > 1) {
+              rRatio = 0.90;
+              badgeFontSize = isMobile ? 12 : 16;
+              padX = isMobile ? 6 : 9;
+              padY = isMobile ? 3 : 5;
+            } else {
+              rRatio = 0.98;
+              badgeFontSize = isMobile ? 11 : 14;
+              padX = isMobile ? 5 : 8;
+              padY = isMobile ? 2 : 4;
+            }
+
+            const posX = centerX + Math.cos(midAngle) * (R * rRatio);
+            const posY = centerY + Math.sin(midAngle) * (R * rRatio);
+
+            const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
+            drawBadge(
+              c,
+              text,
+              posX,
+              posY,
+              'rgba(15, 23, 42, 0.92)',
+              '#ffffff',
+              badgeFontSize,
+              padX,
+              padY,
+              8,
+              'rgba(255, 255, 255, 0.6)'
+            );
           });
+        },
+      };
 
-          chartInstanceRef.current = barChart;
-        }
-      }
+      pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: racaCorSlices.map((r) => `${r.raca} (${r.pct.toFixed(1).replace('.', ',')}%)`),
+          datasets: [
+            {
+              data: racaCorSlices.map((r) => r.total),
+              backgroundColor: racaCorSlices.map((r) => r.cor),
+              hoverBackgroundColor: racaCorSlices.map((r) => r.cor),
+              borderColor: '#ffffff',
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: {
+            padding: 12,
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              padding: 14,
+              titleFont: { size: 16, weight: 'bold' },
+              bodyFont: { size: 14 },
+              callbacks: {
+                label: (ctx: any) => {
+                  const item = racaCorSlices[ctx.dataIndex];
+                  return ` ${item.raca}: ${item.total.toLocaleString('pt-BR')} servidores (${item.pct.toFixed(1).replace('.', ',')}%)`;
+                },
+              },
+            },
+          },
+        },
+        plugins: [pieSliceBadgePlugin],
+      });
+
+      chartInstanceRef.current = pieChart;
     });
 
     return () => {
       active = false;
       chartInstanceRef.current = null;
-      barChart?.destroy();
+      pieChart?.destroy();
     };
   }, []);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-center w-full h-full">
-      {/* Coluna Esquerda: Gráfico de Barras Empilhadas */}
-      <div className="lg:col-span-8 xl:col-span-8 flex flex-col justify-center relative w-full h-[400px] sm:h-[480px] lg:h-[550px] xl:h-[600px]">
-        <canvas ref={barRef} />
+      {/* Coluna Esquerda: Gráfico de Pizza */}
+      <div className="lg:col-span-7 xl:col-span-7 flex flex-col items-center justify-center relative w-full">
+        <div className="w-full h-[440px] sm:h-[520px] lg:h-[580px] xl:h-[640px] relative flex items-center justify-center">
+          <canvas ref={pieRef} />
+        </div>
       </div>
 
-      {/* Coluna Direita: Legenda Lateral + Destaque Étnico-Racial Abaixo da Legenda */}
-      <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
-        {/* Linhas de Carreira: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
+      {/* Coluna Direita: Legenda Lateral das Raças/Etnias + Destaque Abaixo */}
+      <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center gap-3.5 sm:gap-4 w-full">
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <div className="flex flex-col divide-y divide-slate-100">
-            {categorias.map((item) => {
-              const pct = ((item.total / totalGeralRaca) * 100).toFixed(1).replace('.', ',');
-              return (
-                <div
-                  key={item.label}
-                  onClick={() => toggleDataset(item.datasetIndex)}
-                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
-                  title={`Clique para alternar visibilidade de ${item.label}`}
-                >
-                  <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                    <span
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
-                      {item.label}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2 shrink-0">
-                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
-                      {item.total.toLocaleString('pt-BR')}
-                    </span>
-                    <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                      ({pct}%)
-                    </span>
-                  </div>
+            {racaCorSlices.map((item, index) => (
+              <div
+                key={item.raca}
+                onClick={() => toggleSlice(index)}
+                className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
+                title={`Clique para alternar ${item.raca}`}
+              >
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                  <span
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: item.cor }}
+                  />
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                    {item.raca}
+                  </span>
                 </div>
-              );
-            })}
+                <div className="flex items-baseline gap-2 shrink-0">
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
+                    {item.total.toLocaleString('pt-BR')}
+                  </span>
+                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                    ({item.pct.toFixed(1).replace('.', ',')}%)
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Total Geral */}
@@ -1914,20 +1885,6 @@ export const TopCargosTable: React.FC = () => {
   const top20 = TOP_CARGOS_2026.slice(0, 20);
   const totalGeral = TOTAL_SERVIDORES_ATIVOS; // 9416
 
-  const getAreaColor = (categoria: string) => {
-    switch (categoria) {
-      case 'Saúde':
-        return { bg: '#fff7ed', border: '#d67b27', text: '#9a3412', dot: '#d67b27' };
-      case 'Ensino e Pesquisa':
-        return { bg: '#f0fdf4', border: '#477b2f', text: '#166534', dot: '#477b2f' };
-      case 'Tecnologia da Informação (TI)':
-        return { bg: '#fffbeb', border: '#e5a93a', text: '#854d0e', dot: '#e5a93a' };
-      case 'Técnica-Administrativa':
-      default:
-        return { bg: '#f0f9ff', border: '#105e7b', text: '#0369a1', dot: '#105e7b' };
-    }
-  };
-
   const col1 = top20.slice(0, 10);
   const col2 = top20.slice(10, 20);
 
@@ -1941,7 +1898,6 @@ export const TopCargosTable: React.FC = () => {
           <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col1.map((item, index) => {
             const rank = index + 1;
-            const areaStyle = getAreaColor(item.categoria);
             const pct = ((item.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
             return (
               <div
@@ -1964,19 +1920,14 @@ export const TopCargosTable: React.FC = () => {
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Ponto Colorido de Classificação */}
-                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  {/* Nome do Cargo */}
+                  <div className="flex items-center min-w-0 flex-1">
                     <span
                       className="text-lg sm:text-xl lg:text-2xl xl:text-[24px] 2xl:text-[26px] font-normal text-slate-800 tracking-tight truncate"
                       title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
                     </span>
-                    <span
-                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 shadow-xs"
-                      style={{ backgroundColor: areaStyle.dot }}
-                      title={item.categoria}
-                    />
                   </div>
                 </div>
 
@@ -1998,7 +1949,6 @@ export const TopCargosTable: React.FC = () => {
         <div className="flex flex-col space-y-0.5 sm:space-y-1">
           {col2.map((item, index) => {
             const rank = index + 11;
-            const areaStyle = getAreaColor(item.categoria);
             const pct = ((item.quantidade / totalGeral) * 100).toFixed(1).replace('.', ',');
             return (
               <div
@@ -2011,19 +1961,14 @@ export const TopCargosTable: React.FC = () => {
                     {rank}º
                   </span>
 
-                  {/* Nome do Cargo e Ponto Colorido de Classificação */}
-                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  {/* Nome do Cargo */}
+                  <div className="flex items-center min-w-0 flex-1">
                     <span
                       className="text-lg sm:text-xl lg:text-2xl xl:text-[24px] 2xl:text-[26px] font-normal text-slate-800 tracking-tight truncate"
                       title={`${item.cargo} (${item.categoria})`}
                     >
                       {item.cargo}
                     </span>
-                    <span
-                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 shadow-xs"
-                      style={{ backgroundColor: areaStyle.dot }}
-                      title={item.categoria}
-                    />
                   </div>
                 </div>
 
@@ -2042,27 +1987,6 @@ export const TopCargosTable: React.FC = () => {
         </div>
       </div>
     </div>
-
-      {/* Mini Legenda de Áreas (Pontos Coloridos) - Abaixo da tabela e centralizada */}
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-3 pt-3.5 pb-1 text-sm sm:text-base font-normal text-slate-600 shrink-0">
-        <span className="text-slate-400 font-medium mr-1">Áreas:</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#105e7b' }} />
-          <span>Técnica-Administrativa</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#d67b27' }} />
-          <span>Saúde</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#477b2f' }} />
-          <span>Ensino e Pesquisa</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#e5a93a' }} />
-          <span>Tecnologia da Informação (TI)</span>
-        </div>
-      </div>
     </div>
   );
 };
@@ -2329,23 +2253,15 @@ export const TopCargosBarChart: React.FC = () => {
           {areasSummary.map((area) => (
             <div
               key={area.nome}
-              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
+              className="py-3 sm:py-3.5 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
             >
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: area.cor }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
                   {area.nome}
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
-                  {area.total.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({area.pct}%)
                 </span>
               </div>
             </div>
@@ -2355,10 +2271,20 @@ export const TopCargosBarChart: React.FC = () => {
         {/* Total dos 20 Cargos */}
         <div className="pt-3 sm:pt-3.5 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
           <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-            Total
+            Total dos 20 Cargos
           </span>
           <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
             {totalTop20.toLocaleString('pt-BR')}
+          </span>
+        </div>
+
+        {/* Total Geral */}
+        <div className="pt-2 sm:pt-2.5 flex items-center justify-between px-2">
+          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
+            Total Geral
+          </span>
+          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 tracking-wider">
+            9.416
           </span>
         </div>
       </div>
