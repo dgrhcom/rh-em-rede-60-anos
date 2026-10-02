@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
           isCentered
             ? isLogoInCenterScreen
               ? isLogoAtUpperThird
-                ? 'top-[max(2rem,10%)] sm:top-[11%] md:top-[12%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
+                ? 'top-[max(2.5rem,16%)] sm:top-[17%] md:top-[18%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
                 : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
               : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(15vh-40px)] md:top-[calc(16vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
             : 'top-0 left-0 translate-x-0 translate-y-0 w-auto'
