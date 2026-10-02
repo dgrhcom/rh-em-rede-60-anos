@@ -369,7 +369,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm6-5',
         year: '2000',
-        text: 'Transferência do PASS (Programa de Assistência à Saúde do Servidor) do CECOM para a DAB/DGRH',
+        text: 'Transferência do PASS (Programa de Assistência à Saúde do Servidor) do CECOM para a Divisão de Assistência e Benefícios (DAB/DGRH)',
         category: 'saude',
       },
       {
@@ -526,7 +526,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm8-4',
         year: '2006',
-        text: 'Divisão de Administração de Benefícios (DAB) e o Serviço Social da DGRH dão origem ao GGBS',
+        text: 'Divisão de Assistência e Benefícios (DAB) e o Serviço Social da DGRH dão origem ao GGBS',
         category: 'organizacao',
       },
     ],
