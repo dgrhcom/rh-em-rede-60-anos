@@ -61,9 +61,9 @@ export function App() {
     }
 
     if (openingPhase === 'yellow_fade') {
-      // 2. depois começa a aparecer o fundo amarelo
+      // 2. Fundo amarelo e logotipo aparecem simultaneamente
       const timer = setTimeout(() => {
-        setOpeningPhase('logo_fade');
+        setOpeningPhase('logo_expand');
       }, 2000);
       return () => clearTimeout(timer);
     }

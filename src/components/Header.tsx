@@ -115,12 +115,12 @@ export const Header: React.FC<HeaderProps> = ({
       openingPhase === 'first_stop');
 
   const isLogoAtCenter =
-    isCentered && isLogoInCenterScreen && openingPhase === 'logo_fade';
-
-  const isLogoHiddenInIntro =
     isCentered &&
     isLogoInCenterScreen &&
-    (openingPhase === 'bg_only' || openingPhase === 'yellow_fade');
+    (openingPhase === 'yellow_fade' || openingPhase === 'logo_fade');
+
+  const isLogoHiddenInIntro =
+    isCentered && isLogoInCenterScreen && openingPhase === 'bg_only';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
           isCentered
             ? isLogoInCenterScreen
               ? isLogoAtUpperThird
-                ? 'top-[18%] sm:top-[20%] md:top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
+                ? 'top-[max(2rem,10%)] sm:top-[11%] md:top-[12%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
                 : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
               : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(15vh-40px)] md:top-[calc(16vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
             : 'top-0 left-0 translate-x-0 translate-y-0 w-auto'
@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
               : isLogoHiddenInIntro
               ? 'opacity-0 scale-90'
               : isLogoAtUpperThird
-              ? 'opacity-100 scale-150 sm:scale-175 md:scale-200 origin-center drop-shadow-2xl'
+              ? 'opacity-100 scale-[1.35] sm:scale-[1.58] md:scale-[1.8] origin-center drop-shadow-2xl'
               : isLogoAtCenter
               ? 'opacity-100 scale-100 origin-center drop-shadow-xl'
               : logoVisible
