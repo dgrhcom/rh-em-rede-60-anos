@@ -53,10 +53,10 @@ export function App() {
     }
 
     if (openingPhase === 'bg_only') {
-      // 1. A tela inicial aparece com a imagem de fundo sem o bg amarelo, fica um segundo
+      // 1. A tela inicial aparece com a imagem de fundo sem o bg amarelo, fica dois segundos
       const timer = setTimeout(() => {
         setOpeningPhase('yellow_fade');
-      }, 1000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
 
@@ -64,7 +64,7 @@ export function App() {
       // 2. depois começa a aparecer o fundo amarelo
       const timer = setTimeout(() => {
         setOpeningPhase('logo_fade');
-      }, 1000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
 
@@ -72,7 +72,7 @@ export function App() {
       // 3. e em seguida o logotipo, gradualmente
       const timer = setTimeout(() => {
         setOpeningPhase('logo_expand');
-      }, 1200);
+      }, 2400);
       return () => clearTimeout(timer);
     }
 
@@ -80,7 +80,7 @@ export function App() {
       // 4. Depois O logotipo dobra de tamanho proporcionalmente e vai para o terço superior da tela
       const timer = setTimeout(() => {
         setOpeningPhase('quote_typing');
-      }, 1200);
+      }, 2400);
       return () => clearTimeout(timer);
     }
   }, [openingPhase, hasIntroCompleted, currentView]);
@@ -223,7 +223,7 @@ export function App() {
 
       {/* Layer 2: Yellow Theme Background Color + Texture blend */}
       <div
-        className={`fixed inset-0 pointer-events-none z-0 transition-opacity duration-1000 ease-in-out ${
+        className={`fixed inset-0 pointer-events-none z-0 transition-opacity duration-[2000ms] ease-in-out ${
           isYellowBgVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
