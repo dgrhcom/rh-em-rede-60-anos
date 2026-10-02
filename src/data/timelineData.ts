@@ -550,7 +550,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     title: 'Reconhecimento',
     shortLabel: 'RECONHECIMENTO',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2011_2.jpg',
-    summary: 'Recadastramento anual, Patrulheiros, fiscalização de terceirizados e criação do Prêmio PAEPE.',
+    summary: 'Recadastramento anual, Programa de Patrulheiros e criação do Prêmio PAEPE.',
     description: 'Valorização dos talentos da universidade com a instituição do prestigioso Prêmio PAEPE, recadastramento anual contínuo e acolhimento dos jovens com o Programa de Patrulheiros.',
     iconName: 'Medal',
     themeColor: {
@@ -582,12 +582,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
       },
       {
         id: 'm9-3',
-        year: '2011',
-        text: 'DSTr assume Seção de Fiscalização de Serviços/Obras Terceirizadas',
-        category: 'saude',
-      },
-      {
-        id: 'm9-4',
         year: '2011',
         text: 'Lançamento do Prêmio PAEPE',
         category: 'carreira',
