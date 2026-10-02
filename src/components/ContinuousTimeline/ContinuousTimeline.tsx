@@ -756,28 +756,6 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         </div>
       )}
 
-      {/* ================= 1.1. PRIMEIRA PARADA NA ABERTURA (Prompt para continuar) ================= */}
-      {introStatus === 'logo_pause' && openingPhase === 'first_stop' && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12 transition-all duration-700">
-          <div className="pointer-events-auto animate-bounce">
-            <button
-              onClick={() => {
-                if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen().catch(() => {});
-                }
-                continueFromLogo();
-              }}
-              className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950/85 hover:bg-slate-950 text-white font-bold text-xs sm:text-sm tracking-wide shadow-2xl border border-white/40 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group backdrop-blur-md"
-              title="Avançar para a Linha do Tempo"
-            >
-              <span>Pressione</span>
-              <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-[11px] font-mono group-hover:bg-[#e5a93a] group-hover:text-slate-950 transition-colors">→</kbd>
-              <span>ou clique para continuar</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ================= 2. CONTINUOUS HORIZONTAL CARDS STAGE ================= */}
       <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden pt-2 sm:pt-4">
         {/* Horizontal Connecting Timeline Line */}
