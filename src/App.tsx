@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from './types/timeline';
 import { timelinePeriods } from './data/timelineData';
-import { Header } from './components/Header';
+import { Header, type OpeningPhase } from './components/Header';
 import { ContinuousTimeline } from './components/ContinuousTimeline/ContinuousTimeline';
 import { HistoricalDashboard } from './components/Dashboard/HistoricalDashboard';
 import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
@@ -30,6 +30,70 @@ export function App() {
   const [timelineResetTrigger, setTimelineResetTrigger] = useState<number>(0);
   const [timelineFocusTrigger, setTimelineFocusTrigger] = useState<{ index: number; timestamp: number } | null>(null);
   const [dashboardInitialSlide, setDashboardInitialSlide] = useState<number | undefined>(undefined);
+
+  // Opening animation stages before the first stop
+  const [openingPhase, setOpeningPhase] = useState<OpeningPhase>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const search = new URLSearchParams(window.location.search);
+      if (hash === '#dashboard' || search.get('view') === 'dashboard') {
+        return 'first_stop';
+      }
+    }
+    return 'bg_only';
+  });
+
+  // Orchestrate Opening Animation Sequence
+  useEffect(() => {
+    if (hasIntroCompleted || currentView === 'dashboard') {
+      if (openingPhase !== 'first_stop') {
+        setOpeningPhase('first_stop');
+      }
+      return;
+    }
+
+    if (openingPhase === 'bg_only') {
+      // 1. A tela inicial aparece com a imagem de fundo sem o bg amarelo, fica um segundo
+      const timer = setTimeout(() => {
+        setOpeningPhase('yellow_fade');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
+    if (openingPhase === 'yellow_fade') {
+      // 2. depois começa a aparecer o fundo amarelo
+      const timer = setTimeout(() => {
+        setOpeningPhase('logo_fade');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
+    if (openingPhase === 'logo_fade') {
+      // 3. e em seguida o logotipo, gradualmente
+      const timer = setTimeout(() => {
+        setOpeningPhase('logo_expand');
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+
+    if (openingPhase === 'logo_expand') {
+      // 4. Depois O logotipo dobra de tamanho proporcionalmente e vai para o terço superior da tela
+      const timer = setTimeout(() => {
+        setOpeningPhase('quote_typing');
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [openingPhase, hasIntroCompleted, currentView]);
+
+  useEffect(() => {
+    if (timelineResetTrigger > 0) {
+      setOpeningPhase('bg_only');
+    }
+  }, [timelineResetTrigger]);
+
+  const skipOpeningPhase = useCallback(() => {
+    setOpeningPhase('first_stop');
+  }, []);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -105,6 +169,7 @@ export function App() {
     setIsLogoInCenterScreen(true);
     setIsPreAnimating(false);
     setDashboardInitialSlide(undefined);
+    setOpeningPhase('bg_only');
     setTimelineResetTrigger((prev) => prev + 1);
   }, []);
 
@@ -143,15 +208,33 @@ export function App() {
     setTimelineFocusTrigger({ index: lastIndex, timestamp: Date.now() });
   }, [handleSelectPeriod, periods.length]);
 
+  const isYellowBgVisible =
+    hasIntroCompleted || currentView === 'dashboard' || openingPhase !== 'bg_only';
+
   return (
-    <div className="min-h-screen w-full bg-[#e5a93a] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
-      {/* Background Texture Overlay with Multiply Blend Mode over yellow background */}
+    <div className="min-h-screen w-full bg-[#cbd5e1] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
+      {/* Layer 1: Background Mural Photo (always present, pure monochrome photo without yellow at first) */}
       <div
-        className="fixed inset-0 pointer-events-none z-0 mix-blend-multiply opacity-25 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
         style={{
           backgroundImage: "url('/bg_60_anos.jpg')",
         }}
       />
+
+      {/* Layer 2: Yellow Theme Background Color + Texture blend */}
+      <div
+        className={`fixed inset-0 pointer-events-none z-0 transition-opacity duration-1000 ease-in-out ${
+          isYellowBgVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="absolute inset-0 bg-[#e5a93a]" />
+        <div
+          className="absolute inset-0 mix-blend-multiply opacity-25 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/bg_60_anos.jpg')",
+          }}
+        />
+      </div>
 
       {/* Top Main Navigation Header (Maintains DGRH logo and page selector on all views) */}
       <Header
@@ -171,6 +254,8 @@ export function App() {
         logoVisible={hasIntroCompleted || isLogoVisible || currentView === 'dashboard' || !isFanIdle}
         isPreAnimating={!hasIntroCompleted && isPreAnimating && currentView === 'timeline'}
         isLogoInCenterScreen={!hasIntroCompleted && isLogoInCenterScreen && isFanIdle && currentView === 'timeline'}
+        openingPhase={openingPhase}
+        onQuoteTypingComplete={() => setOpeningPhase('first_stop')}
       />
 
       {/* Main View Area: Continuous Timeline or Historical Dashboard */}
@@ -191,6 +276,8 @@ export function App() {
             onOpenDashboard={handleOpenDashboard}
             isActive={currentView === 'timeline'}
             focusTrigger={timelineFocusTrigger}
+            openingPhase={openingPhase}
+            onSkipOpening={skipOpeningPhase}
           />
         </div>
         {currentView === 'dashboard' && (

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { LAST_DASHBOARD_SLIDE_INDEX } from '../Dashboard/HistoricalDashboard';
+import type { OpeningPhase } from '../Header';
 
 interface ContinuousTimelineProps {
   periods: HistoricalPeriod[];
@@ -23,6 +24,8 @@ interface ContinuousTimelineProps {
   resetTrigger?: number;
   isActive?: boolean;
   focusTrigger?: { index: number; timestamp: number } | null;
+  openingPhase?: OpeningPhase;
+  onSkipOpening?: () => void;
 }
 
 export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
@@ -40,6 +43,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
   resetTrigger,
   isActive = true,
   focusTrigger,
+  openingPhase,
+  onSkipOpening,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPeriods = periods.length;
@@ -521,6 +526,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         }
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
           e.preventDefault();
+          if (openingPhase && openingPhase !== 'first_stop') {
+            onSkipOpening?.();
+            return;
+          }
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
           }
@@ -603,7 +612,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, introStatus, continueFromLogo, isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, handleCloseCard, slideToIndex, onOpenPhoto, periods, currentPosition, onOpenDashboard, totalPeriods]);
+  }, [isActive, introStatus, continueFromLogo, isPreAnimating, isFanIdle, isAnimating, skipPreAnim, executeOpeningAnimation, skipIntro, handlePrev, handleNext, activeIndex, handleCloseCard, slideToIndex, onOpenPhoto, periods, currentPosition, onOpenDashboard, totalPeriods, openingPhase, onSkipOpening]);
 
   // Mouse wheel navigation
   useEffect(() => {
@@ -747,6 +756,28 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         </div>
       )}
 
+      {/* ================= 1.1. PRIMEIRA PARADA NA ABERTURA (Prompt para continuar) ================= */}
+      {introStatus === 'logo_pause' && openingPhase === 'first_stop' && (
+        <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12 transition-all duration-700">
+          <div className="pointer-events-auto animate-bounce">
+            <button
+              onClick={() => {
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(() => {});
+                }
+                continueFromLogo();
+              }}
+              className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950/85 hover:bg-slate-950 text-white font-bold text-xs sm:text-sm tracking-wide shadow-2xl border border-white/40 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group backdrop-blur-md"
+              title="Avançar para a Linha do Tempo"
+            >
+              <span>Pressione</span>
+              <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-[11px] font-mono group-hover:bg-[#e5a93a] group-hover:text-slate-950 transition-colors">→</kbd>
+              <span>ou clique para continuar</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ================= 2. CONTINUOUS HORIZONTAL CARDS STAGE ================= */}
       <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden pt-2 sm:pt-4">
         {/* Horizontal Connecting Timeline Line */}
@@ -776,6 +807,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           }}
           onClick={() => {
             if (introStatus === 'logo_pause') {
+              if (openingPhase && openingPhase !== 'first_stop') {
+                onSkipOpening?.();
+                return;
+              }
               continueFromLogo();
             } else if (introStatus === 'pre_animating') {
               skipPreAnim();
@@ -1084,6 +1119,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 onClick={(e) => {
                   if (introStatus === 'logo_pause') {
                     e.stopPropagation();
+                    if (openingPhase && openingPhase !== 'first_stop') {
+                      onSkipOpening?.();
+                      return;
+                    }
                     continueFromLogo();
                   } else if (introStatus === 'pre_animating') {
                     e.stopPropagation();
@@ -1114,6 +1153,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   isActive={isCardActive}
                   onSelect={() => {
                     if (introStatus === 'logo_pause') {
+                      if (openingPhase && openingPhase !== 'first_stop') {
+                        onSkipOpening?.();
+                        return;
+                      }
                       continueFromLogo();
                     } else if (introStatus === 'pre_animating') {
                       skipPreAnim();
@@ -1271,6 +1314,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   onClick={(e) => {
                     if (introStatus === 'logo_pause') {
                       e.stopPropagation();
+                      if (openingPhase && openingPhase !== 'first_stop') {
+                        onSkipOpening?.();
+                        return;
+                      }
                       continueFromLogo();
                     } else if (introStatus === 'pre_animating') {
                       e.stopPropagation();

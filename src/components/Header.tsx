@@ -2,6 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BarChart3, Clock, Maximize2, Minimize2 } from 'lucide-react';
 import { soundFx } from '../utils/soundEffects';
 
+export type OpeningPhase =
+  | 'bg_only'
+  | 'yellow_fade'
+  | 'logo_fade'
+  | 'logo_expand'
+  | 'quote_typing'
+  | 'first_stop';
+
 interface HeaderProps {
   isCentered?: boolean;
   currentView?: 'timeline' | 'dashboard';
@@ -9,7 +17,14 @@ interface HeaderProps {
   logoVisible?: boolean;
   isPreAnimating?: boolean;
   isLogoInCenterScreen?: boolean;
+  openingPhase?: OpeningPhase;
+  onQuoteTypingComplete?: () => void;
 }
+
+const QUOTE_TEXT =
+  '“As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios”';
+const AUTHOR_TEXT = '— Prof. Dr. Zeferino Vaz';
+const TOTAL_CHARS = QUOTE_TEXT.length + AUTHOR_TEXT.length + 1;
 
 export const Header: React.FC<HeaderProps> = ({
   isCentered = true,
@@ -18,27 +33,60 @@ export const Header: React.FC<HeaderProps> = ({
   logoVisible = true,
   isPreAnimating = false,
   isLogoInCenterScreen = false,
+  openingPhase = 'first_stop',
+  onQuoteTypingComplete,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const logoRef = useRef<HTMLImageElement>(null);
-  const [logoWidth, setLogoWidth] = useState<number | undefined>(undefined);
+
+  // Typewriter effect state
+  const [typedCount, setTypedCount] = useState<number>(() => {
+    return openingPhase === 'first_stop' ? TOTAL_CHARS : 0;
+  });
 
   useEffect(() => {
-    if (!logoRef.current) return;
-    const updateWidth = () => {
-      if (logoRef.current) {
-        setLogoWidth(logoRef.current.offsetWidth);
-      }
-    };
-    updateWidth();
-    const ro = new ResizeObserver(updateWidth);
-    ro.observe(logoRef.current);
-    window.addEventListener('resize', updateWidth);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', updateWidth);
-    };
-  }, [isLogoInCenterScreen]);
+    if (openingPhase === 'first_stop') {
+      setTypedCount(TOTAL_CHARS);
+      return;
+    }
+
+    if (openingPhase !== 'quote_typing') {
+      setTypedCount(0);
+      return;
+    }
+
+    setTypedCount(0);
+    const interval = setInterval(() => {
+      setTypedCount((prev) => {
+        const next = prev + 1;
+        // Subtle tick sound on word spaces
+        if (next <= QUOTE_TEXT.length) {
+          if (QUOTE_TEXT[next - 1] === ' ') {
+            soundFx.playCardTick();
+          }
+        } else if (next > QUOTE_TEXT.length + 1) {
+          const authIdx = next - QUOTE_TEXT.length - 2;
+          if (AUTHOR_TEXT[authIdx] === ' ') {
+            soundFx.playCardTick();
+          }
+        }
+
+        if (next >= TOTAL_CHARS) {
+          clearInterval(interval);
+          onQuoteTypingComplete?.();
+          return TOTAL_CHARS;
+        }
+        return next;
+      });
+    }, 22);
+
+    return () => clearInterval(interval);
+  }, [openingPhase, onQuoteTypingComplete]);
+
+  const visibleQuote = QUOTE_TEXT.slice(0, Math.min(typedCount, QUOTE_TEXT.length));
+  const authorCount = Math.max(0, typedCount - QUOTE_TEXT.length - 1);
+  const visibleAuthor = AUTHOR_TEXT.slice(0, authorCount);
+  const isTypingActive = openingPhase === 'quote_typing' && typedCount < TOTAL_CHARS;
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -58,13 +106,32 @@ export const Header: React.FC<HeaderProps> = ({
       }
     }
   };
+
+  const isLogoAtUpperThird =
+    isCentered &&
+    isLogoInCenterScreen &&
+    (openingPhase === 'logo_expand' ||
+      openingPhase === 'quote_typing' ||
+      openingPhase === 'first_stop');
+
+  const isLogoAtCenter =
+    isCentered && isLogoInCenterScreen && openingPhase === 'logo_fade';
+
+  const isLogoHiddenInIntro =
+    isCentered &&
+    isLogoInCenterScreen &&
+    (openingPhase === 'bg_only' || openingPhase === 'yellow_fade');
+
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-transparent pointer-events-none">
+      {/* Container do Logotipo DGRH */}
       <div
         className={`fixed z-40 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-center ${
           isCentered
             ? isLogoInCenterScreen
-              ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
+              ? isLogoAtUpperThird
+                ? 'top-[18%] sm:top-[20%] md:top-[22%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
+                : 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 sm:px-8'
               : 'top-[max(1rem,calc(14vh-40px))] sm:top-[calc(16vh-40px)] md:top-[calc(18vh-40px)] left-1/2 -translate-x-1/2 translate-y-0 w-auto'
             : 'top-0 left-0 translate-x-0 translate-y-0 w-auto'
         }`}
@@ -79,39 +146,49 @@ export const Header: React.FC<HeaderProps> = ({
           className={`w-auto object-contain select-none pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isPreAnimating && isCentered
               ? 'animate-logo-reveal-bottom-up'
+              : isLogoHiddenInIntro
+              ? 'opacity-0 scale-90'
+              : isLogoAtUpperThird
+              ? 'opacity-100 scale-150 sm:scale-175 md:scale-200 origin-center drop-shadow-2xl'
+              : isLogoAtCenter
+              ? 'opacity-100 scale-100 origin-center drop-shadow-xl'
               : logoVisible
               ? 'opacity-100 scale-100'
               : 'opacity-0 scale-90'
           } ${
             isCentered
               ? isLogoInCenterScreen
-                ? 'h-12 sm:h-16 md:h-20 max-w-[85vw] drop-shadow-xl'
+                ? 'h-12 sm:h-16 md:h-20 max-w-[85vw]'
                 : 'h-9 sm:h-12 md:h-14 max-w-[85vw] drop-shadow-md'
               : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
           }`}
         />
+      </div>
 
-        {/* Citação do Prof. Dr. Zeferino Vaz na abertura inicial */}
-        <div
-          style={{
-            maxWidth: logoWidth ? `${logoWidth}px` : undefined,
-          }}
-          className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col text-left w-full max-w-[485px] sm:max-w-[647px] md:max-w-[809px] px-0 ${
-            isLogoInCenterScreen
-              ? 'opacity-100 translate-y-0 mt-5 sm:mt-7 md:mt-8'
-              : 'opacity-0 -translate-y-4 pointer-events-none max-h-0 overflow-hidden mt-0'
-          }`}
-        >
-          <blockquote className="text-left text-slate-950 text-lg sm:text-xl md:text-2xl lg:text-[28px] leading-snug sm:leading-relaxed tracking-tight select-none">
-            <span className="font-medium italic">
-              “As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios”
-            </span>
-            {' '}
-            <span className="not-italic font-black text-black uppercase tracking-wider text-sm sm:text-base md:text-lg lg:text-xl inline-block whitespace-nowrap align-baseline ml-1.5 sm:ml-2">
-              — Prof. Dr. Zeferino Vaz
-            </span>
-          </blockquote>
-        </div>
+      {/* Citação do Prof. Dr. Zeferino Vaz na abertura inicial: efeito digitação, fonte ampliada, alinhada do centro para a direita */}
+      <div
+        className={`fixed z-40 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isCentered && isLogoInCenterScreen && (openingPhase === 'quote_typing' || openingPhase === 'first_stop')
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 -translate-y-4 pointer-events-none'
+        } top-[42%] sm:top-[44%] md:top-[46%] left-6 right-6 md:left-[50%] md:right-10 lg:right-16 xl:right-24 2xl:right-32 text-left`}
+      >
+        <blockquote className="text-left text-slate-950 text-xl sm:text-2xl md:text-3xl lg:text-[32px] xl:text-[36px] leading-snug sm:leading-relaxed tracking-tight select-none max-w-4xl">
+          <span className="font-medium italic">
+            {visibleQuote}
+          </span>
+          {visibleAuthor && (
+            <>
+              {' '}
+              <span className="not-italic font-black text-black uppercase tracking-wider text-base sm:text-lg md:text-xl lg:text-2xl inline-block whitespace-nowrap align-baseline ml-2 sm:ml-3">
+                {visibleAuthor}
+              </span>
+            </>
+          )}
+          {isTypingActive && (
+            <span className="inline-block w-[3px] h-[0.9em] bg-slate-950 ml-1.5 align-middle animate-pulse" />
+          )}
+        </blockquote>
       </div>
 
       {/* Top-Right Navigation Pill (Visible only after opening is completed or on dashboard) */}
