@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundEffects';
 import {
-  GeneroCharts,
   FaixaEtariaBarChart,
   RacaCorCharts,
   EscolaridadeEvolucaoLineChart,
@@ -40,14 +39,13 @@ interface SlideDefinition {
 // Deep, vibrant auxiliary and secondary design system colors for each chart card
 export const SLIDE_BG_COLORS = [
   'bg-[#366023]', // 0: Áreas da Unicamp - Aux 1 (Verde Floresta)
-  'bg-[#5e2a6b]', // 1: Gênero - Aux 2 (Roxo DGRH)
-  'bg-[#d67b27]', // 2: Faixa Etária - Aux 3 (Laranja DGRH)
-  'bg-[#105e7b]', // 3: Raça / Cor - Primária (Azul DGRH)
-  'bg-[#6b213b]', // 4: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
-  'bg-[#c05621]', // 5: Escolaridade Zoom - Aux 3 (Terracota)
-  'bg-[#701a75]', // 6: Nacionalidades - Aux 2 (Ameixa DGRH)
-  'bg-[#0d6e8a]', // 7: Top 20 Cargos Tabela - Azul Petróleo
-  'bg-[#b8801a]', // 8: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
+  'bg-[#d67b27]', // 1: Faixa Etária - Aux 3 (Laranja DGRH)
+  'bg-[#105e7b]', // 2: Raça / Cor - Primária (Azul DGRH)
+  'bg-[#6b213b]', // 3: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
+  'bg-[#c05621]', // 4: Escolaridade Zoom - Aux 3 (Terracota)
+  'bg-[#701a75]', // 5: Nacionalidades - Aux 2 (Ameixa DGRH)
+  'bg-[#0d6e8a]', // 6: Top 20 Cargos Tabela - Azul Petróleo
+  'bg-[#b8801a]', // 7: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
 ];
 
 const SLIDES: SlideDefinition[] = [
@@ -57,13 +55,6 @@ const SLIDES: SlideDefinition[] = [
     title: 'Servidores Ativos por Área da Universidade',
     subtitle: 'Distribuição do quadro de pessoal entre Faculdades, Saúde, Administração Central, Centros e Colégios',
     tag: 'Áreas da Unicamp',
-  },
-  {
-    id: 'genero',
-    category: 'Diversidade & Perfil',
-    title: 'Distribuição por Gênero',
-    subtitle: 'Composição institucional e por carreira na Unicamp',
-    tag: 'Gênero',
   },
   {
     id: 'faixaEtaria',
@@ -391,64 +382,57 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
               </button>
             </div>
 
-          {/* ================= SLIDE 1 (Index 0): SERVIDORES ATIVOS POR ÁREA ================= */}
-          {currentSlideIndex === 0 && (
+          {/* ================= SLIDE: SERVIDORES ATIVOS POR ÁREA ================= */}
+          {currentSlide?.id === 'areas' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <ServidoresPorAreaPieChart />
             </div>
           )}
 
-          {/* ================= SLIDE 2 (Index 1): DISTRIBUIÇÃO POR GÊNERO ================= */}
-          {currentSlideIndex === 1 && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
-              <GeneroCharts />
-            </div>
-          )}
-
-          {/* ================= SLIDE 3 (Index 2): FAIXA ETÁRIA ================= */}
-          {currentSlideIndex === 2 && (
+          {/* ================= SLIDE: FAIXA ETÁRIA ================= */}
+          {currentSlide?.id === 'faixaEtaria' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <FaixaEtariaBarChart />
             </div>
           )}
 
-          {/* ================= SLIDE 4 (Index 3): RAÇA / COR (INTEGRADO) ================= */}
-          {currentSlideIndex === 3 && (
+          {/* ================= SLIDE: RAÇA / COR (INTEGRADO) ================= */}
+          {currentSlide?.id === 'racaCor' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <RacaCorCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 5 (Index 4): ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
-          {currentSlideIndex === 4 && (
+          {/* ================= SLIDE: ESCOLARIDADE (TODAS AS CATEGORIAS EM LINHAS) ================= */}
+          {currentSlide?.id === 'escolaridadeGeral' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <EscolaridadeEvolucaoLineChart />
             </div>
           )}
 
-          {/* ================= SLIDE 6 (Index 5): ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
-          {currentSlideIndex === 5 && (
+          {/* ================= SLIDE: ESCOLARIDADE (ZOOM EM LINHAS) ================= */}
+          {currentSlide?.id === 'escolaridadeZoom' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <EscolaridadeZoomLineChart />
             </div>
           )}
 
-          {/* ================= SLIDE 7 (Index 6): NACIONALIDADES ================= */}
-          {currentSlideIndex === 6 && (
+          {/* ================= SLIDE: NACIONALIDADES ================= */}
+          {currentSlide?.id === 'nacionalidade' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <NacionalidadesCharts />
             </div>
           )}
 
-          {/* ================= SLIDE 8 (Index 7): TOP 20 CARGOS (TABELA QUANTITATIVA) ================= */}
-          {currentSlideIndex === 7 && (
+          {/* ================= SLIDE: TOP 20 CARGOS (TABELA QUANTITATIVA) ================= */}
+          {currentSlide?.id === 'cargosTabela' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <TopCargosTable />
             </div>
           )}
 
-          {/* ================= SLIDE 9 (Index 8): TOP 20 CARGOS (GRÁFICO DE BARRAS) ================= */}
-          {currentSlideIndex === 8 && (
+          {/* ================= SLIDE: TOP 20 CARGOS (GRÁFICO DE BARRAS) ================= */}
+          {currentSlide?.id === 'cargos' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <TopCargosBarChart />
             </div>
