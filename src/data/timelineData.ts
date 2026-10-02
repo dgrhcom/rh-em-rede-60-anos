@@ -765,7 +765,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     shortLabel: 'DIGITAL & DESEMPENHO',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2020_2.png',
     summary: 'Adequação ao ambiente digital devido à pandemia, lançamento do FALP e gestão de desempenho PAEPE.',
-    description: 'Adaptação ágil às demandas remotas provocadas pela pandemia Covid-19, modernização dos sistemas de frequência e licença-prêmio (FALP), nova versão do Vida Funcional Online e implantação da gestão de desempenho PAEPE.',
+    description: 'Adaptação ágil às demandas remotas provocadas pela pandemia Covid-19, modernização dos sistemas de férias, afastamento e licença-prêmio (FALP), nova versão do Vida Funcional Online e implantação da gestão de desempenho PAEPE.',
     iconName: 'Laptop',
     themeColor: {
       bg: 'from-blue-50 to-indigo-100',
@@ -791,7 +791,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm12-2',
         year: '2020',
-        text: 'Lançamento do Sistema de Frequência, Afastamento e Licença Prêmio (FALP) e da nova versão do Vida Funcional Online',
+        text: 'Lançamento do Sistema de Férias, Afastamento e Licença Prêmio (FALP) e da nova versão do Vida Funcional Online',
         category: 'informatizacao',
       },
       {
@@ -813,7 +813,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'p12-2',
         title: 'Sistemas FALP e Vida Funcional',
-        caption: 'Lançamento de novas soluções online de frequência, afastamento e vida funcional.',
+        caption: 'Lançamento de novas soluções online de férias, afastamento e vida funcional.',
         url: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2020_1.jpg',
         aspectRatio: 'landscape',
         credit: 'DSI / DGRH',
