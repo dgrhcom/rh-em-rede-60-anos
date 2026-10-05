@@ -57,7 +57,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
         transition-[width,height,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
         ${
           isActive
-            ? 'w-[96vw] sm:w-[920px] md:w-[1080px] lg:w-[1240px] xl:w-[1360px] 2xl:w-[1440px] max-w-[1460px] h-[calc(100vh-7.25rem)] min-h-[540px] max-h-[830px] xl:max-h-[860px] shadow-2xl shadow-slate-950/40 ring-2 ring-white cursor-default'
+            ? 'w-[96vw] sm:w-[920px] md:w-[1080px] lg:w-[1240px] xl:w-[1360px] 2xl:w-[1440px] max-w-[1460px] h-[calc(100vh-8rem)] min-h-[530px] max-h-[810px] shadow-2xl shadow-slate-950/40 ring-2 ring-white cursor-default'
             : 'w-[210px] sm:w-[235px] md:w-[250px] h-[350px] sm:h-[390px] md:h-[420px] lg:h-[440px] shadow-lg hover:shadow-2xl cursor-pointer hover:opacity-95 hover:brightness-105'
         }
       `}
