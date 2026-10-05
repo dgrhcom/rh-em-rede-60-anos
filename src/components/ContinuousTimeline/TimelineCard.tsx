@@ -19,7 +19,7 @@ export const pureBgColors = [
   'bg-[#105e7b]', // 0: 1962 (Primária - Azul DGRH)
   'bg-[#d67b27]', // 1: 1966-1974 (Aux 3 - Laranja DGRH)
   'bg-[#477b2f]', // 2: 1983-1986 (Aux 1 - Verde DGRH)
-  'bg-[#5e2a6b]', // 3: 1989 (Aux 2 - Roxo DGRH)
+  'bg-[#5e2a6b]', // 3: 1987-1989 (Aux 2 - Roxo DGRH)
   'bg-[#187fa1]', // 4: 1990-1993 (Azul Céu DGRH)
   'bg-[#b8801a]', // 5: 1995-1997 (Secundária - Dourado Profundo Unicamp 60 Anos)
   'bg-[#366023]', // 6: 1998 (Aux 1 - Verde Floresta)

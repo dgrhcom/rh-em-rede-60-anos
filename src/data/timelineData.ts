@@ -217,14 +217,14 @@ export const timelinePeriods: HistoricalPeriod[] = [
   {
     id: 'period-4',
     index: 3,
-    period: '1989',
-    startYear: 1989,
+    period: '1987 - 1989',
+    startYear: 1987,
     endYear: 1989,
     title: 'Reforma Administrativa',
     shortLabel: 'REFORMA ADMINISTRATIVA',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_1989_1.jpg',
-    summary: 'Modernização institucional e reorganização da Secretaria da Diretoria.',
-    description: 'Marco histórico de reorganização interna que ampliou a capacidade estratégica da gestão de pessoas, acompanhada de ampla cobertura da imprensa universitária.',
+    summary: 'Criação da primeira carreira dos técnico-administrativos e reorganização administrativa.',
+    description: 'Marco histórico iniciado com a criação da primeira carreira dos servidores técnico-administrativos e consolidado pela reorganização interna e reforma administrativa da Unicamp.',
     iconName: 'FileText',
     themeColor: {
       bg: 'from-amber-50 to-orange-100',
@@ -237,10 +237,16 @@ export const timelinePeriods: HistoricalPeriod[] = [
     },
     badge: {
       title: 'Marco da Reforma',
-      description: 'Reorganização das diretrizes institucionais e expansão do corpo técnico.',
+      description: 'Primeira carreira dos técnico-administrativos e expansão institucional.',
       icon: 'Layers',
     },
     milestones: [
+      {
+        id: 'm2-0',
+        year: '1987',
+        text: 'Criação da primeira carreira dos técnico-administrativos',
+        category: 'carreira',
+      },
       {
         id: 'm2-1',
         year: '1989',
