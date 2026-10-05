@@ -26,7 +26,7 @@ export const pureBgColors = [
   'bg-[#6b213b]', // 7: 1999-2000 (Aux 2 - Vinho Profundo)
   'bg-[#c05621]', // 8: 2001-2003 (Aux 3 - Terracota)
   'bg-[#a16207]', // 9: 2004-2006 (Secundária - Âmbar Ouro)
-  'bg-[#2d5a27]', // 10: 2008-2011 (Aux 1 - Verde Escuro)
+  'bg-[#2d5a27]', // 10: 2008-2013 (Aux 1 - Verde Escuro)
   'bg-[#4c1d95]', // 11: 2014-2015 (Aux 2 - Roxo Profundo)
   'bg-[#b44318]', // 12: 2017-2019 (Aux 3 - Terracota Queimado)
   'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)

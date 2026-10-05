@@ -380,6 +380,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'organizacao',
       },
       {
+        id: 'm4-1b',
+        year: '1995',
+        text: 'Lançamento da primeira versão do Portal DGRH',
+        category: 'informatizacao',
+      },
+      {
         id: 'm4-2',
         year: '1996',
         text: 'Primeira versão do Vida Funcional Online',
@@ -460,7 +466,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm5-4',
         year: '1998',
-        text: 'Implementação da Segurança do Trabalho na Universidade',
+        text: 'Implementação da Segurança do Trabalho na Universidade (SST)',
         category: 'saude',
       },
     ],
@@ -498,15 +504,15 @@ export const timelinePeriods: HistoricalPeriod[] = [
     },
     badge: {
       title: 'Valorização Humana',
-      description: 'Avaliação transparente, perícias médicas e preparação para a aposentadoria.',
+      description: 'Avaliação transparente, integração tecnológica e preparação para a aposentadoria.',
       icon: 'HeartHandshake',
     },
     milestones: [
       {
-        id: 'm6-1',
+        id: 'm6-ccuec',
         year: '1999',
-        text: 'Início do serviço de perícias médicas',
-        category: 'saude',
+        text: 'Fusão das equipes de Informática de RH do CCUEC e da DGRH',
+        category: 'informatizacao',
       },
       {
         id: 'm6-2',
@@ -529,13 +535,13 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm6-5',
         year: '2000',
-        text: 'Transferência do PASS (Programa de Assistência à Saúde do Servidor) do CECOM para a Divisão de Assistência e Benefícios (DAB/DGRH)',
+        text: 'Transferência do PASS (Programa de Assistência à Saúde do Servidor) do CECOM para a Diretoria de Assistência e Benefícios/DGRH',
         category: 'saude',
       },
       {
         id: 'm6-6',
         year: '2000',
-        text: 'Início da parceria com a empresa Sênior Sistemas para administração dos sistemas integrados de RH - atual Sistema de Gestão de Pessoas',
+        text: 'Aquisição dos sistemas integrados de RH da empresa Sênior (atual Sistema Gestão de Pessoas)',
         category: 'informatizacao',
       },
     ],
@@ -590,7 +596,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm7-1',
         year: '2001',
-        text: 'Implantação da Carreira PCVS (Plano de Carreira, Vencimentos e Salários), atual PAEPE',
+        text: 'Implantação do Plano de Carreira, Vencimentos e Salários (PCVS), que unificou mais de 300 funções em grandes grupos e vinculou a progressão ao nível de escolaridade',
         category: 'carreira',
       },
       {
@@ -604,6 +610,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         year: '2002',
         text: 'Implantação do Projeto Ingressando na Universidade, atual Programa Ingresso',
         category: 'desenvolvimento',
+      },
+      {
+        id: 'm7-paepe',
+        year: '2003',
+        text: 'Criação da carreira PAEPE',
+        category: 'carreira',
       },
       {
         id: 'm7-4',
@@ -686,8 +698,14 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm8-4',
         year: '2006',
-        text: 'Divisão de Assistência e Benefícios (DAB) e o Serviço Social da DGRH dão origem ao GGBS',
+        text: 'Diretoria de Assistência e Benefícios (DAB) dá origem ao GGBS',
         category: 'organizacao',
+      },
+      {
+        id: 'm8-vida',
+        year: '2006',
+        text: 'Lançamento da versão web do Vida Funcional Online',
+        category: 'informatizacao',
       },
     ],
     photos: [
@@ -704,14 +722,14 @@ export const timelinePeriods: HistoricalPeriod[] = [
   {
     id: 'period-11',
     index: 10,
-    period: '2008 - 2011',
+    period: '2008 - 2013',
     startYear: 2008,
-    endYear: 2011,
+    endYear: 2013,
     title: 'Reconhecimento',
     shortLabel: 'RECONHECIMENTO',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2011_2.jpg',
-    summary: 'Recadastramento anual, Programa de Patrulheiros e criação do Prêmio PAEPE.',
-    description: 'Valorização dos talentos da universidade com a instituição do prestigioso Prêmio PAEPE, recadastramento anual contínuo e acolhimento dos jovens com o Programa de Patrulheiros.',
+    summary: 'Recadastramento anual, Programa de Patrulheiros, Prêmio PAEPE e demonstrativos digitais.',
+    description: 'Valorização dos talentos da universidade com a instituição do prestigioso Prêmio PAEPE, recadastramento anual contínuo, acolhimento dos jovens com o Programa de Patrulheiros e transição digital dos demonstrativos de pagamento.',
     iconName: 'Medal',
     themeColor: {
       bg: 'from-amber-50 to-yellow-100',
@@ -746,6 +764,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         text: 'Lançamento do Prêmio PAEPE',
         category: 'carreira',
       },
+      {
+        id: 'm9-4',
+        year: '2013',
+        text: 'Demonstrativos de pagamento e IR deixam de ser impressos',
+        category: 'informatizacao',
+      },
     ],
     photos: [
       {
@@ -767,7 +791,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     title: 'RH em Rede, Planes e Relações de Trabalho',
     shortLabel: 'RH EM REDE, PLANES & RELAÇÕES',
     coverImage: 'https://www.dgrh.unicamp.br/wp-content/uploads/sites/18/2026/03/linha_do_tempo_2014_2.jpg',
-    summary: 'Página de contato de Gestores, RH em Rede, Planes com RHs locais e combate a práticas abusivas.',
+    summary: 'RH em Rede, Planes com RHs locais, revisão da carreira PAEPE e TAC de relações de trabalho.',
     description: 'Adoção da gestão colaborativa com o RH em Rede, elaboração de planejamento estratégico com participação direta dos órgãos locais e normas para proteção das relações interpessoais.',
     iconName: 'Network',
     themeColor: {
@@ -786,12 +810,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
     },
     milestones: [
       {
-        id: 'm10-1',
-        year: '2014',
-        text: 'Criação de página de contato dos Gestores das Unidades e Órgãos da Unicamp',
-        category: 'organizacao',
-      },
-      {
         id: 'm10-2',
         year: '2014',
         text: 'Criação do RH em Rede',
@@ -806,13 +824,13 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm10-4',
         year: '2015',
-        text: 'Revisão da avaliação de desempenho e carreira PAEPE',
+        text: 'Revisão da carreira PAEPE e da avaliação de desempenho',
         category: 'carreira',
       },
       {
         id: 'm10-5',
         year: '2015',
-        text: 'Publicação de procedimentos para prevenção e apuração de práticas abusivas nas relações de trabalho',
+        text: 'Publicação de procedimentos para prevenção e apuração de práticas abusivas nas relações de trabalho (Termo de Ajuste de Conduta - TAC assinado com o Ministério Público do Trabalho)',
         category: 'saude',
       },
     ],
@@ -876,6 +894,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         id: 'm11-4',
         year: '2018',
         text: 'Implantação da Declaração Anual dos Bens e Valores',
+        category: 'organizacao',
+      },
+      {
+        id: 'm11-central',
+        year: '2018',
+        text: 'Criação da Central de Atendimento DGRH',
         category: 'organizacao',
       },
       {
@@ -949,9 +973,21 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'informatizacao',
       },
       {
+        id: 'm12-vunesp',
+        year: '2021',
+        text: 'Concursos públicos passam a ser organizados pela Vunesp',
+        category: 'organizacao',
+      },
+      {
+        id: 'm12-prog',
+        year: '2022',
+        text: 'Informatização do processo de progressão PAEPE',
+        category: 'carreira',
+      },
+      {
         id: 'm12-3',
         year: '2022',
-        text: 'Implantação da gestão de desempenho PAEPE',
+        text: 'Revisão e informatização do processo de gestão de desempenho',
         category: 'carreira',
       },
     ],
@@ -1004,8 +1040,14 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm13-1',
         year: '2024',
-        text: 'Recadastramento anual de servidores ativos passa a ser feito na plataforma SOU.SP',
+        text: 'Recadastramento anual de ativos na plataforma SOU.SP',
         category: 'organizacao',
+      },
+      {
+        id: 'm13-dpsi',
+        year: '2024',
+        text: 'Criação da Divisão de Psicologia do Trabalho (DPsi)',
+        category: 'saude',
       },
       {
         id: 'm13-2',
@@ -1028,8 +1070,14 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm13-5',
         year: '2025',
-        text: 'Lançamento do sistema ASTRA para gerenciar a transferência de servidores',
+        text: 'Lançamento do sistema ASTRA para transferência de servidores',
         category: 'informatizacao',
+      },
+      {
+        id: 'm13-funcamp',
+        year: '2025',
+        text: 'Concursos públicos passam a ser organizados pela Funcamp',
+        category: 'organizacao',
       },
       {
         id: 'm13-6',
