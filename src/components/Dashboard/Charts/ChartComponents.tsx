@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { School, TrendingUp, Users, Cake } from 'lucide-react';
+import { School, TrendingUp, Users } from 'lucide-react';
 import {
   SERVIDORES_POR_AREA,
   TOTAL_SERVIDORES_ATIVOS,
   GENERO_DATA,
   FAIXA_ETARIA_DATA,
-  DESTAQUE_FAIXA_ETARIA,
   RACA_COR_DATA,
   RACA_COR_TABELA_2,
   ESCOLARIDADE_EVOLUCAO,
@@ -621,14 +620,6 @@ export const FaixaEtariaBarChart: React.FC = () => {
             <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
               {totalGeral.toLocaleString('pt-BR')}
             </span>
-          </div>
-        </div>
-
-        {/* 2. Destaque Demográfico (Abaixo da Legenda) */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
-          <Cake className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
-            <span className="font-semibold text-slate-900">Destaque Demográfico:</span> {DESTAQUE_FAIXA_ETARIA.jovem.split('18')[0]}<span className="font-semibold text-slate-900">18 anos</span> e {DESTAQUE_FAIXA_ETARIA.velho.toLowerCase().split('89')[0]}<span className="font-semibold text-slate-900">89 anos</span>.
           </div>
         </div>
       </div>
@@ -1830,7 +1821,7 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
       <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center gap-3 sm:gap-4">
         {/* Linhas de Áreas: sem borda esquerda colorida, sem negrito, fonte ampliada e quadradinhos coloridos ao lado esquerdo */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
-          {SERVIDORES_POR_AREA.map((item) => (
+          {[...SERVIDORES_POR_AREA].sort((a, b) => b.total - a.total).map((item) => (
             <div
               key={item.tipoOrgao}
               className="py-3 sm:py-3.5 flex items-center justify-between first:pt-1 last:pb-1 transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
@@ -2268,24 +2259,25 @@ export const TopCargosBarChart: React.FC = () => {
           ))}
         </div>
 
-        {/* Total dos 20 Cargos */}
-        <div className="pt-3 sm:pt-3.5 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-            Total dos 20 Cargos
-          </span>
-          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-            {totalTop20.toLocaleString('pt-BR')}
-          </span>
-        </div>
+        {/* Totais: Geral e Top 20 Cargos */}
+        <div className="pt-3 sm:pt-3.5 mt-1 flex flex-col gap-2.5 px-2 border-t border-slate-200">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-600">
+              Total geral de servidores:
+            </span>
+            <span className="text-base sm:text-lg lg:text-xl font-semibold text-slate-900 tracking-tight shrink-0">
+              9.416 <span className="text-xs sm:text-sm font-normal text-slate-500">(233 cargos)</span>
+            </span>
+          </div>
 
-        {/* Total Geral */}
-        <div className="pt-2 sm:pt-2.5 flex items-center justify-between px-2">
-          <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-            Total Geral
-          </span>
-          <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 tracking-wider">
-            9.416
-          </span>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-600">
+              Total de servidores nos 20 cargos:
+            </span>
+            <span className="text-base sm:text-lg lg:text-xl font-semibold text-[#105e7b] tracking-tight shrink-0">
+              7.246 <span className="text-xs sm:text-sm font-normal text-slate-500">(76%)</span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
