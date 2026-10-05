@@ -586,16 +586,6 @@ export const FaixaEtariaBarChart: React.FC = () => {
               </div>
             ))}
           </div>
-
-          {/* Total Geral */}
-          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-              Total Geral
-            </span>
-            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-              {totalGeral.toLocaleString('pt-BR')}
-            </span>
-          </div>
         </div>
       </div>
     </div>
@@ -617,8 +607,6 @@ export const RacaCorCharts: React.FC = () => {
     { raca: 'Não Informado', total: 95, pct: 1.0, cor: DS_COLORS.slate },      // #475569 - Slate
     { raca: 'Indígena', total: 11, pct: 0.1, cor: DS_COLORS.aux1 },            // #477b2f - Verde Auxiliar 1
   ];
-
-  const totalGeralRaca = racaCorSlices.reduce((acc, r) => acc + r.total, 0); // 13.554
 
   const toggleSlice = (index: number) => {
     if (!chartInstanceRef.current) return;
@@ -941,16 +929,6 @@ export const RacaCorCharts: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Total Geral */}
-          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-              Total Geral
-            </span>
-            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-              {totalGeralRaca.toLocaleString('pt-BR')}
-            </span>
           </div>
         </div>
 
@@ -1961,16 +1939,6 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
               </div>
             </div>
           ))}
-
-          {/* Total Geral da Universidade */}
-          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2">
-            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-              Total Geral da Universidade
-            </span>
-            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-              {TOTAL_SERVIDORES_ATIVOS.toLocaleString('pt-BR')}
-            </span>
-          </div>
         </div>
 
         {/* Destaque Institucional (Abaixo da Legenda) */}
