@@ -23,7 +23,7 @@ interface HeaderProps {
 }
 
 const QUOTE_TEXT =
-  '“As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios”';
+  '“As coisas mais importantes para construir uma universidade são, em primeiro lugar cérebros, em segundo, cérebros, em terceiro, cérebros, e em quarto equipamentos e edifícios.”';
 const AUTHOR_TEXT = '— Prof. Dr. Zeferino Vaz';
 const TOTAL_CHARS = QUOTE_TEXT.length + AUTHOR_TEXT.length + 1;
 
