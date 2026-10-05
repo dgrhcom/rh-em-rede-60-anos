@@ -232,17 +232,17 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                         </h4>
                       </div>
 
-                      {/* 4. Nome do(s) Diretores Adjuntos - Fonte ampliada */}
+                      {/* 4. Nome do(s) Diretores Adjuntos - Fonte ampliada (sem o termo "adjunto") */}
                       <div className="mt-1.5 flex-1 flex flex-col justify-start gap-0.5">
                         {Array.isArray(director.deputies) ? (
                           director.deputies.map((dep, dIdx) => (
                             <p key={dIdx} className="text-xs sm:text-[13px] text-white/95 font-semibold leading-snug">
-                              {dep}
+                              {dep.replace(/\s*\((?:adjunt[oa]s?)\s*([0-9-]*)\)/i, (_m, yr) => yr ? ` (${yr})` : '').replace(/\s*\((?:adjunt[oa]s?)\)/i, '').trim()}
                             </p>
                           ))
                         ) : director.deputy ? (
                           <p className="text-xs sm:text-[13px] text-white/95 font-semibold leading-snug">
-                            {director.deputy}
+                            {director.deputy.replace(/\s*\((?:adjunt[oa]s?)\)/i, '').trim()}
                           </p>
                         ) : null}
                       </div>
