@@ -6,6 +6,7 @@ import { ContinuousTimeline } from './components/ContinuousTimeline/ContinuousTi
 import { HistoricalDashboard } from './components/Dashboard/HistoricalDashboard';
 import { PhotoViewerModal } from './components/DetailModal/PhotoViewerModal';
 import { AchievementsModal } from './components/GameBoard/AchievementsModal';
+import { soundFx } from './utils/soundEffects';
 
 export function App() {
   const [currentView, setCurrentView] = useState<'timeline' | 'dashboard'>(() => {
@@ -99,13 +100,7 @@ export function App() {
       return () => clearTimeout(timer);
     }
 
-    if (openingPhase === 'logo_hold') {
-      // 3. Logotipo fica visível no centro por 2 segundos
-      const timer = setTimeout(() => {
-        setOpeningPhase('logo_fade_out');
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
+    // 3. logo_hold: Pausado no logotipo pequeno central até o usuário navegar (sem timer automático)
 
     if (openingPhase === 'logo_fade_out') {
       // 4. Logotipo desaparece gradualmente no centro (1.2s de transição)
@@ -132,9 +127,21 @@ export function App() {
     }
   }, [timelineResetTrigger]);
 
-  const skipOpeningPhase = useCallback(() => {
-    setOpeningPhase('first_stop');
-  }, []);
+  const handleAdvanceOpening = useCallback(() => {
+    if (openingPhase === 'bg_only' || openingPhase === 'yellow_fade') {
+      setOpeningPhase('logo_hold');
+    } else if (openingPhase === 'logo_hold') {
+      soundFx.playCardTick();
+      setOpeningPhase('logo_fade_out');
+    } else if (
+      openingPhase === 'logo_fade_out' ||
+      openingPhase === 'quote_typing' ||
+      openingPhase === 'logo_top_appear'
+    ) {
+      soundFx.playCardTick();
+      setOpeningPhase('first_stop');
+    }
+  }, [openingPhase]);
 
   // Track visited periods for achievements and timeline progress
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(() => {
@@ -318,7 +325,7 @@ export function App() {
             isActive={currentView === 'timeline'}
             focusTrigger={timelineFocusTrigger}
             openingPhase={openingPhase}
-            onSkipOpening={skipOpeningPhase}
+            onSkipOpening={handleAdvanceOpening}
           />
         </div>
         {currentView === 'dashboard' && (

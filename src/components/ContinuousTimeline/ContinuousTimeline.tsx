@@ -757,7 +757,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
       )}
 
       {/* ================= 1.1. PRIMEIRA PARADA NA ABERTURA (Prompt para continuar) ================= */}
-      {introStatus === 'logo_pause' && openingPhase === 'first_stop' && (
+      {introStatus === 'logo_pause' && (openingPhase === 'logo_hold' || openingPhase === 'first_stop') && (
         <div className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-end pb-8 sm:pb-12 transition-all duration-700">
           <div className="pointer-events-auto animate-bounce">
             <button
@@ -765,7 +765,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 if (!document.fullscreenElement) {
                   document.documentElement.requestFullscreen().catch(() => {});
                 }
-                continueFromLogo();
+                if (openingPhase === 'first_stop') {
+                  continueFromLogo();
+                } else {
+                  onSkipOpening?.();
+                }
               }}
               className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-950/85 hover:bg-slate-950 text-white font-bold text-xs sm:text-sm tracking-wide shadow-2xl border border-white/40 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-black/10 group backdrop-blur-md"
               title="Avançar para a Linha do Tempo"
