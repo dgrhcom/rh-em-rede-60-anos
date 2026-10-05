@@ -26,14 +26,24 @@ export const isTopAlignedPhoto = (
   if (!photoOrUrl) return false;
   if (typeof photoOrUrl === 'object') {
     if (photoOrUrl.objectPosition === 'top') return true;
-    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962/i.test(
+    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962|diretor/i.test(
       `${photoOrUrl.url || ''} ${photoOrUrl.title || ''} ${photoOrUrl.credit || ''} ${photoOrUrl.caption || ''}`
     );
   }
-  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962/i.test(
+  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962|diretor/i.test(
     `${photoOrUrl} ${title || ''} ${credit || ''}`
   );
 };
+
+export interface DirectorProfile {
+  id: string;
+  period: string; // e.g. "2017 – 2021"
+  director: string; // e.g. "Gilmar Dias da Silva"
+  deputy?: string; // e.g. "Milton Guilhen (Adjunto)"
+  deputies?: string[]; // e.g. ["Margareth Bazzo (Adjunta 1990-1994)", "Cecília Rampazzo (Adjunta 1995-1998)"]
+  photoUrl: string;
+  bio?: string;
+}
 
 export interface PeriodMilestone {
   id: string;
@@ -55,6 +65,7 @@ export interface HistoricalPeriod {
   description: string; // Longer context
   milestones: PeriodMilestone[];
   photos: MilestonePhoto[];
+  directors?: DirectorProfile[];
   themeColor: {
     bg: string;
     border: string;

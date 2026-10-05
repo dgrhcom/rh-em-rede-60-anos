@@ -31,6 +31,7 @@ export const pureBgColors = [
   'bg-[#b44318]', // 12: 2017-2019 (Aux 3 - Terracota Queimado)
   'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
   'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
+  'bg-[#1e3a5f]', // 15: Diretores Anteriores (Azul Marinho Nobre Institucional)
 ];
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({
@@ -42,6 +43,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
 }) => {
   const cardBgClass = pureBgColors[period.index % pureBgColors.length];
   const hasPhotos = Boolean(period.photos && period.photos.length > 0);
+  const isDirectorsCard = Boolean(period.directors && period.directors.length > 0);
 
   const handleNeighborClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -89,18 +91,93 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
         <div className="pb-3 sm:pb-3.5 border-b-2 border-white/20 shrink-0 text-left pr-12 sm:pr-14 mb-3 sm:mb-4">
           <div className="flex flex-wrap items-baseline gap-x-3 sm:gap-x-4 gap-y-1">
             <span className="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black tracking-tight text-[#e5a93a] whitespace-nowrap leading-none drop-shadow-xs">
-              {period.period}
+              {isDirectorsCard ? 'Diretores anteriores' : period.period}
             </span>
             <span className="text-white/30 font-light select-none text-2xl sm:text-3xl lg:text-4xl hidden sm:inline leading-none">
               |
             </span>
             <h2 className="text-xl sm:text-2xl lg:text-[28px] xl:text-[30px] font-bold text-white/95 tracking-tight leading-tight inline">
-              {period.title}
+              {isDirectorsCard ? 'Gestões de 1983 a 2021' : period.title}
             </h2>
           </div>
         </div>
 
-        <div className={`grid ${hasPhotos ? 'grid-cols-1 sm:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] gap-4 sm:gap-6 lg:gap-8' : 'grid-cols-1'} flex-1 min-h-0 items-stretch`}>
+        {isDirectorsCard && period.directors ? (
+          /* ================= LAYOUT ESPECIAL: GALERIA DE DIRETORES ANTERIORES ================= */
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5 p-1">
+                {period.directors.map((director) => {
+                  const matchingPhoto = period.photos.find(
+                    (p) => p.url === director.photoUrl || p.title === director.director
+                  );
+
+                  return (
+                    <div
+                      key={director.id}
+                      className="flex flex-col bg-slate-900/60 hover:bg-slate-900/85 backdrop-blur-md border-2 border-white/20 hover:border-white/80 rounded-2xl p-2.5 sm:p-3 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] group text-center select-none"
+                    >
+                      {/* 1. Período da Gestão */}
+                      <div className="mb-2 shrink-0">
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-xs sm:text-sm tracking-tight shadow-sm leading-none">
+                          {director.period}
+                        </span>
+                      </div>
+
+                      {/* 2. Foto do Diretor */}
+                      <div
+                        className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border-2 border-white/25 bg-slate-950 shadow-md my-0.5 cursor-pointer group/photo"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          soundFx.playCardTick();
+                          if (matchingPhoto) {
+                            onOpenPhoto(matchingPhoto, period);
+                          }
+                        }}
+                        title={`Clique para ampliar foto de ${director.director}`}
+                      >
+                        <img
+                          src={director.photoUrl}
+                          alt={director.director}
+                          className="w-full h-full object-cover object-top group-hover/photo:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="px-2 py-0.5 rounded-md bg-white text-slate-950 text-[10px] font-black shadow-md">
+                            Ampliar
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 3. Nome do Diretor */}
+                      <div className="mt-2 shrink-0">
+                        <h4 className="text-xs sm:text-sm font-black text-white tracking-tight leading-snug">
+                          {director.director}
+                        </h4>
+                      </div>
+
+                      {/* 4. Nome do(s) Diretores Adjuntos */}
+                      <div className="mt-1 flex-1 flex flex-col justify-start">
+                        {Array.isArray(director.deputies) ? (
+                          director.deputies.map((dep, dIdx) => (
+                            <p key={dIdx} className="text-[10px] sm:text-[11px] text-white/80 font-medium leading-tight">
+                              {dep}
+                            </p>
+                          ))
+                        ) : director.deputy ? (
+                          <p className="text-[10px] sm:text-[11px] text-white/80 font-medium leading-tight">
+                            {director.deputy}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className={`grid ${hasPhotos ? 'grid-cols-1 sm:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] gap-4 sm:gap-6 lg:gap-8' : 'grid-cols-1'} flex-1 min-h-0 items-stretch`}>
           {/* ================= COLUNA 1: FOTOS HISTÓRICAS DO PERÍODO (SE HOUVER) ================= */}
           {hasPhotos && (
             <div className="flex flex-col h-full min-h-0 min-w-0 justify-center">
@@ -198,6 +275,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
             })()}
           </div>
         </div>
+        )}
       </div>
 
       {/* ================= 2. UNSELECTED NEIGHBOR CARD: COMPACT 1-COLUMN PREVIEW ================= */}

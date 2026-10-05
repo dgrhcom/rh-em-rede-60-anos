@@ -1466,10 +1466,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     }`}
                   >
                     <span className="sm:hidden text-[7px] font-black leading-none tracking-tighter">
-                      {p.startYear === p.endYear ? p.startYear : `${String(p.startYear).slice(2)}-${String(p.endYear).slice(2)}`}
+                      {p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${String(p.startYear).slice(2)}-${String(p.endYear).slice(2)}`}
                     </span>
                     <span className="hidden sm:inline text-[8.5px] md:text-[9.5px] font-black leading-none tracking-tighter">
-                      {p.startYear === p.endYear ? p.startYear : `${p.startYear}-${String(p.endYear).slice(2)}`}
+                      {p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${p.startYear}-${String(p.endYear).slice(2)}`}
                     </span>
                   </div>
                 </button>

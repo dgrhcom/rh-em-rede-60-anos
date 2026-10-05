@@ -34,6 +34,7 @@ const pureBgColors = [
   'bg-[#b44318]', // 12: 2017-2019 (Aux 3 - Terracota Queimado)
   'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
   'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
+  'bg-[#1e3a5f]', // 15: Diretores Anteriores (Azul Marinho Nobre Institucional)
 ];
 
 // 4-column dynamic board game trail coordinates with expanded vertical spacing (step ~450px)
@@ -52,7 +53,8 @@ const trailPositions = [
   { x: 62, y: 5130 },  // 11: 2014-2015 (Col 3)
   { x: 82, y: 5580 },  // 12: 2017-2019 (Col 4)
   { x: 38, y: 6030 },  // 13: 2020-2022 (Col 2)
-  { x: 82, y: 6480 },  // 14: 2024-2026 (Col 4 - Topo / Chegada 60 Anos)
+  { x: 82, y: 6480 },  // 14: 2024-2026 (Col 4)
+  { x: 50, y: 6930 },  // 15: Diretores Anteriores (Col 2/3 - Topo / Chegada)
 ];
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -136,9 +138,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const activePeriod = periods[currentTileIndex];
   const progressPercent = Math.round((visitedIndices.size / totalTiles) * 100);
 
-  // Generate SVG path connecting the 15 tiles from bottom to top (using 0..1000 X coordinate space)
-  // Generate SVG orthogonal path connecting the 15 tiles with straight lines and 90° bends
-  const svgTotalHeight = 6750;
+  // Generate SVG path connecting the 16 tiles from bottom to top (using 0..1000 X coordinate space)
+  // Generate SVG orthogonal path connecting the 16 tiles with straight lines and 90° bends
+  const svgTotalHeight = 7200;
   const buildSvgPath = () => {
     if (trailPositions.length === 0) return '';
     let d = '';

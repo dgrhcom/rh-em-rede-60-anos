@@ -75,7 +75,7 @@ export const PeriodDetailModal: React.FC<PeriodDetailModalProps> = ({
               {period.period}
             </span>
             <span className="text-xs font-bold text-slate-200">
-              {period.index + 1} de 12
+              {period.index + 1} de 16
             </span>
             <div className="flex items-center gap-1.5 ml-auto text-xs text-[#e5a93a] font-black">
               <Award className="w-4 h-4" />
