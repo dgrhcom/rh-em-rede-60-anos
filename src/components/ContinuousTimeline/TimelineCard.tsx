@@ -116,11 +116,29 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                 return (
                   <div
                     key={director.id}
-                    className="flex flex-col sm:flex-row gap-4 sm:gap-5 lg:gap-6 p-4 sm:p-5 lg:p-6 bg-slate-900/65 hover:bg-slate-900/85 backdrop-blur-md border-2 border-white/20 hover:border-white/70 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-xl text-left select-none group"
+                    className="flex flex-col p-4 sm:p-5 lg:p-6 bg-slate-900/65 hover:bg-slate-900/85 backdrop-blur-md border-2 border-white/20 hover:border-white/70 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-xl text-left select-none group"
                   >
-                    {/* Foto dos Diretores Atuais - Tamanho ampliado */}
+                    {/* 1. Cabeçalho com os títulos: Período, Cargo ("Diretora" / "Diretor Adjunto") e Nome */}
+                    <div className="shrink-0 mb-3 sm:mb-3.5 pb-2.5 sm:pb-3 border-b border-white/15">
+                      <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
+                        <span className="inline-block px-3 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-xs sm:text-sm tracking-tight shadow-sm leading-none">
+                          {director.period}
+                        </span>
+                        {director.role && (
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-white/20 text-white font-bold text-xs sm:text-sm tracking-tight border border-white/20 leading-none">
+                            {director.role}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-black text-white tracking-tight leading-tight">
+                        {director.director}
+                      </h3>
+                    </div>
+
+                    {/* 2. Foto dos Diretores Atuais - Abaixo do cabeçalho com os títulos e mais larga */}
                     <div
-                      className="relative w-full sm:w-44 md:w-44 lg:w-52 xl:w-56 aspect-[3/4] sm:aspect-auto sm:h-full rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg shrink-0 cursor-pointer group/photo"
+                      className="relative w-full max-h-[200px] sm:max-h-[225px] lg:max-h-[245px] aspect-[16/10] sm:aspect-[3/2] rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg shrink-0 cursor-pointer group/photo mb-3 sm:mb-3.5"
                       onClick={(e) => {
                         e.stopPropagation();
                         soundFx.playCardTick();
@@ -133,7 +151,9 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                       <img
                         src={director.photoUrl}
                         alt={director.director}
-                        className="w-full h-full object-cover object-top group-hover/photo:scale-105 transition-transform duration-500"
+                        className={`w-full h-full object-cover ${
+                          director.id === 'dir-atual-everaldo' ? 'object-top' : 'object-center'
+                        } group-hover/photo:scale-105 transition-transform duration-500`}
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
@@ -143,36 +163,14 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                       </div>
                     </div>
 
-                    {/* Informações detalhadas da Gestão Atual */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
-                      <div>
-                        {/* Período e Cargo */}
-                        <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
-                          <span className="inline-block px-3 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-xs sm:text-sm tracking-tight shadow-sm leading-none">
-                            {director.period}
-                          </span>
-                          {director.role && (
-                            <span className="inline-block px-2.5 py-1 rounded-full bg-white/20 text-white font-bold text-xs tracking-tight border border-white/20 leading-none">
-                              {director.role}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Nome do Diretor */}
-                        <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-[26px] font-black text-white tracking-tight leading-tight">
-                          {director.director}
-                        </h3>
+                    {/* 3. Biografia oficial completa */}
+                    {director.bio && (
+                      <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
+                        <p className="text-xs sm:text-sm lg:text-[14px] text-white/90 leading-relaxed font-normal">
+                          {director.bio}
+                        </p>
                       </div>
-
-                      {/* Biografia oficial completa */}
-                      {director.bio && (
-                        <div className="mt-3 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[180px] sm:max-h-[220px] lg:max-h-[260px]">
-                          <p className="text-xs sm:text-sm lg:text-[14px] text-white/90 leading-relaxed font-normal">
-                            {director.bio}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 );
               })}
