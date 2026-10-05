@@ -49,6 +49,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
         url: '/linha_do_tempo_1962.jpg',
         aspectRatio: 'landscape',
         credit: 'Acervo Histórico Unicamp',
+        objectPosition: 'top',
       },
       {
         id: 'p1-2',

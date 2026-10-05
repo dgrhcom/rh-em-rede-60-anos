@@ -26,11 +26,11 @@ export const isTopAlignedPhoto = (
   if (!photoOrUrl) return false;
   if (typeof photoOrUrl === 'object') {
     if (photoOrUrl.objectPosition === 'top') return true;
-    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1/i.test(
+    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962/i.test(
       `${photoOrUrl.url || ''} ${photoOrUrl.title || ''} ${photoOrUrl.credit || ''} ${photoOrUrl.caption || ''}`
     );
   }
-  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1/i.test(
+  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962/i.test(
     `${photoOrUrl} ${title || ''} ${credit || ''}`
   );
 };
