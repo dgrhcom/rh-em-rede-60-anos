@@ -1391,16 +1391,6 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
               );
             })}
           </div>
-
-          {/* Total PAEPE */}
-          <div className="pt-2.5 sm:pt-3 mt-1 flex items-center justify-between px-1.5 border-t border-slate-200">
-            <span className="text-xs sm:text-sm lg:text-base font-normal text-slate-600">
-              Total PAEPE (2026)
-            </span>
-            <span className="text-base sm:text-lg lg:text-xl font-semibold text-[#105e7b] tracking-wider">
-              {totalPAEPE2026.toLocaleString('pt-BR')}
-            </span>
-          </div>
         </div>
 
         {/* 2. Destaque Histórico (Abaixo da Legenda) */}
@@ -1664,16 +1654,6 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
                 </div>
               );
             })}
-          </div>
-
-          {/* Total Selecionado do Zoom */}
-          <div className="pt-3 sm:pt-4 mt-1 flex items-center justify-between px-2 border-t border-slate-200">
-            <span className="text-base sm:text-lg lg:text-xl font-normal text-slate-600">
-              Total Selecionado (2026)
-            </span>
-            <span className="text-xl sm:text-2xl lg:text-3xl font-semibold text-[#105e7b] tracking-wider">
-              {ESCOLARIDADE_ZOOM_SERIES.reduce((acc, s) => acc + s.valores[s.valores.length - 1], 0).toLocaleString('pt-BR')}
-            </span>
           </div>
         </div>
 
