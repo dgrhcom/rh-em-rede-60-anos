@@ -71,12 +71,12 @@ export const DESTAQUE_FAIXA_ETARIA = {
 };
 
 export const RACA_COR_DATA = [
-  { raca: 'Branca', total: 10302, pct: 71.9 },
-  { raca: 'Parda', total: 1870, pct: 18.3 },
-  { raca: 'Preta', total: 794, pct: 5.6 },
-  { raca: 'Amarela', total: 332, pct: 1.3 },
-  { raca: 'Não Informado', total: 229, pct: 2.7 },
-  { raca: 'Indígena', total: 27, pct: 0.3 },
+  { raca: 'Branca', total: 7155, pct: 76.5 },
+  { raca: 'Parda', total: 1259, pct: 13.5 },
+  { raca: 'Preta', total: 618, pct: 6.6 },
+  { raca: 'Amarela', total: 217, pct: 2.3 },
+  { raca: 'Não Informado', total: 95, pct: 1.0 },
+  { raca: 'Indígena', total: 11, pct: 0.1 },
 ];
 
 // Dados completos da Tabela 2 da planilha oficial por categoria funcional

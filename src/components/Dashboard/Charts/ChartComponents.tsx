@@ -644,12 +644,12 @@ export const RacaCorCharts: React.FC = () => {
   const chartInstanceRef = useRef<any>(null);
 
   const racaCorSlices = [
-    { raca: 'Branca', total: 10302, pct: 71.9, cor: DS_COLORS.primary },        // #105e7b - Azul Primário DGRH
-    { raca: 'Parda', total: 1870, pct: 18.3, cor: DS_COLORS.secondary },       // #e5a93a - Dourado Secundário
-    { raca: 'Preta', total: 794, pct: 5.6, cor: DS_COLORS.aux2 },              // #5e2a6b - Roxo Auxiliar 2
-    { raca: 'Não Informado', total: 229, pct: 2.7, cor: DS_COLORS.slate },      // #475569 - Slate
-    { raca: 'Amarela', total: 332, pct: 1.3, cor: DS_COLORS.aux3 },            // #d67b27 - Laranja Auxiliar 3
-    { raca: 'Indígena', total: 27, pct: 0.3, cor: DS_COLORS.aux1 },            // #477b2f - Verde Auxiliar 1
+    { raca: 'Branca', total: 7155, pct: 76.5, cor: DS_COLORS.primary },        // #105e7b - Azul Primário DGRH
+    { raca: 'Parda', total: 1259, pct: 13.5, cor: DS_COLORS.secondary },       // #e5a93a - Dourado Secundário
+    { raca: 'Preta', total: 618, pct: 6.6, cor: DS_COLORS.aux2 },              // #5e2a6b - Roxo Auxiliar 2
+    { raca: 'Amarela', total: 217, pct: 2.3, cor: DS_COLORS.aux3 },            // #d67b27 - Laranja Auxiliar 3
+    { raca: 'Não Informado', total: 95, pct: 1.0, cor: DS_COLORS.slate },      // #475569 - Slate
+    { raca: 'Indígena', total: 11, pct: 0.1, cor: DS_COLORS.aux1 },            // #477b2f - Verde Auxiliar 1
   ];
 
   const totalGeralRaca = racaCorSlices.reduce((acc, r) => acc + r.total, 0); // 13.554
@@ -851,7 +851,7 @@ export const RacaCorCharts: React.FC = () => {
         <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
           <Users className="w-5 h-5 text-[#105e7b] shrink-0 mt-0.5" />
           <div className="text-xs sm:text-sm lg:text-base leading-relaxed font-normal text-slate-700">
-            <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 71,9% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 18,3% <span className="font-semibold text-slate-900">Pardos</span> e 5,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
+            <span className="font-semibold text-slate-900">Autodeclaração Institucional:</span> 76,5% autodeclarados <span className="font-semibold text-slate-900">Brancos</span>, 13,5% <span className="font-semibold text-slate-900">Pardos</span> e 6,6% <span className="font-semibold text-slate-900">Pretos</span> no quadro total.
           </div>
         </div>
       </div>
