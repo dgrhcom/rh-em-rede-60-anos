@@ -643,16 +643,44 @@ export const RacaCorCharts: React.FC = () => {
           const meta = chartInstance.getDatasetMeta(0);
           const isMobile = chartInstance.width < 500;
 
+          interface BadgeInfo {
+            index: number;
+            text: string;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            fontSize: number;
+            padX: number;
+            padY: number;
+            isExternal: boolean;
+            edgeX: number;
+            edgeY: number;
+            color: string;
+          }
+
+          const badges: BadgeInfo[] = [];
+
+          // Coleta itens visíveis
+          const visibleItems: { item: (typeof racaCorSlices)[0]; index: number; element: any }[] = [];
           racaCorSlices.forEach((item, i) => {
             if (!chartInstance.getDataVisibility(i)) return;
             const element = meta.data[i];
             if (!element) return;
+            visibleItems.push({ item, index: i, element });
+          });
 
+          // Fatias muito estreitas (< 2.0%, ex: Não Informado 1.0% e Indígena 0.1%) recebem badges externos com linha indicadora
+          const smallSlices = visibleItems.filter((v) => v.item.pct < 2.0);
+
+          visibleItems.forEach((v) => {
+            const { item, index, element } = v;
             const midAngle = (element.startAngle + element.endAngle) / 2;
             const R = element.outerRadius;
             const centerX = element.x;
             const centerY = element.y;
 
+            const isSmall = item.pct < 2.0;
             let rRatio = 0.58;
             let badgeFontSize = isMobile ? 22 : 36;
             let padX = isMobile ? 12 : 20;
@@ -678,34 +706,142 @@ export const RacaCorCharts: React.FC = () => {
               badgeFontSize = isMobile ? 13 : 18;
               padX = isMobile ? 7 : 10;
               padY = isMobile ? 3 : 5;
-            } else if (item.pct > 1) {
-              rRatio = 0.90;
-              badgeFontSize = isMobile ? 12 : 16;
-              padX = isMobile ? 6 : 9;
-              padY = isMobile ? 3 : 5;
             } else {
-              rRatio = 0.98;
-              badgeFontSize = isMobile ? 11 : 14;
-              padX = isMobile ? 5 : 8;
-              padY = isMobile ? 2 : 4;
+              // Fatias < 2% (Não Informado 1,0% e Indígena 0,1%)
+              badgeFontSize = isMobile ? 12 : 15;
+              padX = isMobile ? 7 : 10;
+              padY = isMobile ? 3.5 : 5;
             }
 
-            const posX = centerX + Math.cos(midAngle) * (R * rRatio);
-            const posY = centerY + Math.sin(midAngle) * (R * rRatio);
-
             const text = `${item.pct.toFixed(1).replace('.', ',')}%`;
-            drawBadge(
-              c,
+
+            c.save();
+            c.font = `bold ${badgeFontSize}px Inter, -apple-system, sans-serif`;
+            const textWidth = c.measureText(text).width;
+            const badgeWidth = textWidth + padX * 2;
+            const badgeHeight = badgeFontSize + padY * 2;
+            c.restore();
+
+            const edgeX = centerX + Math.cos(midAngle) * R;
+            const edgeY = centerY + Math.sin(midAngle) * R;
+
+            let posX: number;
+            let posY: number;
+
+            if (isSmall) {
+              // Posicionamento externo com linha indicadora (afastando fatias vizinhas para evitar qualquer sobreposição)
+              const smallIndex = smallSlices.findIndex((s) => s.index === index);
+              const totalSmall = smallSlices.length;
+
+              const uRadX = Math.cos(midAngle);
+              const uRadY = Math.sin(midAngle);
+              const uTanX = -Math.sin(midAngle);
+              const uTanY = Math.cos(midAngle);
+
+              const radialOffset = isMobile ? 24 : 30;
+              const tangentialSpread = totalSmall > 1
+                ? (smallIndex - (totalSmall - 1) / 2) * (isMobile ? 54 : 68)
+                : 0;
+
+              posX = edgeX + uRadX * radialOffset + uTanX * tangentialSpread;
+              posY = edgeY + uRadY * radialOffset + uTanY * tangentialSpread;
+            } else {
+              posX = centerX + Math.cos(midAngle) * (R * rRatio);
+              posY = centerY + Math.sin(midAngle) * (R * rRatio);
+            }
+
+            badges.push({
+              index,
               text,
-              posX,
-              posY,
-              'rgba(15, 23, 42, 0.92)',
-              '#ffffff',
-              badgeFontSize,
+              x: posX,
+              y: posY,
+              width: badgeWidth,
+              height: badgeHeight,
+              fontSize: badgeFontSize,
               padX,
               padY,
+              isExternal: isSmall,
+              edgeX,
+              edgeY,
+              color: item.cor,
+            });
+          });
+
+          // Resolução iterativa de colisões para garantia absoluta de espaçamento
+          for (let iter = 0; iter < 5; iter++) {
+            let hadCollision = false;
+            for (let i = 0; i < badges.length; i++) {
+              for (let j = i + 1; j < badges.length; j++) {
+                const b1 = badges[i];
+                const b2 = badges[j];
+                const dx = b2.x - b1.x;
+                const dy = b2.y - b1.y;
+                const minDistX = (b1.width + b2.width) / 2 + 8;
+                const minDistY = (b1.height + b2.height) / 2 + 6;
+
+                if (Math.abs(dx) < minDistX && Math.abs(dy) < minDistY) {
+                  hadCollision = true;
+                  const overlapX = minDistX - Math.abs(dx);
+                  const overlapY = minDistY - Math.abs(dy);
+
+                  if (overlapX < overlapY) {
+                    const shift = overlapX / 2;
+                    if (dx >= 0) {
+                      b1.x -= shift;
+                      b2.x += shift;
+                    } else {
+                      b1.x += shift;
+                      b2.x -= shift;
+                    }
+                  } else {
+                    const shift = overlapY / 2;
+                    if (dy >= 0) {
+                      b1.y -= shift;
+                      b2.y += shift;
+                    } else {
+                      b1.y += shift;
+                      b2.y += shift;
+                    }
+                  }
+                }
+              }
+            }
+            if (!hadCollision) break;
+          }
+
+          // 1. Traçar linhas indicadoras para badges externos
+          badges.forEach((b) => {
+            if (b.isExternal) {
+              c.save();
+              c.beginPath();
+              c.moveTo(b.edgeX, b.edgeY);
+              c.lineTo(b.x, b.y);
+              c.strokeStyle = b.color;
+              c.lineWidth = 1.5;
+              c.stroke();
+
+              c.beginPath();
+              c.arc(b.edgeX, b.edgeY, 2.5, 0, Math.PI * 2);
+              c.fillStyle = b.color;
+              c.fill();
+              c.restore();
+            }
+          });
+
+          // 2. Desenhar os badges
+          badges.forEach((b) => {
+            drawBadge(
+              c,
+              b.text,
+              b.x,
+              b.y,
+              'rgba(15, 23, 42, 0.92)',
+              '#ffffff',
+              b.fontSize,
+              b.padX,
+              b.padY,
               8,
-              'rgba(255, 255, 255, 0.6)'
+              b.isExternal ? b.color : 'rgba(255, 255, 255, 0.6)'
             );
           });
         },
@@ -729,7 +865,12 @@ export const RacaCorCharts: React.FC = () => {
           responsive: true,
           maintainAspectRatio: false,
           layout: {
-            padding: 12,
+            padding: {
+              top: 38,
+              bottom: 16,
+              left: 20,
+              right: 20,
+            },
           },
           plugins: {
             legend: {
