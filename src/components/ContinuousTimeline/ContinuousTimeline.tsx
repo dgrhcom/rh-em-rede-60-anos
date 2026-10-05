@@ -1450,11 +1450,11 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               const cardBgClass = pureBgColors[idx % pureBgColors.length];
 
               return (
-                <button
+                  <button
                   key={p.id}
                   onClick={() => slideToIndex(idx)}
                   className="relative z-10 flex flex-col items-center cursor-pointer group transition-all duration-200"
-                  title={`${p.period} • ${p.title}`}
+                  title={`${p.title} (${p.period})`}
                 >
                   <div
                     className={`min-w-5 sm:min-w-7 h-5 sm:h-6 px-0.5 sm:px-1 rounded-full flex items-center justify-center transition-all ${
@@ -1466,10 +1466,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                     }`}
                   >
                     <span className="sm:hidden text-[7px] font-black leading-none tracking-tighter">
-                      {p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${String(p.startYear).slice(2)}-${String(p.endYear).slice(2)}`}
+                      {p.id === 'period-16' ? 'ANT' : p.id === 'period-17' ? 'ATU' : p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${String(p.startYear).slice(2)}-${String(p.endYear).slice(2)}`}
                     </span>
                     <span className="hidden sm:inline text-[8.5px] md:text-[9.5px] font-black leading-none tracking-tighter">
-                      {p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${p.startYear}-${String(p.endYear).slice(2)}`}
+                      {p.id === 'period-16' ? 'ANT' : p.id === 'period-17' ? 'ATUAL' : p.directors ? 'DIR' : p.startYear === p.endYear ? p.startYear : `${p.startYear}-${String(p.endYear).slice(2)}`}
                     </span>
                   </div>
                 </button>

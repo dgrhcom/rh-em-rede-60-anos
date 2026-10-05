@@ -35,6 +35,7 @@ const pureBgColors = [
   'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
   'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
   'bg-[#1e3a5f]', // 15: Diretores Anteriores (Azul Marinho Nobre Institucional)
+  'bg-[#0f4c64]', // 16: Diretores Atuais (Azul Petróleo Institucional)
 ];
 
 // 4-column dynamic board game trail coordinates with expanded vertical spacing (step ~450px)
@@ -54,7 +55,8 @@ const trailPositions = [
   { x: 82, y: 5580 },  // 12: 2017-2019 (Col 4)
   { x: 38, y: 6030 },  // 13: 2020-2022 (Col 2)
   { x: 82, y: 6480 },  // 14: 2024-2026 (Col 4)
-  { x: 50, y: 6930 },  // 15: Diretores Anteriores (Col 2/3 - Topo / Chegada)
+  { x: 38, y: 6930 },  // 15: Diretores Anteriores (Col 2)
+  { x: 62, y: 7380 },  // 16: Diretores Atuais (Col 3 - Topo / Chegada)
 ];
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -140,7 +142,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   // Generate SVG path connecting the 16 tiles from bottom to top (using 0..1000 X coordinate space)
   // Generate SVG orthogonal path connecting the 16 tiles with straight lines and 90° bends
-  const svgTotalHeight = 7200;
+  const svgTotalHeight = 7650;
   const buildSvgPath = () => {
     if (trailPositions.length === 0) return '';
     let d = '';

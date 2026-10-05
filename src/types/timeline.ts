@@ -43,6 +43,7 @@ export interface DirectorProfile {
   deputies?: string[]; // e.g. ["Margareth Bazzo (Adjunta 1990-1994)", "Cecília Rampazzo (Adjunta 1995-1998)"]
   photoUrl: string;
   bio?: string;
+  role?: string;
 }
 
 export interface PeriodMilestone {

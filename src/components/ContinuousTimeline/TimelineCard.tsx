@@ -32,6 +32,7 @@ export const pureBgColors = [
   'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
   'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
   'bg-[#1e3a5f]', // 15: Diretores Anteriores (Azul Marinho Nobre Institucional)
+  'bg-[#0f4c64]', // 16: Diretores Atuais (Azul Petróleo Institucional)
 ];
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({
@@ -44,6 +45,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   const cardBgClass = pureBgColors[period.index % pureBgColors.length];
   const hasPhotos = Boolean(period.photos && period.photos.length > 0);
   const isDirectorsCard = Boolean(period.directors && period.directors.length > 0);
+  const isCurrentDirectorsCard = isDirectorsCard && Boolean(period.directors && period.directors.length <= 2);
 
   const handleNeighborClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -91,18 +93,92 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
         <div className="pb-3 sm:pb-3.5 border-b-2 border-white/20 shrink-0 text-left pr-12 sm:pr-14 mb-3 sm:mb-4">
           <div className="flex flex-wrap items-baseline gap-x-3 sm:gap-x-4 gap-y-1">
             <span className="text-3xl sm:text-4xl lg:text-5xl xl:text-[54px] font-black tracking-tight text-[#e5a93a] whitespace-nowrap leading-none drop-shadow-xs">
-              {isDirectorsCard ? 'Diretores anteriores' : period.period}
+              {isDirectorsCard ? period.title : period.period}
             </span>
             <span className="text-white/30 font-light select-none text-2xl sm:text-3xl lg:text-4xl hidden sm:inline leading-none">
               |
             </span>
             <h2 className="text-xl sm:text-2xl lg:text-[28px] xl:text-[30px] font-bold text-white/95 tracking-tight leading-tight inline">
-              {isDirectorsCard ? 'Gestões de 1983 a 2021' : period.title}
+              {isDirectorsCard ? period.period : period.title}
             </h2>
           </div>
         </div>
 
-        {isDirectorsCard && period.directors ? (
+        {isCurrentDirectorsCard && period.directors ? (
+          /* ================= LAYOUT ESPECIAL: DIRETORES ATUAIS (2021 – 2029) ================= */
+          <div className="flex-1 min-h-0 flex flex-col justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 h-full max-h-full items-stretch">
+              {period.directors.map((director) => {
+                const matchingPhoto = period.photos.find(
+                  (p) => p.url === director.photoUrl || p.title === director.director
+                );
+
+                return (
+                  <div
+                    key={director.id}
+                    className="flex flex-col sm:flex-row gap-4 sm:gap-5 lg:gap-6 p-4 sm:p-5 lg:p-6 bg-slate-900/65 hover:bg-slate-900/85 backdrop-blur-md border-2 border-white/20 hover:border-white/70 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-xl text-left select-none group"
+                  >
+                    {/* Foto dos Diretores Atuais - Tamanho ampliado */}
+                    <div
+                      className="relative w-full sm:w-44 md:w-44 lg:w-52 xl:w-56 aspect-[3/4] sm:aspect-auto sm:h-full rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg shrink-0 cursor-pointer group/photo"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        soundFx.playCardTick();
+                        if (matchingPhoto) {
+                          onOpenPhoto(matchingPhoto, period);
+                        }
+                      }}
+                      title={`Clique para ampliar foto de ${director.director}`}
+                    >
+                      <img
+                        src={director.photoUrl}
+                        alt={director.director}
+                        className="w-full h-full object-cover object-top group-hover/photo:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="px-3 py-1 rounded-md bg-white text-slate-950 text-xs font-black shadow-md">
+                          Ampliar
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Informações detalhadas da Gestão Atual */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+                      <div>
+                        {/* Período e Cargo */}
+                        <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
+                          <span className="inline-block px-3 py-1 rounded-full bg-[#e5a93a] text-slate-950 font-black text-xs sm:text-sm tracking-tight shadow-sm leading-none">
+                            {director.period}
+                          </span>
+                          {director.role && (
+                            <span className="inline-block px-2.5 py-1 rounded-full bg-white/20 text-white font-bold text-xs tracking-tight border border-white/20 leading-none">
+                              {director.role}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Nome do Diretor */}
+                        <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-[26px] font-black text-white tracking-tight leading-tight">
+                          {director.director}
+                        </h3>
+                      </div>
+
+                      {/* Biografia oficial completa */}
+                      {director.bio && (
+                        <div className="mt-3 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[180px] sm:max-h-[220px] lg:max-h-[260px]">
+                          <p className="text-xs sm:text-sm lg:text-[14px] text-white/90 leading-relaxed font-normal">
+                            {director.bio}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : isDirectorsCard && period.directors ? (
           /* ================= LAYOUT ESPECIAL: GALERIA DE DIRETORES ANTERIORES ================= */
           <div className="flex-1 min-h-0 flex flex-col">
             <div className="flex-1 min-h-0 overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
@@ -156,16 +232,16 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                         </h4>
                       </div>
 
-                      {/* 4. Nome do(s) Diretores Adjuntos */}
-                      <div className="mt-1 flex-1 flex flex-col justify-start">
+                      {/* 4. Nome do(s) Diretores Adjuntos - Fonte ampliada */}
+                      <div className="mt-1.5 flex-1 flex flex-col justify-start gap-0.5">
                         {Array.isArray(director.deputies) ? (
                           director.deputies.map((dep, dIdx) => (
-                            <p key={dIdx} className="text-[10px] sm:text-[11px] text-white/80 font-medium leading-tight">
+                            <p key={dIdx} className="text-xs sm:text-[13px] text-white/95 font-semibold leading-snug">
                               {dep}
                             </p>
                           ))
                         ) : director.deputy ? (
-                          <p className="text-[10px] sm:text-[11px] text-white/80 font-medium leading-tight">
+                          <p className="text-xs sm:text-[13px] text-white/95 font-semibold leading-snug">
                             {director.deputy}
                           </p>
                         ) : null}
