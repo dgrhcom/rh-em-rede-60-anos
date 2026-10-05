@@ -298,7 +298,7 @@ export const CircleCarousel: React.FC<CircleCarouselProps> = ({
           <button
             onClick={() => rotateToIndex(0)}
             className="p-1 rounded-full bg-white text-slate-700 hover:text-slate-950 border-2 border-slate-900 hover:bg-slate-100 shadow-xs transition-colors cursor-pointer"
-            title="Voltar ao Início (1983)"
+            title="Voltar ao Início (1962)"
           >
             <RotateCcw className="w-3 h-3" />
           </button>

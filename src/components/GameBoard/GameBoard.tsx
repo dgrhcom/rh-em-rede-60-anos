@@ -17,38 +17,42 @@ interface GameBoardProps {
   onOpenDetail: (period: HistoricalPeriod) => void;
 }
 
-// Pure DGRH colors for the 13 periods
+// Pure DGRH colors for the 15 periods
 const pureBgColors = [
-  'bg-[#105e7b]', // 0: 1983-1986 (Azul DGRH)
-  'bg-[#477b2f]', // 1: 1989 (Verde DGRH)
-  'bg-[#5e2a6b]', // 2: 1990-1993 (Roxo DGRH)
-  'bg-[#d67b27]', // 3: 1995-1997 (Laranja DGRH)
-  'bg-[#0a4155]', // 4: 1998 (Azul Petróleo)
-  'bg-[#366023]', // 5: 1999-2000 (Verde Floresta)
-  'bg-[#6b213b]', // 6: 2001-2003 (Vinho Profundo)
-  'bg-[#1a508b]', // 7: 2004-2006 (Azul Cobalto)
-  'bg-[#4c1d95]', // 8: 2008-2011 (Roxo Escuro)
-  'bg-[#c05621]', // 9: 2014-2015 (Terracota)
-  'bg-[#0d6e8a]', // 10: 2017-2019 (Azul Oceano)
-  'bg-[#701a75]', // 11: 2020-2022 (Ameixa DGRH)
-  'bg-[#105e7b]', // 12: 2024-2026 (Azul DGRH 60 Anos)
+  'bg-[#105e7b]', // 0: 1962 (Primária - Azul DGRH)
+  'bg-[#d67b27]', // 1: 1966-1974 (Aux 3 - Laranja DGRH)
+  'bg-[#477b2f]', // 2: 1983-1986 (Aux 1 - Verde DGRH)
+  'bg-[#5e2a6b]', // 3: 1989 (Aux 2 - Roxo DGRH)
+  'bg-[#187fa1]', // 4: 1990-1993 (Azul Céu DGRH)
+  'bg-[#b8801a]', // 5: 1995-1997 (Secundária - Dourado Profundo Unicamp 60 Anos)
+  'bg-[#366023]', // 6: 1998 (Aux 1 - Verde Floresta)
+  'bg-[#6b213b]', // 7: 1999-2000 (Aux 2 - Vinho Profundo)
+  'bg-[#c05621]', // 8: 2001-2003 (Aux 3 - Terracota)
+  'bg-[#a16207]', // 9: 2004-2006 (Secundária - Âmbar Ouro)
+  'bg-[#2d5a27]', // 10: 2008-2011 (Aux 1 - Verde Escuro)
+  'bg-[#4c1d95]', // 11: 2014-2015 (Aux 2 - Roxo Profundo)
+  'bg-[#b44318]', // 12: 2017-2019 (Aux 3 - Terracota Queimado)
+  'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
+  'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
 ];
 
 // 4-column dynamic board game trail coordinates with expanded vertical spacing (step ~450px)
 const trailPositions = [
-  { x: 18, y: 180 },   // 0: 1983-1986 (Col 1 - Base / Partida)
-  { x: 62, y: 630 },   // 1: 1989 (Col 3)
-  { x: 82, y: 1080 },  // 2: 1990-1993 (Col 4)
-  { x: 38, y: 1530 },  // 3: 1995-1997 (Col 2)
-  { x: 18, y: 1980 },  // 4: 1998 (Col 1)
-  { x: 82, y: 2430 },  // 5: 1999-2000 (Col 4)
-  { x: 62, y: 2880 },  // 6: 2001-2003 (Col 3)
-  { x: 18, y: 3330 },  // 7: 2004-2006 (Col 1)
-  { x: 38, y: 3780 },  // 8: 2008-2011 (Col 2)
-  { x: 82, y: 4230 },  // 9: 2014-2015 (Col 4)
-  { x: 38, y: 4680 },  // 10: 2017-2019 (Col 2)
-  { x: 62, y: 5130 },  // 11: 2020-2022 (Col 3)
-  { x: 82, y: 5580 },  // 12: 2024-2026 (Col 4 - Topo / Chegada 60 Anos)
+  { x: 18, y: 180 },   // 0: 1962 (Col 1 - Base / Partida)
+  { x: 62, y: 630 },   // 1: 1966-1974 (Col 3)
+  { x: 82, y: 1080 },  // 2: 1983-1986 (Col 4)
+  { x: 38, y: 1530 },  // 3: 1989 (Col 2)
+  { x: 18, y: 1980 },  // 4: 1990-1993 (Col 1)
+  { x: 82, y: 2430 },  // 5: 1995-1997 (Col 4)
+  { x: 62, y: 2880 },  // 6: 1998 (Col 3)
+  { x: 18, y: 3330 },  // 7: 1999-2000 (Col 1)
+  { x: 38, y: 3780 },  // 8: 2001-2003 (Col 2)
+  { x: 82, y: 4230 },  // 9: 2004-2006 (Col 4)
+  { x: 38, y: 4680 },  // 10: 2008-2011 (Col 2)
+  { x: 62, y: 5130 },  // 11: 2014-2015 (Col 3)
+  { x: 82, y: 5580 },  // 12: 2017-2019 (Col 4)
+  { x: 38, y: 6030 },  // 13: 2020-2022 (Col 2)
+  { x: 82, y: 6480 },  // 14: 2024-2026 (Col 4 - Topo / Chegada 60 Anos)
 ];
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -132,9 +136,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const activePeriod = periods[currentTileIndex];
   const progressPercent = Math.round((visitedIndices.size / totalTiles) * 100);
 
-  // Generate SVG path connecting the 13 tiles from bottom to top (using 0..1000 X coordinate space)
-  // Generate SVG orthogonal path connecting the 13 tiles with straight lines and 90° bends
-  const svgTotalHeight = 5850;
+  // Generate SVG path connecting the 15 tiles from bottom to top (using 0..1000 X coordinate space)
+  // Generate SVG orthogonal path connecting the 15 tiles with straight lines and 90° bends
+  const svgTotalHeight = 6750;
   const buildSvgPath = () => {
     if (trailPositions.length === 0) return '';
     let d = '';
@@ -266,7 +270,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#105e7b] text-white font-black text-xs uppercase tracking-wider shadow-md border-2 border-slate-900">
             <Flag className="w-4 h-4 text-[#e5a93a]" />
-            <span>Ponto de Partida • 1983</span>
+            <span>Ponto de Partida • 1962</span>
           </div>
           <p className="text-[11px] text-slate-500 font-bold mt-1">
             Gire o scroll ou jogue o dado para subir a trilha
@@ -427,14 +431,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </button>
         </div>
 
-        {/* Reset Trail to 1983 (Bottom) */}
+        {/* Reset Trail to 1962 (Bottom) */}
         <button
           onClick={() => {
             soundFx.playCardTick();
             handleMove(0);
           }}
           className="p-2.5 rounded-2xl bg-white border-2 border-slate-900 hover:bg-slate-100 text-slate-900 shadow-md transition-colors cursor-pointer"
-          title="Voltar à base da trilha (1983)"
+          title="Voltar à base da trilha (1962)"
         >
           <RotateCcw className="w-4 h-4" />
         </button>

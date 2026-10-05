@@ -14,21 +14,23 @@ interface TimelineCardProps {
   onOpenPhoto: (photo: MilestonePhoto, period: HistoricalPeriod) => void;
 }
 
-// Deep, saturated DGRH colors for the 13 periods (Secondary and Auxiliaries only - Primary reserved strictly for Cover)
+// Deep, saturated DGRH colors for the 15 periods
 export const pureBgColors = [
-  'bg-[#477b2f]', // 0: 1983-1986 (Aux 1 - Verde DGRH)
-  'bg-[#5e2a6b]', // 1: 1989 (Aux 2 - Roxo DGRH)
-  'bg-[#d67b27]', // 2: 1990-1993 (Aux 3 - Laranja DGRH)
-  'bg-[#b8801a]', // 3: 1995-1997 (Secundária - Dourado Profundo Unicamp 60 Anos)
-  'bg-[#366023]', // 4: 1998 (Aux 1 - Verde Floresta)
-  'bg-[#6b213b]', // 5: 1999-2000 (Aux 2 - Vinho Profundo)
-  'bg-[#c05621]', // 6: 2001-2003 (Aux 3 - Terracota)
-  'bg-[#a16207]', // 7: 2004-2006 (Secundária - Âmbar Ouro)
-  'bg-[#2d5a27]', // 8: 2008-2011 (Aux 1 - Verde Escuro)
-  'bg-[#4c1d95]', // 9: 2014-2015 (Aux 2 - Roxo Profundo)
-  'bg-[#b44318]', // 10: 2017-2019 (Aux 3 - Terracota Queimado)
-  'bg-[#701a75]', // 11: 2020-2022 (Aux 2 - Ameixa DGRH)
-  'bg-[#105e7b]', // 12: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
+  'bg-[#105e7b]', // 0: 1962 (Primária - Azul DGRH)
+  'bg-[#d67b27]', // 1: 1966-1974 (Aux 3 - Laranja DGRH)
+  'bg-[#477b2f]', // 2: 1983-1986 (Aux 1 - Verde DGRH)
+  'bg-[#5e2a6b]', // 3: 1989 (Aux 2 - Roxo DGRH)
+  'bg-[#187fa1]', // 4: 1990-1993 (Azul Céu DGRH)
+  'bg-[#b8801a]', // 5: 1995-1997 (Secundária - Dourado Profundo Unicamp 60 Anos)
+  'bg-[#366023]', // 6: 1998 (Aux 1 - Verde Floresta)
+  'bg-[#6b213b]', // 7: 1999-2000 (Aux 2 - Vinho Profundo)
+  'bg-[#c05621]', // 8: 2001-2003 (Aux 3 - Terracota)
+  'bg-[#a16207]', // 9: 2004-2006 (Secundária - Âmbar Ouro)
+  'bg-[#2d5a27]', // 10: 2008-2011 (Aux 1 - Verde Escuro)
+  'bg-[#4c1d95]', // 11: 2014-2015 (Aux 2 - Roxo Profundo)
+  'bg-[#b44318]', // 12: 2017-2019 (Aux 3 - Terracota Queimado)
+  'bg-[#701a75]', // 13: 2020-2022 (Aux 2 - Ameixa DGRH)
+  'bg-[#105e7b]', // 14: 2024-2026 (Primária DGRH - Azul Celebração 60 Anos)
 ];
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({
@@ -168,14 +170,21 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
 
                       {/* Tópicos dos marcos para o ano: 26px */}
                       <ul className="space-y-3.5 list-disc pl-5 sm:pl-6">
-                        {milestones.map((m) => (
-                          <li
-                            key={m.id}
-                            className="text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
-                          >
-                            {m.text}
-                          </li>
-                        ))}
+                        {milestones.map((m) => {
+                          const isHeading = m.text.endsWith(':');
+                          return (
+                            <li
+                              key={m.id}
+                              className={
+                                isHeading
+                                  ? "list-none -ml-5 sm:-ml-6 text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-bold text-white tracking-normal break-words mt-1 mb-1"
+                                  : "text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
+                              }
+                            >
+                              {m.text}
+                            </li>
+                          );
+                        })}
                       </ul>
 
                       {/* Separador horizontal entre anos */}

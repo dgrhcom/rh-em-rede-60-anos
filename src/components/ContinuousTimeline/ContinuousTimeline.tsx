@@ -260,8 +260,8 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
         setPreAnimProgress(obj.p);
 
         // Sound cadence as cards slide in from the left and snap individually into the central deck
-        for (let i = 0; i <= 12; i++) {
-          const cardArrival = 0.02 + (i / 12) * 0.28 + 0.12;
+        for (let i = 0; i <= totalPeriods; i++) {
+          const cardArrival = 0.02 + (i / totalPeriods) * 0.28 + 0.12;
           if (obj.p >= cardArrival && !cardsTicked.has(i)) {
             cardsTicked.add(i);
             soundFx.playCardTick();
@@ -876,16 +876,18 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             let currentZIndex = targetZIndex;
 
             if (isIntroActive) {
-              // 3D Fan Stack initial values (13 items total: 12 cards + cover, centered symmetrically at 6.0)
+              // 3D Fan Stack initial values (totalPeriods + 1 items total: cards + cover, centered symmetrically)
+              const totalFanItems = totalPeriods + 1;
+              const fanCenter = (totalFanItems - 1) / 2.0;
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
               const isTablet = typeof window !== 'undefined' && window.innerWidth >= 640 && window.innerWidth < 1024;
               const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
-              const angleStep = isMobile ? 1.5 : 2.0; // Tighter fan tilt
-              const spreadStep = isMobile ? 6.5 : 9.0;  // Tighter horizontal spread
-              const arcStep = isMobile ? 1.2 : 1.6;   // Gentle natural arc
+              const angleStep = isMobile ? 1.2 : 1.6; // Tighter fan tilt to fit 16 items
+              const spreadStep = isMobile ? 5.5 : 7.5;  // Tighter horizontal spread to fit 16 items
+              const arcStep = isMobile ? 1.0 : 1.3;   // Gentle natural arc
               const arcBase = isMobile ? 3 : 4;
 
-              const fanDelta = idx - 6.0; // Symmetrical around 6.0 for 13 items (0..12)
+              const fanDelta = idx - fanCenter; // Symmetrical around fanCenter
               const finalFanAngle = fanDelta * angleStep;
               const finalFanX = fanDelta * spreadStep;
               const finalFanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
@@ -895,7 +897,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               if (introStatus === 'logo_pause') {
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
                 currentX = -enterStartX;
-                currentY = (idx - 6) * -0.5;
+                currentY = (idx - fanCenter) * -0.5;
                 currentRot = -8;
                 currentRotX = 0;
                 currentScale = fanScale;
@@ -904,14 +906,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               } else if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
-                // Staggered swift arrival from left to right: 13 items (0..12).
-                const cardStart = 0.02 + (idx / 12) * 0.28;
+                // Staggered swift arrival from left to right
+                const cardStart = 0.02 + (idx / totalPeriods) * 0.28;
                 const cardDur = 0.12;
 
                 if (p < cardStart) {
                   // Phase 1: Waiting off-screen to the left, hidden
                   currentX = -enterStartX;
-                  currentY = (idx - 6) * -0.5;
+                  currentY = (idx - fanCenter) * -0.5;
                   currentRot = -8;
                   currentRotX = 0;
                   currentScale = fanScale;
@@ -922,7 +924,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   const rawFlight = (p - cardStart) / cardDur;
                   const flightP = 1 - Math.pow(1 - rawFlight, 3);
                   currentX = -enterStartX * (1 - flightP);
-                  currentY = (idx - 6) * -0.5;
+                  currentY = (idx - fanCenter) * -0.5;
                   currentRot = -8 * (1 - flightP);
                   currentRotX = 0;
                   currentScale = fanScale;
@@ -930,7 +932,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentZIndex = fanZ;
                 } else if (p < 0.60) {
                   // Phase 3: Resting in central stacked deck ("monte no centro")
-                  currentY = (idx - 6) * -0.5;
+                  currentY = (idx - fanCenter) * -0.5;
                   currentX = 0;
                   currentRot = 0;
                   currentRotX = 0;
@@ -942,7 +944,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   const fanRaw = Math.min(1, (p - 0.60) / (0.86 - 0.60));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   currentX = finalFanX * fanP;
-                  currentY = finalFanY * fanP + (1 - fanP) * ((idx - 6) * -0.5);
+                  currentY = finalFanY * fanP + (1 - fanP) * ((idx - fanCenter) * -0.5);
                   currentRot = finalFanAngle * fanP;
                   currentRotX = 0;
                   currentScale = fanScale;
@@ -950,17 +952,18 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   currentZIndex = fanZ;
                 }
               } else if (introStatus === 'animating') {
-                // Overview Row coordinates: all 12 cards arranged small side-by-side with clear spacing and zero overlap
+                // Overview Row coordinates: all cards arranged small side-by-side with clear spacing and zero overlap
                 const overviewStepX = isMobile
-                  ? Math.min(32, Math.max(25, (winW * 0.90) / 11))
+                  ? Math.min(26, Math.max(20, (winW * 0.92) / (totalPeriods - 1)))
                   : isTablet
-                  ? Math.min(68, Math.max(50, (winW * 0.86) / 11))
-                  : Math.min(115, Math.max(86, (winW * 0.88) / 11));
+                  ? Math.min(54, Math.max(40, (winW * 0.88) / (totalPeriods - 1)))
+                  : Math.min(92, Math.max(68, (winW * 0.90) / (totalPeriods - 1)));
 
-                const overviewScale = isMobile ? 0.09 : isTablet ? 0.16 : 0.25;
-                const overviewX = (idx - 5.5) * overviewStepX;
-                // Cards dealt top (11) to bottom (0), so each lands on top of previous:
-                const overviewZ = 20 + (11 - idx);
+                const overviewScale = isMobile ? 0.08 : isTablet ? 0.14 : 0.22;
+                const overviewCenter = (totalPeriods - 1) / 2.0;
+                const overviewX = (idx - overviewCenter) * overviewStepX;
+                // Cards dealt top down, so each lands on top of previous:
+                const overviewZ = 20 + ((totalPeriods - 1) - idx);
 
                 // Target timeline coordinates relative to target card (card 0 or user clicked card)
                 const targetCardIdx = introTargetIndexRef.current;
@@ -995,10 +998,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   finalTimelineZ = Math.round(50 - finalAbsOffset * 10);
                 }
 
-                // Dealing order: swift distribution from card 11 down to card 0 (~1.1s total)
-                const dealOrder = 11 - idx; // 0 for card 11, 11 for card 0
-                const cardStart = 0.02 + (dealOrder / 11) * 0.38; // 0.02 to 0.40
-                const cardDur = 0.12; // lands by cardStart + 0.12 (card 0 lands by ~0.52)
+                // Dealing order: swift distribution from top card down to bottom card (~1.1s total)
+                const dealOrder = (totalPeriods - 1) - idx;
+                const cardStart = 0.02 + (dealOrder / Math.max(1, totalPeriods - 1)) * 0.38;
+                const cardDur = 0.12; // lands by cardStart + 0.12
 
                 if (introProgress < cardStart) {
                   // Phase A: Waiting in fan
@@ -1180,15 +1183,18 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
           {/* ================= 2.1. CAPA DOS CARDS (Posicionada após o último card no leque) ================= */}
           {isIntroActive && (
             (() => {
+              const coverIndex = totalPeriods;
+              const totalFanItems = totalPeriods + 1;
+              const fanCenter = (totalFanItems - 1) / 2.0;
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
               const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
-              const angleStep = isMobile ? 1.5 : 2.0; // Even tighter fan tilt
-              const spreadStep = isMobile ? 6.5 : 9.0;  // Even tighter horizontal spread
-              const arcStep = isMobile ? 1.2 : 1.6;   // Gentle natural arc
+              const angleStep = isMobile ? 1.2 : 1.6; // Tighter fan tilt
+              const spreadStep = isMobile ? 5.5 : 7.5;  // Tighter horizontal spread
+              const arcStep = isMobile ? 1.0 : 1.3;   // Gentle natural arc
               const arcBase = isMobile ? 3 : 4;
 
-              // Virtual index 12: comes right after card 11 (the last card)
-              const fanDelta = 12 - 6.0; // +6.0
+              // Capa comes right after the last card
+              const fanDelta = coverIndex - fanCenter;
               const finalFanAngle = fanDelta * angleStep;
               const finalFanX = fanDelta * spreadStep;
               const finalFanY = Math.pow(Math.abs(fanDelta), 1.35) * arcStep - arcBase;
@@ -1206,7 +1212,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               if (introStatus === 'logo_pause') {
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
                 coverCurrentX = -enterStartX;
-                coverCurrentY = (12 - 6) * -0.5;
+                coverCurrentY = (coverIndex - fanCenter) * -0.5;
                 coverCurrentRot = -8;
                 coverCurrentRotX = 0;
                 coverCurrentScale = fanScale;
@@ -1214,14 +1220,14 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               } else if (introStatus === 'pre_animating') {
                 const p = preAnimProgress;
                 const enterStartX = Math.max(850, winW * 0.72 + 250);
-                // Capa is idx 12 (last card to enter from the left and land on top of the central deck)
-                const cardStart = 0.02 + (12 / 12) * 0.28;
+                // Capa is last card to enter from the left and land on top of the central deck
+                const cardStart = 0.02 + (coverIndex / totalPeriods) * 0.28;
                 const cardDur = 0.12;
 
                 if (p < cardStart) {
                   // Phase 1: Waiting off-screen to the left, hidden
                   coverCurrentX = -enterStartX;
-                  coverCurrentY = (12 - 6) * -0.5;
+                  coverCurrentY = (coverIndex - fanCenter) * -0.5;
                   coverCurrentRot = -8;
                   coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
@@ -1231,25 +1237,25 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   const riseRaw = (p - cardStart) / cardDur;
                   const riseP = 1 - Math.pow(1 - riseRaw, 3);
                   coverCurrentX = -enterStartX * (1 - riseP);
-                  coverCurrentY = (12 - 6) * -0.5;
+                  coverCurrentY = (coverIndex - fanCenter) * -0.5;
                   coverCurrentRot = -8 * (1 - riseP);
                   coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
                   coverOpacity = Math.min(1, riseRaw * 4);
                 } else if (p < 0.60) {
                   // Phase 3: Hold top of deck in center
-                  coverCurrentY = (12 - 6) * -0.5;
+                  coverCurrentY = (coverIndex - fanCenter) * -0.5;
                   coverCurrentX = 0;
                   coverCurrentRot = 0;
                   coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
                   coverOpacity = 1;
                 } else {
-                  // Phase 4: Fans out to index 12
+                  // Phase 4: Fans out to coverIndex
                   const fanRaw = Math.min(1, (p - 0.60) / (0.86 - 0.60));
                   const fanP = 1 - Math.pow(1 - fanRaw, 3);
                   coverCurrentX = finalFanX * fanP;
-                  coverCurrentY = finalFanY * fanP + (1 - fanP) * ((12 - 6) * -0.5);
+                  coverCurrentY = finalFanY * fanP + (1 - fanP) * ((coverIndex - fanCenter) * -0.5);
                   coverCurrentRot = finalFanAngle * fanP;
                   coverCurrentRotX = 0;
                   coverCurrentScale = fanScale;
@@ -1273,12 +1279,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                 let hoverScaleMult = 1.0;
 
                 if (hoveredCardIndex !== null) {
-                  if (hoveredCardIndex === 12) {
+                  if (hoveredCardIndex === coverIndex) {
                     hoverOffsetY = 0;
                     hoverScaleMult = 1.0;
                     coverCurrentZ = 55;
                   } else {
-                    const dist = 12 - hoveredCardIndex;
+                    const dist = coverIndex - hoveredCardIndex;
                     if (dist === 1) {
                       hoverOffsetX = 20;
                       hoverOffsetRot = 2.5;
@@ -1307,12 +1313,12 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                   }`}
                   onMouseEnter={() => {
                     if (introStatus === 'idle_fan') {
-                      setHoveredCardIndex(12);
+                      setHoveredCardIndex(coverIndex);
                     }
                   }}
                   onMouseLeave={() => {
                     if (introStatus === 'idle_fan') {
-                      setHoveredCardIndex((prev) => (prev === 12 ? null : prev));
+                      setHoveredCardIndex((prev) => (prev === coverIndex ? null : prev));
                     }
                   }}
                   onClick={(e) => {
@@ -1349,7 +1355,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
                         A Gestão de Pessoas nos 60 anos da Unicamp
                       </h2>
                       <span className="text-xs sm:text-[13px] text-white/85 font-bold tracking-wider mt-1">
-                        1983 – 2026
+                        1962 – 2026
                       </span>
                     </div>
 
@@ -1437,7 +1443,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               }}
             />
 
-            {/* 12 Historical Compact Nodes with Years directly inside circles */}
+            {/* 15 Historical Compact Nodes with Years directly inside circles */}
             {periods.map((p, idx) => {
               const isSelected = activeIndex !== null && idx === activeIndex;
               const isCenterInGallery = activeIndex === null && Math.round(currentPosition) === idx;
@@ -1513,10 +1519,10 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
               slideToIndex(0);
             }}
             className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 text-[10px] sm:text-[10.5px] font-black border border-slate-950 shadow-xs transition-all cursor-pointer"
-            title="Voltar ao card inicial (1983)"
+            title="Voltar ao card inicial (1962)"
           >
             <RotateCcw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-            <span>Início (1983)</span>
+            <span>Início (1962)</span>
           </button>
 
           {/* Sound / Audio Toggle pill */}
@@ -1564,7 +1570,7 @@ export const ContinuousTimeline: React.FC<ContinuousTimelineProps> = ({
             </span>
           ) : (
             <span className="text-[11px] font-black text-slate-900 bg-white/95 border border-slate-950 px-3 py-0.5 rounded-full shadow-xs">
-              1983 — 2026
+              1962 — 2026
             </span>
           )}
         </div>
