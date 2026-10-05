@@ -399,6 +399,27 @@ export const FaixaEtariaBarChart: React.FC = () => {
   const totalTecnicos = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.tecnicos, 0);
   const totalGeral = totalDocentes + totalPesquisadores + totalTecnicos;
 
+  const legendItems = [
+    {
+      nome: 'Técnico-administrativos',
+      datasetIndex: 2,
+      cor: DS_COLORS.primary,
+      total: totalTecnicos,
+    },
+    {
+      nome: 'Docentes',
+      datasetIndex: 0,
+      cor: DS_COLORS.aux2,
+      total: totalDocentes,
+    },
+    {
+      nome: 'Pesquisadores',
+      datasetIndex: 1,
+      cor: DS_COLORS.aux1,
+      total: totalPesquisadores,
+    },
+  ].sort((a, b) => b.total - a.total);
+
   const toggleDataset = (datasetIndex: number) => {
     if (!chartInstanceRef.current) return;
     const isVisible = chartInstanceRef.current.isDatasetVisible(datasetIndex);
@@ -536,80 +557,34 @@ export const FaixaEtariaBarChart: React.FC = () => {
         {/* 1. Legenda Padronizada com Tipografia Ampliada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <div className="flex flex-col divide-y divide-slate-100">
-            {/* Docentes */}
-            <div
-              onClick={() => toggleDataset(0)}
-              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
-              title="Clique para alternar visibilidade de Docentes"
-            >
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                <span
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.aux2 }}
-                />
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
-                  Docentes
-                </span>
+            {legendItems.map((item, index) => (
+              <div
+                key={item.nome}
+                onClick={() => toggleDataset(item.datasetIndex)}
+                className={`py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none ${
+                  index === 0 ? 'first:pt-0' : ''
+                }`}
+                title={`Clique para alternar visibilidade de ${item.nome}`}
+              >
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                  <span
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: item.cor }}
+                  />
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
+                    {item.nome}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-2 shrink-0">
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
+                    {item.total.toLocaleString('pt-BR')}
+                  </span>
+                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
+                    ({((item.total / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
+                  </span>
+                </div>
               </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
-                  {totalDocentes.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({((totalDocentes / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
-                </span>
-              </div>
-            </div>
-
-            {/* Pesquisadores */}
-            <div
-              onClick={() => toggleDataset(1)}
-              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
-              title="Clique para alternar visibilidade de Pesquisadores"
-            >
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                <span
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.aux1 }}
-                />
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
-                  Pesquisadores
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
-                  {totalPesquisadores.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({((totalPesquisadores / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
-                </span>
-              </div>
-            </div>
-
-            {/* Técnicos (Técnico-administrativos) */}
-            <div
-              onClick={() => toggleDataset(2)}
-              className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none"
-              title="Clique para alternar visibilidade de Técnico-administrativos"
-            >
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                <span
-                  className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                  style={{ backgroundColor: DS_COLORS.primary }}
-                />
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
-                  Técnico-administrativos
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
-                  {totalTecnicos.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({((totalTecnicos / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
-                </span>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Total Geral */}
