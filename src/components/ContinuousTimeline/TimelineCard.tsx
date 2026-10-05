@@ -136,41 +136,44 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                       </h3>
                     </div>
 
-                    {/* 2. Foto dos Diretores Atuais - Abaixo do cabeçalho com os títulos e mais larga */}
-                    <div
-                      className="relative w-full max-h-[200px] sm:max-h-[225px] lg:max-h-[245px] aspect-[16/10] sm:aspect-[3/2] rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg shrink-0 cursor-pointer group/photo mb-3 sm:mb-3.5"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        soundFx.playCardTick();
-                        if (matchingPhoto) {
-                          onOpenPhoto(matchingPhoto, period);
-                        }
-                      }}
-                      title={`Clique para ampliar foto de ${director.director}`}
-                    >
-                      <img
-                        src={director.photoUrl}
-                        alt={director.director}
-                        className={`w-full h-full object-cover ${
-                          director.id === 'dir-atual-everaldo' ? 'object-top' : 'object-center'
-                        } group-hover/photo:scale-105 transition-transform duration-500`}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="px-3 py-1 rounded-md bg-white text-slate-950 text-xs font-black shadow-md">
-                          Ampliar
-                        </span>
+                    {/* 2. Conteúdo abaixo do cabeçalho: Foto com metade da largura + Biografia */}
+                    <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+                      {/* Foto dos Diretores Atuais - Metade da largura, proporcional ao tamanho original */}
+                      <div
+                        className="relative w-full sm:w-1/2 aspect-[4/3] rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg shrink-0 cursor-pointer group/photo"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          soundFx.playCardTick();
+                          if (matchingPhoto) {
+                            onOpenPhoto(matchingPhoto, period);
+                          }
+                        }}
+                        title={`Clique para ampliar foto de ${director.director}`}
+                      >
+                        <img
+                          src={director.photoUrl}
+                          alt={director.director}
+                          className={`w-full h-full object-cover ${
+                            director.id === 'dir-atual-everaldo' ? 'object-top' : 'object-center'
+                          } group-hover/photo:scale-105 transition-transform duration-500`}
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="px-3 py-1 rounded-md bg-white text-slate-950 text-xs font-black shadow-md">
+                            Ampliar
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* 3. Biografia oficial completa */}
-                    {director.bio && (
-                      <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
-                        <p className="text-xs sm:text-sm lg:text-[14px] text-white/90 leading-relaxed font-normal">
-                          {director.bio}
-                        </p>
-                      </div>
-                    )}
+                      {/* 3. Biografia oficial completa */}
+                      {director.bio && (
+                        <div className="flex-1 min-w-0 h-full overflow-y-auto pr-2 custom-scrollbar">
+                          <p className="text-xs sm:text-sm lg:text-[14px] text-white/90 leading-relaxed font-normal">
+                            {director.bio}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
