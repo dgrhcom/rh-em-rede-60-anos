@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { isTopAlignedPhoto, getPhotoPositionClass } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
@@ -46,6 +47,90 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   const hasPhotos = Boolean(period.photos && period.photos.length > 0);
   const isDirectorsCard = Boolean(period.directors && period.directors.length > 0);
   const isCurrentDirectorsCard = isDirectorsCard && Boolean(period.directors && period.directors.length <= 2);
+
+  // Controle de apresentação especial para o primeiro slide (1962)
+  const isFirstSlide = period.period === '1962' || period.index === 0;
+  const [firstSlideStage, setFirstSlideStage] = useState<'hero' | 'gliding' | 'settled'>('hero');
+  const contentRef = useRef<HTMLDivElement>(null);
+  const firstSlotRef = useRef<HTMLDivElement>(null);
+  const floatingHeroRef = useRef<HTMLDivElement>(null);
+  const glideTweenRef = useRef<gsap.core.Tween | null>(null);
+  const glideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!isActive || !isFirstSlide) {
+      if (glideTimeoutRef.current) clearTimeout(glideTimeoutRef.current);
+      if (glideTweenRef.current) glideTweenRef.current.kill();
+      setFirstSlideStage('hero');
+      return;
+    }
+
+    // Reinicia o estágio hero sempre que o card de 1962 se torna ativo
+    setFirstSlideStage('hero');
+
+    // Permanece grande e sozinho abaixo do título por 1s (com margem de 300ms da abertura do card)
+    glideTimeoutRef.current = setTimeout(() => {
+      if (!contentRef.current || !firstSlotRef.current || !floatingHeroRef.current) {
+        setFirstSlideStage('settled');
+        return;
+      }
+
+      const cRect = contentRef.current.getBoundingClientRect();
+      const sRect = firstSlotRef.current.getBoundingClientRect();
+      const hRect = floatingHeroRef.current.getBoundingClientRect();
+
+      if (cRect.width === 0 || sRect.width === 0 || hRect.width === 0) {
+        setFirstSlideStage('settled');
+        return;
+      }
+
+      const startX = hRect.left - cRect.left;
+      const startY = hRect.top - cRect.top;
+      const startW = hRect.width;
+      const startH = hRect.height;
+
+      const targetX = sRect.left - cRect.left;
+      const targetY = sRect.top - cRect.top;
+      const targetW = sRect.width;
+      const targetH = sRect.height;
+
+      setFirstSlideStage('gliding');
+
+      gsap.set(floatingHeroRef.current, {
+        left: startX,
+        top: startY,
+        width: startW,
+        height: startH,
+        x: 0,
+        y: 0,
+        xPercent: 0,
+        yPercent: 0,
+        transform: 'none',
+        position: 'absolute',
+        margin: 0,
+      });
+
+      soundFx.playCardTick();
+
+      glideTweenRef.current = gsap.to(floatingHeroRef.current, {
+        left: targetX,
+        top: targetY,
+        width: targetW,
+        height: targetH,
+        duration: 0.85,
+        ease: 'power3.inOut',
+        onComplete: () => {
+          glideTweenRef.current = null;
+          setFirstSlideStage('settled');
+        },
+      });
+    }, 1300);
+
+    return () => {
+      if (glideTimeoutRef.current) clearTimeout(glideTimeoutRef.current);
+      if (glideTweenRef.current) glideTweenRef.current.kill();
+    };
+  }, [isActive, isFirstSlide]);
 
   const handleNeighborClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -254,104 +339,161 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
             </div>
           </div>
         ) : (
-          <div className={`grid ${hasPhotos ? 'grid-cols-1 sm:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] gap-4 sm:gap-6 lg:gap-8' : 'grid-cols-1'} flex-1 min-h-0 items-stretch`}>
-          {/* ================= COLUNA 1: FOTOS HISTÓRICAS DO PERÍODO (SE HOUVER) ================= */}
-          {hasPhotos && (
-            <div className="flex flex-col h-full min-h-0 min-w-0 justify-center">
-              {/* Fotos (máximo 2 fotos empilhadas, cada uma em modo cover ocupando sua fração) */}
-              <div className={`grid ${period.photos.slice(0, 2).length === 1 ? 'grid-rows-1' : 'grid-rows-2'} gap-2.5 sm:gap-3 h-full min-h-0 max-h-full`}>
-                {period.photos.slice(0, 2).map((photo) => (
-                  <div
-                    key={photo.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      soundFx.playCardTick();
-                      onOpenPhoto(photo, period);
-                    }}
-                    className="relative w-full h-full min-h-0 min-w-0 rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg group cursor-pointer hover:border-white transition-all flex items-center justify-center text-left"
-                    title={`${photo.title} - Clique para ampliar`}
-                  >
-                    {photo.url ? (
-                      <img
-                        src={photo.url}
-                        alt={photo.title}
-                        className={`group-hover:scale-105 transition-transform duration-500 ${
-                          photo.objectFit === 'contain'
-                            ? 'h-full w-auto max-w-full object-contain object-center p-1 sm:p-2'
-                            : `w-full h-full object-cover ${getPhotoPositionClass(photo)}`
-                        }`}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                        <ImageIcon className="w-8 h-8 text-white/50" />
-                      </div>
-                    )}
+          <div ref={contentRef} className="relative flex-1 min-h-0 flex flex-col">
+            <div className={`grid ${hasPhotos ? 'grid-cols-1 sm:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] gap-4 sm:gap-6 lg:gap-8' : 'grid-cols-1'} flex-1 min-h-0 items-stretch`}>
+              {/* ================= COLUNA 1: FOTOS HISTÓRICAS DO PERÍODO (SE HOUVER) ================= */}
+              {hasPhotos && (
+                <div className="flex flex-col h-full min-h-0 min-w-0 justify-center">
+                  {/* Fotos (máximo 2 fotos empilhadas, cada uma em modo cover ocupando sua fração) */}
+                  <div className={`grid ${period.photos.slice(0, 2).length === 1 ? 'grid-rows-1' : 'grid-rows-2'} gap-2.5 sm:gap-3 h-full min-h-0 max-h-full`}>
+                    {period.photos.slice(0, 2).map((photo, pIdx) => {
+                      if (isFirstSlide && pIdx === 0 && firstSlideStage !== 'settled') {
+                        return (
+                          <div
+                            key={photo.id}
+                            ref={firstSlotRef}
+                            className="relative w-full h-full min-h-0 min-w-0 rounded-2xl opacity-0 pointer-events-none"
+                          />
+                        );
+                      }
 
-                    {/* Hover Overlay Hint */}
-                    <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="px-2.5 py-1 rounded-md bg-white text-slate-950 text-[10px] font-black shadow-md">
-                        Ampliar
-                      </span>
-                    </div>
+                      const isSecondPhotoHidden = isFirstSlide && pIdx === 1 && firstSlideStage === 'hero';
+
+                      return (
+                        <div
+                          key={photo.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            soundFx.playCardTick();
+                            onOpenPhoto(photo, period);
+                          }}
+                          className={`relative w-full h-full min-h-0 min-w-0 rounded-2xl overflow-hidden border-2 border-white/30 bg-slate-950 shadow-lg group cursor-pointer hover:border-white transition-all flex items-center justify-center text-left ${
+                            isSecondPhotoHidden
+                              ? 'opacity-0 translate-y-6 pointer-events-none'
+                              : 'opacity-100 translate-y-0 transition-all duration-700 ease-out delay-150'
+                          }`}
+                          title={`${photo.title} - Clique para ampliar`}
+                        >
+                          {photo.url ? (
+                            <img
+                              src={photo.url}
+                              alt={photo.title}
+                              className={`group-hover:scale-105 transition-transform duration-500 ${
+                                photo.objectFit === 'contain'
+                                  ? 'h-full w-auto max-w-full object-contain object-center p-1 sm:p-2'
+                                  : `w-full h-full object-cover ${getPhotoPositionClass(photo)}`
+                              }`}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-slate-800">
+                              <ImageIcon className="w-8 h-8 text-white/50" />
+                            </div>
+                          )}
+
+                          {/* Hover Overlay Hint */}
+                          <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="px-2.5 py-1 rounded-md bg-white text-slate-950 text-[10px] font-black shadow-md">
+                              Ampliar
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* ================= COLUNA 2: MARCOS HISTÓRICOS ================= */}
+              <div
+                className={`flex flex-col justify-between h-full min-h-0 min-w-0 ${
+                  hasPhotos ? 'sm:pl-2 lg:pl-3' : 'w-full max-w-5xl mx-auto'
+                } text-left ${
+                  isFirstSlide && firstSlideStage === 'hero'
+                    ? 'opacity-0 translate-y-6 pointer-events-none'
+                    : 'opacity-100 translate-y-0 transition-all duration-700 ease-out delay-200'
+                }`}
+              >
+                {/* Lista de Marcos agrupados por ano em tópicos com tipografia ampliada */}
+                {(() => {
+                  const groupedMilestones = period.milestones.reduce((acc, m) => {
+                    const y = m.year || period.period;
+                    if (!acc[y]) acc[y] = [];
+                    acc[y].push(m);
+                    return acc;
+                  }, {} as Record<string, typeof period.milestones>);
+                  const yearGroups = Object.entries(groupedMilestones);
+
+                  return (
+                    <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
+                      {yearGroups.map(([year, milestones], gIdx) => (
+                        <div key={year} className="flex flex-col text-left">
+                          {/* Cabeçalho do Ano: 20px */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[20px] font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
+                              {year}
+                            </span>
+                          </div>
+
+                          {/* Tópicos dos marcos para o ano: 26px */}
+                          <ul className="space-y-3.5 list-disc pl-5 sm:pl-6">
+                            {milestones.map((m) => {
+                              const isHeading = m.text.endsWith(':');
+                              return (
+                                <li
+                                  key={m.id}
+                                  className={
+                                    isHeading
+                                      ? "list-none -ml-5 sm:-ml-6 text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-bold text-white tracking-normal break-words mt-1 mb-1"
+                                      : "text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
+                                  }
+                                >
+                                  {m.text}
+                                </li>
+                              );
+                            })}
+                          </ul>
+
+                          {/* Separador horizontal entre anos */}
+                          {gIdx < yearGroups.length - 1 && (
+                            <hr className="border-t border-white/20 mt-4" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          )}
 
-          {/* ================= COLUNA 2: MARCOS HISTÓRICOS ================= */}
-          <div className={`flex flex-col justify-between h-full min-h-0 min-w-0 ${hasPhotos ? 'sm:pl-2 lg:pl-3' : 'w-full max-w-5xl mx-auto'} text-left`}>
-            {/* Lista de Marcos agrupados por ano em tópicos com tipografia ampliada */}
-            {(() => {
-              const groupedMilestones = period.milestones.reduce((acc, m) => {
-                const y = m.year || period.period;
-                if (!acc[y]) acc[y] = [];
-                acc[y].push(m);
-                return acc;
-              }, {} as Record<string, typeof period.milestones>);
-              const yearGroups = Object.entries(groupedMilestones);
-
-              return (
-                <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
-                  {yearGroups.map(([year, milestones], gIdx) => (
-                    <div key={year} className="flex flex-col text-left">
-                      {/* Cabeçalho do Ano: 20px */}
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[20px] font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
-                          {year}
-                        </span>
-                      </div>
-
-                      {/* Tópicos dos marcos para o ano: 26px */}
-                      <ul className="space-y-3.5 list-disc pl-5 sm:pl-6">
-                        {milestones.map((m) => {
-                          const isHeading = m.text.endsWith(':');
-                          return (
-                            <li
-                              key={m.id}
-                              className={
-                                isHeading
-                                  ? "list-none -ml-5 sm:-ml-6 text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-bold text-white tracking-normal break-words mt-1 mb-1"
-                                  : "text-xl sm:text-2xl lg:text-[25px] xl:text-[26px] leading-[1.28] font-normal text-white/95 tracking-normal break-words"
-                              }
-                            >
-                              {m.text}
-                            </li>
-                          );
-                        })}
-                      </ul>
-
-                      {/* Separador horizontal entre anos */}
-                      {gIdx < yearGroups.length - 1 && (
-                        <hr className="border-t border-white/20 mt-4" />
-                      )}
-                    </div>
-                  ))}
+            {/* Imagem Hero Flutuante Inicial (Aparece grande e sozinha abaixo do título no Slide 1962) */}
+            {isFirstSlide && firstSlideStage !== 'settled' && period.photos && period.photos[0] && (
+              <div
+                ref={floatingHeroRef}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  soundFx.playCardTick();
+                  onOpenPhoto(period.photos[0], period);
+                }}
+                className={`rounded-2xl overflow-hidden border-2 border-white/40 bg-slate-950 shadow-2xl z-30 flex items-center justify-center cursor-pointer group ${
+                  firstSlideStage === 'hero'
+                    ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] sm:w-[68%] md:w-[60%] lg:w-[54%] max-w-[640px] h-[88%] max-h-[550px]'
+                    : ''
+                }`}
+                title={`${period.photos[0].title} - Clique para ampliar`}
+              >
+                <img
+                  src={period.photos[0].url}
+                  alt={period.photos[0].title}
+                  className={`w-full h-full object-cover ${getPhotoPositionClass(period.photos[0])} group-hover:scale-105 transition-transform duration-500`}
+                />
+                <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="px-2.5 py-1 rounded-md bg-white text-slate-950 text-[10px] font-black shadow-md">
+                    Ampliar
+                  </span>
                 </div>
-              );
-            })()}
+              </div>
+            )}
           </div>
-        </div>
         )}
       </div>
 
