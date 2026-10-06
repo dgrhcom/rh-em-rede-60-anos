@@ -465,7 +465,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               </div>
             </div>
 
-            {/* Imagem Hero Flutuante Inicial (Aparece grande e sozinha abaixo do título no Slide 1962) */}
+            {/* Imagem Hero Flutuante Inicial (Aparece grande ocupando toda a largura abaixo do título no Slide 1962) */}
             {isFirstSlide && firstSlideStage !== 'settled' && period.photos && period.photos[0] && (
               <div
                 ref={floatingHeroRef}
@@ -476,7 +476,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                 }}
                 className={`rounded-2xl overflow-hidden border-2 border-white/40 bg-slate-950 shadow-2xl z-30 flex items-center justify-center cursor-pointer group ${
                   firstSlideStage === 'hero'
-                    ? 'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] sm:w-[68%] md:w-[60%] lg:w-[54%] max-w-[640px] h-[88%] max-h-[550px]'
+                    ? 'absolute inset-0 w-full h-full'
                     : ''
                 }`}
                 title={`${period.photos[0].title} - Clique para ampliar`}
