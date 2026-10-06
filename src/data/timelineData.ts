@@ -190,6 +190,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'organizacao',
       },
       {
+        id: 'm1-reitoria3',
+        year: '1985',
+        text: 'Alocação da DGRH no prédio Reitoria III',
+        category: 'organizacao',
+      },
+      {
         id: 'm1-2',
         year: '1986',
         text: 'Estruturação da DGRH (Portaria GR 114/1986)',
@@ -387,6 +393,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'informatizacao',
       },
       {
+        id: 'm4-sst',
+        year: '1995',
+        text: 'Implementação da Segurança do Trabalho na Universidade (SST)',
+        category: 'saude',
+      },
+      {
         id: 'm4-2',
         year: '1996',
         text: 'Primeira versão do Vida Funcional Online',
@@ -467,7 +479,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: 'm5-4',
         year: '1998',
-        text: 'Implementação da Segurança do Trabalho na Universidade (SST)',
+        text: 'Incorporação da Segurança do Trabalho na DGRH',
         category: 'saude',
       },
     ],
@@ -605,6 +617,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         year: '2001',
         text: 'Implantação do Programa de Certificação das Unidades/Órgãos',
         category: 'organizacao',
+      },
+      {
+        id: 'm7-medicina',
+        year: '2001',
+        text: 'O serviço de medicina do trabalho vem do CECOM para a DGRH',
+        category: 'saude',
       },
       {
         id: 'm7-3',
@@ -766,10 +784,22 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'carreira',
       },
       {
+        id: 'm9-dsso',
+        year: '2012',
+        text: 'DSSO foi desmembrada em DSTr e DSO',
+        category: 'saude',
+      },
+      {
         id: 'm9-4',
         year: '2013',
         text: 'Demonstrativos de pagamento e IR deixam de ser impressos',
         category: 'informatizacao',
+      },
+      {
+        id: 'm9-rh-dgrh',
+        year: '2013',
+        text: 'Criação do RH/DGRH',
+        category: 'organizacao',
       },
     ],
     photos: [
@@ -792,7 +822,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
     title: 'RH em Rede, Planes e Relações de Trabalho',
     shortLabel: 'RH EM REDE, PLANES & RELAÇÕES',
     coverImage: '/linha_do_tempo_2014_2.jpg',
-    summary: 'RH em Rede, Planes com RHs locais, revisão da carreira PAEPE e TAC de relações de trabalho.',
+    summary: 'RH em Rede, Planes com RHs locais e TAC de relações de trabalho.',
     description: 'Adoção da gestão colaborativa com o RH em Rede, elaboração de planejamento estratégico com participação direta dos órgãos locais e normas para proteção das relações interpessoais.',
     iconName: 'Network',
     themeColor: {
@@ -821,12 +851,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
         year: '2014',
         text: 'Planejamento Estratégico com a participação inédita de servidores da DGRH, RHs locais e órgãos parceiros',
         category: 'organizacao',
-      },
-      {
-        id: 'm10-4',
-        year: '2015',
-        text: 'Revisão da carreira PAEPE e da avaliação de desempenho',
-        category: 'carreira',
       },
       {
         id: 'm10-5',
@@ -904,6 +928,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'organizacao',
       },
       {
+        id: 'm11-vunesp',
+        year: '2018',
+        text: 'Concursos públicos passam a ser organizados pela Vunesp',
+        category: 'organizacao',
+      },
+      {
         id: 'm11-5',
         year: '2019',
         text: 'Revisão da Tabela de Designações e fim das incorporações de GR por força de Emenda Constitucional',
@@ -974,12 +1004,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'informatizacao',
       },
       {
-        id: 'm12-vunesp',
-        year: '2021',
-        text: 'Concursos públicos passam a ser organizados pela Vunesp',
-        category: 'organizacao',
-      },
-      {
         id: 'm12-prog',
         year: '2022',
         text: 'Informatização do processo de progressão PAEPE',
@@ -1020,8 +1044,8 @@ export const timelinePeriods: HistoricalPeriod[] = [
     title: 'Novas Rotinas, Transferência e Segurança',
     shortLabel: 'NOVAS ROTINAS, TRANSFERÊNCIA & SEGURANÇA',
     coverImage: '/ponto-eletronico-2025.png',
-    summary: 'SOU.SP, ponto eletrônico, política de segurança, PGR, ASTRA, trabalho híbrido e escala móvel.',
-    description: 'Consolidação das inovações na gestão de pessoas nos 60 anos da Unicamp: modernização com SOU.SP, ponto eletrônico, segurança institucional no trabalho, mobilidade funcional pelo ASTRA, trabalho híbrido e inclusão.',
+    summary: 'Ponto eletrônico, política de segurança, PGR, ASTRA, trabalho híbrido e escala móvel.',
+    description: 'Consolidação das inovações na gestão de pessoas nos 60 anos da Unicamp: modernização com ponto eletrônico, segurança institucional no trabalho, mobilidade funcional pelo ASTRA, trabalho híbrido e inclusão.',
     iconName: 'Rocket',
     themeColor: {
       bg: 'from-sky-50 to-amber-100',
@@ -1039,15 +1063,15 @@ export const timelinePeriods: HistoricalPeriod[] = [
     },
     milestones: [
       {
-        id: 'm13-1',
-        year: '2024',
-        text: 'Recadastramento anual de ativos na plataforma SOU.SP',
-        category: 'organizacao',
-      },
-      {
         id: 'm13-dpsi',
         year: '2024',
         text: 'Criação da Divisão de Psicologia do Trabalho (DPsi)',
+        category: 'saude',
+      },
+      {
+        id: 'm13-4',
+        year: '2024',
+        text: 'Implantação do Programa de Gerenciamento de Riscos (PGR)',
         category: 'saude',
       },
       {
@@ -1060,12 +1084,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
         id: 'm13-3',
         year: '2025',
         text: 'Implantação da Política de Segurança no Trabalho da Unicamp',
-        category: 'saude',
-      },
-      {
-        id: 'm13-4',
-        year: '2025',
-        text: 'Implantação do Programa de Gerenciamento de Riscos (PGR)',
         category: 'saude',
       },
       {

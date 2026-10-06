@@ -61,12 +61,12 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 animate-fade-in select-none"
+      className="fixed inset-0 z-50 bg-slate-950/92 backdrop-blur-md flex flex-col items-center justify-between p-2 sm:p-4 md:p-5 select-none animate-fade-in"
       onClick={onClose}
     >
       {/* Top Close Button & Photo Counter */}
       <div
-        className="w-full max-w-5xl flex items-center justify-between px-2 mb-3 shrink-0"
+        className="w-full max-w-7xl flex items-center justify-between px-2 mb-1.5 sm:mb-2 shrink-0 z-20"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2">
@@ -96,14 +96,14 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
 
       {/* Main Image Container with Prev/Next Navigation */}
       <div
-        className="relative w-full max-w-5xl flex items-center justify-center flex-1 min-h-0"
+        className="relative w-full flex-1 min-h-0 flex items-center justify-center overflow-hidden my-1"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Arrow */}
         {hasMultiple && (
           <button
             onClick={handlePrev}
-            className="absolute left-2 sm:left-4 z-20 p-2 sm:p-3 rounded-full bg-white/20 hover:bg-white text-white hover:text-slate-950 border border-white/30 transition-all shadow-xl cursor-pointer"
+            className="absolute left-2 sm:left-4 md:left-6 z-30 p-2.5 sm:p-3.5 rounded-full bg-slate-950/60 hover:bg-white text-white hover:text-slate-950 border border-white/30 backdrop-blur-sm transition-all shadow-2xl cursor-pointer hover:scale-105 active:scale-95"
             title="Foto anterior (←)"
           >
             <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -114,20 +114,20 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
         {hasMultiple && (
           <button
             onClick={handleNext}
-            className="absolute right-2 sm:right-4 z-20 p-2 sm:p-3 rounded-full bg-white/20 hover:bg-white text-white hover:text-slate-950 border border-white/30 transition-all shadow-xl cursor-pointer"
+            className="absolute right-2 sm:right-4 md:right-6 z-30 p-2.5 sm:p-3.5 rounded-full bg-slate-950/60 hover:bg-white text-white hover:text-slate-950 border border-white/30 backdrop-blur-sm transition-all shadow-2xl cursor-pointer hover:scale-105 active:scale-95"
             title="Próxima foto (→)"
           >
             <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
           </button>
         )}
 
-        {/* The Photo */}
-        <div className="relative max-w-full max-h-full flex items-center justify-center p-2">
+        {/* The Photo: Expands to maximum height or maximum width that fits */}
+        <div className="w-full h-full flex items-center justify-center p-1 sm:p-2">
           {photo.url ? (
             <img
               src={photo.url}
               alt={photo.title}
-              className="max-h-[68vh] sm:max-h-[72vh] max-w-full w-auto object-contain rounded-2xl shadow-2xl border-2 border-white/25"
+              className="max-h-full max-w-[95vw] sm:max-w-[92vw] lg:max-w-[90vw] w-auto h-auto object-contain rounded-2xl shadow-2xl border-2 border-white/25"
             />
           ) : (
             <div className="w-96 h-72 flex flex-col items-center justify-center bg-slate-800 rounded-2xl border-2 border-white/20 text-white/60">
@@ -140,7 +140,7 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
 
       {/* Bottom Info Card: Title, Caption and Credits */}
       <div
-        className="w-full max-w-2xl mt-3 p-4 rounded-2xl bg-white/95 text-slate-950 border-2 border-slate-900 shadow-2xl text-center shrink-0"
+        className="w-full max-w-3xl mt-1.5 sm:mt-2 px-4 py-2.5 sm:py-3 rounded-2xl bg-white/95 text-slate-950 border border-slate-900/40 shadow-2xl text-center shrink-0 z-20"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-sm sm:text-base font-black tracking-tight text-slate-900">
@@ -148,12 +148,12 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
         </h3>
 
         {photo.caption && (
-          <p className="text-xs sm:text-sm text-slate-700 font-medium mt-1 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-700 font-medium mt-0.5 leading-relaxed">
             {photo.caption}
           </p>
         )}
 
-        <div className="mt-2 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-600 font-bold">
+        <div className="mt-1.5 pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-600 font-bold">
           <span>{photo.credit || 'Acervo Histórico DGRH / Memória Unicamp'}</span>
           {hasMultiple && (
             <span className="text-slate-500 font-medium hidden sm:inline">
