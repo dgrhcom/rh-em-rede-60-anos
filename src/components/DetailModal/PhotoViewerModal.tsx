@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
@@ -24,6 +24,60 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
   const currentIndex = photo ? photos.findIndex((p) => p.id === photo.id) : -1;
   const totalPhotos = photos.length;
   const hasMultiple = totalPhotos > 1;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [imgDimensions, setImgDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  // Calcula e força a imagem a ocupar o máximo de largura ou altura possível
+  const computeSize = useCallback((natW: number, natH: number) => {
+    if (!containerRef.current || natW <= 0 || natH <= 0) return;
+    const cRect = containerRef.current.getBoundingClientRect();
+    if (cRect.width === 0 || cRect.height === 0) return;
+
+    const padX = window.innerWidth < 640 ? 12 : 24;
+    const padY = window.innerWidth < 640 ? 12 : 16;
+    const availW = Math.max(80, cRect.width - padX);
+    const availH = Math.max(80, cRect.height - padY);
+
+    const imgRatio = natW / natH;
+    const contRatio = availW / availH;
+
+    if (imgRatio > contRatio) {
+      // Ocupa o máximo de largura disponível
+      const targetW = availW;
+      const targetH = availW / imgRatio;
+      setImgDimensions({ width: Math.round(targetW), height: Math.round(targetH) });
+    } else {
+      // Ocupa o máximo de altura disponível
+      const targetH = availH;
+      const targetW = availH * imgRatio;
+      setImgDimensions({ width: Math.round(targetW), height: Math.round(targetH) });
+    }
+  }, []);
+
+  // Recalcula dimensões ao trocar de foto
+  useEffect(() => {
+    setImgDimensions(null);
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      computeSize(imgRef.current.naturalWidth, imgRef.current.naturalHeight);
+    }
+  }, [photo?.url, computeSize]);
+
+  // Observa redimensionamentos da janela ou do container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const ro = new ResizeObserver(() => {
+      if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+        computeSize(imgRef.current.naturalWidth, imgRef.current.naturalHeight);
+      }
+    });
+
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [computeSize]);
 
   const handlePrev = useCallback(() => {
     if (!hasMultiple || currentIndex === -1 || !onSelectPhoto) return;
@@ -122,12 +176,29 @@ export const PhotoViewerModal: React.FC<PhotoViewerModalProps> = ({
         )}
 
         {/* The Photo: Expands to maximum height or maximum width that fits */}
-        <div className="w-full h-full flex items-center justify-center p-1 sm:p-2">
+        <div ref={containerRef} className="w-full h-full flex items-center justify-center p-1 sm:p-2">
           {photo.url ? (
             <img
+              ref={imgRef}
               src={photo.url}
               alt={photo.title}
-              className="max-h-full max-w-[95vw] sm:max-w-[92vw] lg:max-w-[90vw] w-auto h-auto object-contain rounded-2xl shadow-2xl border-2 border-white/25"
+              onLoad={(e) => {
+                computeSize(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight);
+              }}
+              style={
+                imgDimensions
+                  ? {
+                      width: `${imgDimensions.width}px`,
+                      height: `${imgDimensions.height}px`,
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                    }
+                  : {
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                    }
+              }
+              className="object-contain rounded-2xl shadow-2xl border-2 border-white/25 select-none"
             />
           ) : (
             <div className="w-96 h-72 flex flex-col items-center justify-center bg-slate-800 rounded-2xl border-2 border-white/20 text-white/60">
