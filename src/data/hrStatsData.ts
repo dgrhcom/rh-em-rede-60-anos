@@ -144,6 +144,6 @@ export const NACIONALIDADES_DATA = {
     { regiao: 'Europa', docentes: 40, pesquisadores: 5, total: 45, pct: 42.5 },
     { regiao: 'América do Norte', docentes: 5, pesquisadores: 0, total: 5, pct: 4.7 },
     { regiao: 'Ásia', docentes: 5, pesquisadores: 0, total: 5, pct: 4.7 },
-    { regiao: 'Outros', docentes: 3, pesquisadores: 0, total: 3, pct: 2.8 },
+    { regiao: 'Oceania e América Central', docentes: 3, pesquisadores: 0, total: 3, pct: 2.8 },
   ],
 };

@@ -2458,7 +2458,7 @@ export const NacionalidadesCharts: React.FC = () => {
             DS_COLORS.aux2, // Europa (31 - #5e2a6b, tom de roxo base do gráfico de pizza)
             '#7d3e8e', // América do Norte (11 - tom médio)
             '#9e5eb2', // Ásia (10 - tom claro)
-            '#c287d5', // Outros (3 - tom mais suave)
+            '#c287d5', // Oceania e América Central (3 - tom mais suave)
           ];
 
           const continentHoverColors = [
@@ -2501,7 +2501,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 'Europa',
                 ['América do', 'Norte'],
                 'Ásia',
-                'Outros',
+                ['Oceania e', 'América Central'],
               ],
               datasets: [
                 {
@@ -2528,7 +2528,7 @@ export const NacionalidadesCharts: React.FC = () => {
                 x: {
                   grid: { display: false },
                   ticks: {
-                    font: { weight: 'bold', size: 22 }, // Tipografia do eixo X ampliada
+                    font: { weight: 'bold', size: 20 }, // Tipografia do eixo X adaptada para caber perfeitamente
                     color: '#0f172a',
                     padding: 8,
                   },
@@ -2541,6 +2541,11 @@ export const NacionalidadesCharts: React.FC = () => {
                   titleFont: { size: 15, weight: 'bold' },
                   bodyFont: { size: 14 },
                   callbacks: {
+                    title: (items: any[]) => {
+                      if (!items.length) return '';
+                      const raw = items[0].label;
+                      return Array.isArray(raw) ? raw.join(' ') : raw;
+                    },
                     label: (ctx: any) => {
                       const item = NACIONALIDADES_DATA.regioesEstrangeiros[ctx.dataIndex];
                       return ` ${item.total} pesquisadores/docentes (${item.pct.toFixed(1).replace('.', ',')}%)`;
