@@ -50,7 +50,6 @@ export const timelinePeriods: HistoricalPeriod[] = [
         aspectRatio: 'landscape',
         credit: 'Acervo Histórico Unicamp',
         objectPosition: 'top',
-        objectFit: 'contain',
       },
       {
         id: 'p1-2',

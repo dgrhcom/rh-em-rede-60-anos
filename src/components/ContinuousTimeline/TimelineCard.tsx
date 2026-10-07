@@ -465,7 +465,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               </div>
             </div>
 
-            {/* Imagem Hero Flutuante Inicial (Aparece grande ocupando o espaço abaixo do título no Slide 1962 sem cortar nas laterais) */}
+            {/* Imagem Hero Flutuante Inicial (Aparece grande ocupando toda a largura abaixo do título no Slide 1962) */}
             {isFirstSlide && firstSlideStage !== 'settled' && period.photos && period.photos[0] && (
               <div
                 ref={floatingHeroRef}
@@ -476,15 +476,15 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                 }}
                 className={`rounded-2xl overflow-hidden border-2 border-white/40 bg-slate-950 shadow-2xl z-30 flex items-center justify-center cursor-pointer group ${
                   firstSlideStage === 'hero'
-                    ? 'absolute inset-0 w-full h-full p-2 sm:p-4'
-                    : 'p-1 sm:p-2'
+                    ? 'absolute inset-0 w-full h-full'
+                    : ''
                 }`}
                 title={`${period.photos[0].title} - Clique para ampliar`}
               >
                 <img
                   src={period.photos[0].url}
                   alt={period.photos[0].title}
-                  className="w-full h-full max-h-full max-w-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+                  className={`w-full h-full object-cover ${getPhotoPositionClass(period.photos[0])} group-hover:scale-105 transition-transform duration-500`}
                 />
                 <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="px-2.5 py-1 rounded-md bg-white text-slate-950 text-[10px] font-black shadow-md">
