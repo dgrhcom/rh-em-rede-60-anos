@@ -967,9 +967,9 @@ export const timelinePeriods: HistoricalPeriod[] = [
   {
     id: 'period-14',
     index: 13,
-    period: '2020 - 2022',
+    period: '2020 - 2023',
     startYear: 2020,
-    endYear: 2022,
+    endYear: 2023,
     title: 'Transformação Digital e Desempenho',
     shortLabel: 'DIGITAL & DESEMPENHO',
     coverImage: '/linha_do_tempo_2020_2.png',
@@ -1014,6 +1014,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         year: '2022',
         text: 'Revisão e informatização do processo de gestão de desempenho',
         category: 'carreira',
+      },
+      {
+        id: 'm12-esocial',
+        year: '2023',
+        text: 'Início dos eventos de saúde e segurança do trabalho no eSocial',
+        category: 'saude',
       },
     ],
     photos: [
