@@ -785,7 +785,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       },
       {
         id: 'm9-dsso',
-        year: '2012',
+        year: '2013',
         text: 'DSSO foi desmembrada em DSTr e DSO',
         category: 'saude',
       },
