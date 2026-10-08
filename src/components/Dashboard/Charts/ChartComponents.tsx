@@ -333,8 +333,8 @@ export const GeneroCharts: React.FC = () => {
         <div className="w-full max-w-[480px] flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 mt-2.5">
           <div className="flex flex-col divide-y divide-slate-100">
             {/* Homens */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+            <div className="py-2.5 sm:py-3 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: DS_COLORS.primary }}
@@ -343,33 +343,17 @@ export const GeneroCharts: React.FC = () => {
                   Homens
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
-                  {GENERO_DATA.total.masculino.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({GENERO_DATA.total.pctMasculino.toFixed(1).replace('.', ',')}%)
-                </span>
-              </div>
             </div>
 
             {/* Mulheres */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+            <div className="py-2.5 sm:py-3 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: DS_COLORS.aux2 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
                   Mulheres
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
-                  {GENERO_DATA.total.feminino.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({GENERO_DATA.total.pctFeminino.toFixed(1).replace('.', ',')}%)
                 </span>
               </div>
             </div>
@@ -397,7 +381,6 @@ export const FaixaEtariaBarChart: React.FC = () => {
   const totalDocentes = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.docentes, 0);
   const totalPesquisadores = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.pesquisadores, 0);
   const totalTecnicos = FAIXA_ETARIA_DATA.reduce((acc, f) => acc + f.tecnicos, 0);
-  const totalGeral = totalDocentes + totalPesquisadores + totalTecnicos;
 
   const legendItems = [
     {
@@ -561,26 +544,18 @@ export const FaixaEtariaBarChart: React.FC = () => {
               <div
                 key={item.nome}
                 onClick={() => toggleDataset(item.datasetIndex)}
-                className={`py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none ${
+                className={`py-3 sm:py-3.5 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none ${
                   index === 0 ? 'first:pt-0' : ''
                 }`}
                 title={`Clique para alternar visibilidade de ${item.nome}`}
               >
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                   <span
                     className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                     style={{ backgroundColor: item.cor }}
                   />
                   <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
                     {item.nome}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-2 shrink-0">
-                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
-                    {item.total.toLocaleString('pt-BR')}
-                  </span>
-                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                    ({((item.total / totalGeral) * 100).toFixed(1).replace('.', ',')}%)
                   </span>
                 </div>
               </div>
@@ -907,24 +882,16 @@ export const RacaCorCharts: React.FC = () => {
               <div
                 key={item.raca}
                 onClick={() => toggleSlice(index)}
-                className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
+                className="py-2.5 sm:py-3 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl cursor-pointer group select-none first:pt-0"
                 title={`Clique para alternar ${item.raca}`}
               >
-                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                   <span
                     className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                     style={{ backgroundColor: item.cor }}
                   />
                   <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
                     {item.raca}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-2 shrink-0">
-                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
-                    {item.total.toLocaleString('pt-BR')}
-                  </span>
-                  <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                    ({item.pct.toFixed(1).replace('.', ',')}%)
                   </span>
                 </div>
               </div>
@@ -1348,8 +1315,6 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
     };
   }, []);
 
-  const totalPAEPE2026 = 7333;
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-center w-full h-full min-h-0">
       {/* Canvas da Linha Geral */}
@@ -1362,34 +1327,22 @@ export const EscolaridadeEvolucaoLineChart: React.FC = () => {
         {/* 1. Legenda Padronizada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <div className="flex flex-col divide-y divide-slate-100">
-            {ESCOLARIDADE_EVOLUCAO.series.map((s) => {
-              const val2026 = s.valores[s.valores.length - 1];
-              const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
-              return (
-                <div
-                  key={s.nivel}
-                  className="py-1.5 sm:py-2 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg first:pt-0"
-                >
-                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
-                    <span
-                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs"
-                      style={{ backgroundColor: s.cor }}
-                    />
-                    <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 tracking-tight truncate">
-                      {s.nivel}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5 shrink-0">
-                    <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-900">
-                      {val2026.toLocaleString('pt-BR')}
-                    </span>
-                    <span className="text-xs sm:text-sm lg:text-[15px] font-normal text-slate-500">
-                      ({pct}%)
-                    </span>
-                  </div>
+            {ESCOLARIDADE_EVOLUCAO.series.map((s) => (
+              <div
+                key={s.nivel}
+                className="py-1.5 sm:py-2 flex items-center transition-colors hover:bg-slate-50/60 px-1.5 rounded-lg first:pt-0"
+              >
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <span
+                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: s.cor }}
+                  />
+                  <span className="text-sm sm:text-base lg:text-[17px] xl:text-[18px] font-normal text-slate-800 tracking-tight truncate">
+                    {s.nivel}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -1612,8 +1565,6 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
     };
   }, []);
 
-  const totalPAEPE2026 = 7333;
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-6 items-center w-full h-full min-h-0">
       {/* Canvas do Gráfico de Zoom */}
@@ -1626,34 +1577,22 @@ export const EscolaridadeZoomLineChart: React.FC = () => {
         {/* 1. Legenda Padronizada */}
         <div className="flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100">
           <div className="flex flex-col divide-y divide-slate-100">
-            {ESCOLARIDADE_ZOOM_SERIES.map((s) => {
-              const val2026 = s.valores[s.valores.length - 1];
-              const pct = ((val2026 / totalPAEPE2026) * 100).toFixed(1).replace('.', ',');
-              return (
-                <div
-                  key={s.nivel}
-                  className="py-3 sm:py-3.5 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
-                >
-                  <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
-                    <span
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
-                      style={{ backgroundColor: s.cor }}
-                    />
-                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
-                      {s.nivel}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2 shrink-0">
-                    <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-900">
-                      {val2026.toLocaleString('pt-BR')}
-                    </span>
-                    <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                      ({pct}%)
-                    </span>
-                  </div>
+            {ESCOLARIDADE_ZOOM_SERIES.map((s) => (
+              <div
+                key={s.nivel}
+                className="py-3 sm:py-3.5 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0"
+              >
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+                  <span
+                    className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
+                    style={{ backgroundColor: s.cor }}
+                  />
+                  <span className="text-lg sm:text-xl lg:text-2xl xl:text-[23px] font-normal text-slate-800 tracking-tight truncate">
+                    {s.nivel}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -1898,23 +1837,15 @@ export const ServidoresPorAreaPieChart: React.FC = () => {
           {[...SERVIDORES_POR_AREA].sort((a, b) => b.total - a.total).map((item) => (
             <div
               key={item.tipoOrgao}
-              className="py-3 sm:py-3.5 flex items-center justify-between first:pt-1 last:pb-1 transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
+              className="py-3 sm:py-3.5 flex items-center first:pt-1 last:pb-1 transition-colors hover:bg-slate-50/60 px-2 rounded-xl"
             >
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: item.cor }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-800 tracking-tight truncate">
                   {item.tipoOrgao}
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl xl:text-[25px] font-normal text-slate-900">
-                  {item.total.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  ({item.percentual.toFixed(1).replace('.', ',')}%)
                 </span>
               </div>
             </div>
@@ -2580,8 +2511,8 @@ export const NacionalidadesCharts: React.FC = () => {
         <div className="w-full max-w-[480px] flex flex-col p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 shadow-sm divide-y divide-slate-100 mt-2.5">
           <div className="flex flex-col divide-y divide-slate-100">
             {/* Brasileiros */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+            <div className="py-2.5 sm:py-3 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl first:pt-0">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: DS_COLORS.aux1 }}
@@ -2590,33 +2521,17 @@ export const NacionalidadesCharts: React.FC = () => {
                   Brasileiros
                 </span>
               </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
-                  {NACIONALIDADES_DATA.totalNatoOuNaturalizado.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  (94,9%)
-                </span>
-              </div>
             </div>
 
             {/* Estrangeiros */}
-            <div className="py-2.5 sm:py-3 flex items-center justify-between transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
-              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pr-3">
+            <div className="py-2.5 sm:py-3 flex items-center transition-colors hover:bg-slate-50/60 px-2 rounded-xl">
+              <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                 <span
                   className="w-5 h-5 sm:w-6 sm:h-6 rounded-md shrink-0 shadow-xs"
                   style={{ backgroundColor: DS_COLORS.aux2 }}
                 />
                 <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-800 tracking-tight">
                   Estrangeiros
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-lg sm:text-xl lg:text-2xl font-normal text-slate-900">
-                  {NACIONALIDADES_DATA.totalEstrangeiro.toLocaleString('pt-BR')}
-                </span>
-                <span className="text-sm sm:text-base lg:text-lg font-normal text-slate-500">
-                  (5,1%)
                 </span>
               </div>
             </div>
