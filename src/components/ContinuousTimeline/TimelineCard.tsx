@@ -48,9 +48,9 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   const isDirectorsCard = Boolean(period.directors && period.directors.length > 0);
   const isCurrentDirectorsCard = isDirectorsCard && Boolean(period.directors && period.directors.length <= 2);
 
-  // Controle de apresentação especial para o primeiro slide (1962)
-  const isFirstSlide = period.period === '1962' || period.index === 0;
-  const [firstSlideStage, setFirstSlideStage] = useState<'hero' | 'gliding' | 'settled'>('hero');
+  // Controle de apresentação especial para a primeira foto (aparece grande e depois vai para a coluna de fotos)
+  const shouldAnimateHero = hasPhotos && !isDirectorsCard;
+  const [heroStage, setHeroStage] = useState<'hero' | 'gliding' | 'settled'>('hero');
   const contentRef = useRef<HTMLDivElement>(null);
   const firstSlotRef = useRef<HTMLDivElement>(null);
   const floatingHeroRef = useRef<HTMLDivElement>(null);
@@ -58,20 +58,26 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   const glideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!isActive || !isFirstSlide) {
+    if (!isActive || !shouldAnimateHero) {
       if (glideTimeoutRef.current) clearTimeout(glideTimeoutRef.current);
       if (glideTweenRef.current) glideTweenRef.current.kill();
-      setFirstSlideStage('hero');
+      if (floatingHeroRef.current) {
+        gsap.set(floatingHeroRef.current, { clearProps: 'all' });
+      }
+      setHeroStage('hero');
       return;
     }
 
-    // Reinicia o estágio hero sempre que o card de 1962 se torna ativo
-    setFirstSlideStage('hero');
+    if (floatingHeroRef.current) {
+      gsap.set(floatingHeroRef.current, { clearProps: 'all' });
+    }
+    // Reinicia o estágio hero sempre que o card se torna ativo
+    setHeroStage('hero');
 
-    // Permanece grande e sozinho abaixo do título (+ 1s a mais conforme solicitado: 2300ms)
+    // Permanece grande e sozinho abaixo do título (2300ms)
     glideTimeoutRef.current = setTimeout(() => {
       if (!contentRef.current || !firstSlotRef.current || !floatingHeroRef.current) {
-        setFirstSlideStage('settled');
+        setHeroStage('settled');
         return;
       }
 
@@ -80,7 +86,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       const hRect = floatingHeroRef.current.getBoundingClientRect();
 
       if (cRect.width === 0 || sRect.width === 0 || hRect.width === 0) {
-        setFirstSlideStage('settled');
+        setHeroStage('settled');
         return;
       }
 
@@ -94,7 +100,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       const targetW = sRect.width;
       const targetH = sRect.height;
 
-      setFirstSlideStage('gliding');
+      setHeroStage('gliding');
 
       gsap.set(floatingHeroRef.current, {
         left: startX,
@@ -121,7 +127,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
         ease: 'power3.inOut',
         onComplete: () => {
           glideTweenRef.current = null;
-          setFirstSlideStage('settled');
+          setHeroStage('settled');
         },
       });
     }, 2300);
@@ -130,7 +136,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       if (glideTimeoutRef.current) clearTimeout(glideTimeoutRef.current);
       if (glideTweenRef.current) glideTweenRef.current.kill();
     };
-  }, [isActive, isFirstSlide]);
+  }, [isActive, shouldAnimateHero]);
 
   const handleNeighborClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -347,7 +353,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                   {/* Fotos (máximo 2 fotos empilhadas, cada uma em modo cover ocupando sua fração) */}
                   <div className={`grid ${period.photos.slice(0, 2).length === 1 ? 'grid-rows-1' : 'grid-rows-2'} gap-2.5 sm:gap-3 h-full min-h-0 max-h-full`}>
                     {period.photos.slice(0, 2).map((photo, pIdx) => {
-                      if (isFirstSlide && pIdx === 0 && firstSlideStage !== 'settled') {
+                      if (shouldAnimateHero && pIdx === 0 && heroStage !== 'settled') {
                         return (
                           <div
                             key={photo.id}
@@ -357,7 +363,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                         );
                       }
 
-                      const isSecondPhotoHidden = isFirstSlide && pIdx === 1 && firstSlideStage === 'hero';
+                      const isSecondPhotoHidden = shouldAnimateHero && pIdx === 1 && heroStage === 'hero';
 
                       return (
                         <div
@@ -408,7 +414,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                 className={`flex flex-col justify-between h-full min-h-0 min-w-0 ${
                   hasPhotos ? 'sm:pl-2 lg:pl-3' : 'w-full max-w-5xl mx-auto'
                 } text-left ${
-                  isFirstSlide && firstSlideStage === 'hero'
+                  shouldAnimateHero && heroStage === 'hero'
                     ? 'opacity-0 translate-y-6 pointer-events-none'
                     : 'opacity-100 translate-y-0 transition-all duration-700 ease-out delay-200'
                 }`}
@@ -465,8 +471,8 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               </div>
             </div>
 
-            {/* Imagem Hero Flutuante Inicial (Aparece grande ocupando toda a largura abaixo do título no Slide 1962) */}
-            {isFirstSlide && firstSlideStage !== 'settled' && period.photos && period.photos[0] && (
+            {/* Imagem Hero Flutuante Inicial (Aparece grande ocupando toda a largura abaixo do título em todos os slides com fotos) */}
+            {shouldAnimateHero && heroStage !== 'settled' && period.photos && period.photos[0] && (
               <div
                 ref={floatingHeroRef}
                 onClick={(e) => {
@@ -475,7 +481,7 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                   onOpenPhoto(period.photos[0], period);
                 }}
                 className={`rounded-2xl overflow-hidden border-2 border-white/40 bg-slate-950 shadow-2xl z-30 flex items-center justify-center cursor-pointer group ${
-                  firstSlideStage === 'hero'
+                  heroStage === 'hero'
                     ? 'absolute inset-0 w-full h-full'
                     : ''
                 }`}
