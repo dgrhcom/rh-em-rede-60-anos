@@ -657,6 +657,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
         url: '/linha_do_tempo_2003_1.jpg',
         aspectRatio: 'landscape',
         credit: 'Memória DGRH 2003',
+        objectPosition: 'top',
       },
       {
         id: 'p7-2',
@@ -703,6 +704,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         category: 'desenvolvimento',
       },
       {
+        id: 'm8-comunicacao',
+        year: '2004',
+        text: 'Criação da Comunicação Institucional DGRH',
+        category: 'organizacao',
+      },
+      {
         id: 'm8-2',
         year: '2005',
         text: 'Lançamento do Portal SIG-RH (atual S-Integra)',
@@ -735,6 +742,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
         url: '/linha_do_tempo_2004_3_espelhada.jpg',
         aspectRatio: 'landscape',
         credit: 'Acervo DPD / DGRH 2004',
+        objectPosition: 'bottom',
       },
     ],
   },
@@ -1001,6 +1009,18 @@ export const timelinePeriods: HistoricalPeriod[] = [
         id: 'm12-2',
         year: '2020',
         text: 'Lançamento do Sistema de Férias, Afastamento e Licença Prêmio (FALP) e da nova versão do Vida Funcional Online',
+        category: 'informatizacao',
+      },
+      {
+        id: 'm12-esocial-2021',
+        year: '2021',
+        text: 'eSocial: cadastro dos servidores, contratos de trabalho, atualizações funcionais, afastamentos e desligamentos',
+        category: 'organizacao',
+      },
+      {
+        id: 'm12-esocial-2022',
+        year: '2022',
+        text: 'eSocial: inclusão dos dados de pagamento e início da rotina mensal obrigatória',
         category: 'informatizacao',
       },
       {

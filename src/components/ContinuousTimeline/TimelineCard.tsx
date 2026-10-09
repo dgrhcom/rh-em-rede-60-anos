@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import type { HistoricalPeriod, MilestonePhoto } from '../../types/timeline';
-import { isTopAlignedPhoto, getPhotoPositionClass } from '../../types/timeline';
+import { isTopAlignedPhoto, isBottomAlignedPhoto, getPhotoPositionClass } from '../../types/timeline';
 import { soundFx } from '../../utils/soundEffects';
 import { 
   Image as ImageIcon, X 
@@ -525,7 +525,11 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
               src={period.coverImage}
               alt={period.title}
               className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
-                isTopAlignedPhoto(period.coverImage, period.title) ? 'object-top' : 'object-center'
+                isBottomAlignedPhoto(period.coverImage, period.title)
+                  ? 'object-bottom'
+                  : isTopAlignedPhoto(period.coverImage, period.title)
+                  ? 'object-top'
+                  : 'object-center'
               }`}
             />
           ) : (

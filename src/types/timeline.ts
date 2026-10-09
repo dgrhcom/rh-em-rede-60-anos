@@ -9,11 +9,23 @@ export interface MilestonePhoto {
   objectFit?: 'contain' | 'cover';
 }
 
+export const isBottomAlignedPhoto = (
+  photoOrUrl?: { url?: string; title?: string; credit?: string; caption?: string; objectPosition?: string } | string | null,
+  title?: string
+): boolean => {
+  if (!photoOrUrl) return false;
+  if (typeof photoOrUrl === 'object') {
+    if (photoOrUrl.objectPosition === 'bottom') return true;
+    return /2004_3/i.test(`${photoOrUrl.url || ''} ${photoOrUrl.title || ''}`);
+  }
+  return /2004_3/i.test(`${photoOrUrl} ${title || ''}`);
+};
+
 export const getPhotoPositionClass = (photo?: MilestonePhoto | null): string => {
   if (!photo) return 'object-center';
   if (photo.objectPosition === 'left') return 'object-left';
   if (photo.objectPosition === 'right') return 'object-right';
-  if (photo.objectPosition === 'bottom') return 'object-bottom';
+  if (photo.objectPosition === 'bottom' || isBottomAlignedPhoto(photo)) return 'object-bottom';
   if (photo.objectPosition === 'top' || isTopAlignedPhoto(photo)) return 'object-top';
   return 'object-center';
 };
@@ -26,11 +38,12 @@ export const isTopAlignedPhoto = (
   if (!photoOrUrl) return false;
   if (typeof photoOrUrl === 'object') {
     if (photoOrUrl.objectPosition === 'top') return true;
-    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962|diretor/i.test(
+    if (photoOrUrl.objectPosition === 'bottom') return false;
+    return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2003_1|2011_1|1962|diretor/i.test(
       `${photoOrUrl.url || ''} ${photoOrUrl.title || ''} ${photoOrUrl.credit || ''} ${photoOrUrl.caption || ''}`
     );
   }
-  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2011_1|1962|diretor/i.test(
+  return /jornal|imprensa|not[ií]cia|manchete|1989_1|1993_1|2001_1|2003_1|2011_1|1962|diretor/i.test(
     `${photoOrUrl} ${title || ''} ${credit || ''}`
   );
 };
