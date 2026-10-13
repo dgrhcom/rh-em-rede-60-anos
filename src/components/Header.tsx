@@ -148,30 +148,40 @@ export const Header: React.FC<HeaderProps> = ({
           padding: isCentered ? '0px' : '48px',
         }}
       >
-        <img
-          ref={logoRef}
-          src="/logo_dgrh.svg"
-          alt="DGRH - Diretoria Geral de Recursos Humanos"
-          className={`w-auto object-contain select-none pointer-events-auto transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            isPreAnimating && isCentered
-              ? 'animate-logo-reveal-bottom-up'
-              : isLogoHiddenInIntro || isLogoFadingOutAtCenter
-              ? 'opacity-0 scale-95'
-              : (openingPhase === 'logo_top_appear' || openingPhase === 'first_stop') && isLogoAtUpperThird
-              ? 'opacity-100 scale-[1.35] sm:scale-[1.58] md:scale-[1.8] origin-center drop-shadow-2xl'
-              : isLogoAtCenter
-              ? 'opacity-100 scale-100 origin-center drop-shadow-xl'
-              : logoVisible
-              ? 'opacity-100 scale-100'
-              : 'opacity-0 scale-90'
-          } ${
-            isCentered
-              ? isLogoInCenterScreen
-                ? 'h-12 sm:h-16 md:h-20 max-w-[85vw]'
-                : 'h-12 sm:h-16 md:h-[75px] max-w-[85vw] drop-shadow-md'
-              : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
+        <div
+          className={`flex items-center justify-center transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            isCentered && isLogoInCenterScreen && (isLogoAtCenter || isLogoFadingOutAtCenter)
+              ? `bg-white px-7 py-3.5 sm:px-9 sm:py-4.5 md:px-11 md:py-5 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-900/10 ${
+                  isLogoFadingOutAtCenter ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                }`
+              : 'bg-transparent p-0 rounded-none shadow-none border-0 opacity-100 scale-100'
           }`}
-        />
+        >
+          <img
+            ref={logoRef}
+            src="/logo_dgrh.svg"
+            alt="DGRH - Diretoria Geral de Recursos Humanos"
+            className={`w-auto object-contain select-none pointer-events-auto transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isPreAnimating && isCentered
+                ? 'animate-logo-reveal-bottom-up'
+                : isLogoHiddenInIntro || isLogoFadingOutAtCenter
+                ? 'opacity-0 scale-95'
+                : (openingPhase === 'logo_top_appear' || openingPhase === 'first_stop') && isLogoAtUpperThird
+                ? 'opacity-100 scale-[1.35] sm:scale-[1.58] md:scale-[1.8] origin-center drop-shadow-2xl'
+                : isLogoAtCenter
+                ? 'opacity-100 scale-100 origin-center'
+                : logoVisible
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-90'
+            } ${
+              isCentered
+                ? isLogoInCenterScreen
+                  ? 'h-12 sm:h-16 md:h-20 max-w-[85vw]'
+                  : 'h-12 sm:h-16 md:h-[75px] max-w-[85vw] drop-shadow-md'
+                : 'h-8 sm:h-10 md:h-12 max-w-[calc(100vw-96px)] drop-shadow-xs'
+            }`}
+          />
+        </div>
       </div>
 
       {/* Citação do Prof. Dr. Zeferino Vaz na abertura inicial: efeito digitação, fonte ampliada, alinhada 125px mais à esquerda */}

@@ -355,16 +355,17 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
       {isIndex ? (
         /* ================= 1. ÍNDICE DE GRÁFICOS (SEM CONTAINER DE FUNDO) ================= */
         <div className="w-full max-w-[1720px] flex flex-col justify-center my-auto py-2">
-          {/* Grid de 9 Cards no estilo dos cards da linha do tempo com animação de entrada */}
+          {/* Grid de Cards de Gráficos no estilo dos cards da linha do tempo com animação de entrada */}
           <div ref={cardsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 w-full">
-            {SLIDES.map((slide, idx) => {
-              const cardBg = SLIDE_BG_COLORS[idx % SLIDE_BG_COLORS.length];
+            {SLIDES.filter((s) => s.id !== 'zeferinoCitation').map((slide) => {
+              const originalIdx = SLIDES.findIndex((s) => s.id === slide.id);
+              const cardBg = SLIDE_BG_COLORS[originalIdx % SLIDE_BG_COLORS.length];
               return (
                 <button
                   key={slide.id}
                   onClick={() => {
                     soundFx.playCardTick();
-                    setCurrentSlideIndex(idx);
+                    setCurrentSlideIndex(originalIdx);
                   }}
                   className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-3xl ${cardBg} border-2.5 border-slate-950 shadow-lg hover:shadow-2xl transition-all duration-200 text-left cursor-pointer overflow-hidden transform hover:-translate-y-1 hover:brightness-105 select-none min-h-[200px] sm:min-h-[225px]`}
                 >
