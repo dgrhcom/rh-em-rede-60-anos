@@ -438,7 +438,7 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
                 </div>
 
                 <div className="w-full lg:max-w-[900px] text-slate-950">
-                  <blockquote className="font-medium italic leading-[1.08] tracking-tight text-[1.8rem] sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.4rem]">
+                  <blockquote className="font-medium italic leading-[1.08] tracking-tight text-[1.6rem] sm:text-[2.3rem] md:text-[2.8rem] lg:text-[3.3rem] xl:text-[3.8rem]">
                     {QUOTE_TEXT}
                   </blockquote>
                   <div className="mt-4 sm:mt-6 font-black uppercase tracking-[0.18em] text-[0.72rem] sm:text-sm md:text-base lg:text-lg">
