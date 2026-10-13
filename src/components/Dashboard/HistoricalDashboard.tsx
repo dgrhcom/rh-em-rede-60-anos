@@ -11,6 +11,7 @@ import {
   Play,
 } from 'lucide-react';
 import { soundFx } from '../../utils/soundEffects';
+import { QUOTE_TEXT, AUTHOR_TEXT } from '../Header';
 import {
   FaixaEtariaBarChart,
   RacaCorCharts,
@@ -27,6 +28,70 @@ export interface HistoricalDashboardProps {
   onNavigateToOpeningLogo?: () => void;
   initialSlideIndex?: number;
 }
+
+const ZEFERINO_PHOTOS = [
+  '/zeferino/zeferino%20(1).jpg',
+  '/zeferino/zeferino%20(1).png',
+  '/zeferino/zeferino%20(2).jpg',
+  '/zeferino/zeferino%20(3).jpg',
+  '/zeferino/zeferino%20(4).jpg',
+  '/zeferino/zeferino%20(5).jpg',
+];
+
+const ZeferinoPhotoSlideshow: React.FC = () => {
+  const [photoTransition, setPhotoTransition] = useState({
+    previous: 0,
+    current: 0,
+    showCurrent: true,
+  });
+
+  useEffect(() => {
+    let transitionFrame: number | undefined;
+    const interval = window.setInterval(() => {
+      setPhotoTransition(({ current }) => ({
+        previous: current,
+        current: (current + 1) % ZEFERINO_PHOTOS.length,
+        showCurrent: false,
+      }));
+      transitionFrame = window.requestAnimationFrame(() => {
+        transitionFrame = window.requestAnimationFrame(() => {
+          setPhotoTransition((transition) => ({ ...transition, showCurrent: true }));
+        });
+      });
+    }, 8000);
+
+    return () => {
+      window.clearInterval(interval);
+      if (transitionFrame !== undefined) {
+        window.cancelAnimationFrame(transitionFrame);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="relative h-full w-full">
+      {Array.from(new Set([photoTransition.previous, photoTransition.current])).map((index) => (
+        <img
+          key={ZEFERINO_PHOTOS[index]}
+          src={ZEFERINO_PHOTOS[index]}
+          alt="Zeferino Vaz, fundador da Unicamp"
+          aria-hidden={index !== photoTransition.current || !photoTransition.showCurrent}
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[2200ms] ease-in-out ${
+            photoTransition.previous === photoTransition.current
+              ? 'opacity-100'
+              : index === photoTransition.previous
+                ? photoTransition.showCurrent
+                  ? 'opacity-0'
+                  : 'opacity-100'
+                : photoTransition.showCurrent
+                  ? 'opacity-100'
+                  : 'opacity-0'
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
 
 interface SlideDefinition {
   id: string;
@@ -46,6 +111,7 @@ export const SLIDE_BG_COLORS = [
   'bg-[#701a75]', // 5: Nacionalidades - Aux 2 (Ameixa DGRH)
   'bg-[#0d6e8a]', // 6: Top 20 Cargos Tabela - Azul Petróleo
   'bg-[#b8801a]', // 7: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
+  'bg-[#8b5f2d]', // 8: Citação final - Marrom Dourado
 ];
 
 const SLIDES: SlideDefinition[] = [
@@ -104,6 +170,13 @@ const SLIDES: SlideDefinition[] = [
     title: 'Ranking dos 20 Cargos com Mais Servidores em 2026',
     subtitle: 'Gráfico comparativo dos 20 cargos com maior número de profissionais em atividade',
     tag: 'Top 20 Cargos (Gráfico)',
+  },
+  {
+    id: 'zeferinoCitation',
+    category: 'Fundação',
+    title: 'Mensagem do Fundador',
+    subtitle: 'A visão de Zeferino Vaz para a construção da Unicamp como universidade de excelência',
+    tag: 'Citação',
   },
 ];
 
@@ -353,6 +426,27 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
               <span>Iniciar Apresentação</span>
               <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
+          </div>
+        </div>
+      ) : currentSlide?.id === 'zeferinoCitation' ? (
+        <div className="w-full flex flex-col justify-center my-auto items-center pb-10 sm:pb-12">
+          <div className="w-full h-[calc(100vh-7.5rem)] min-h-[500px] max-h-[820px]">
+            <div className="flex items-center justify-center h-full px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+              <div className="w-full max-w-[1500px] flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10 text-left">
+                <div className="w-full max-w-[420px] lg:max-w-[480px] h-[44vh] sm:h-[52vh] lg:h-[62vh] overflow-hidden border-[3px] border-slate-950 shadow-[0_18px_35px_rgba(15,23,42,0.25)] bg-slate-200">
+                  <ZeferinoPhotoSlideshow />
+                </div>
+
+                <div className="w-full lg:max-w-[900px] text-slate-950">
+                  <blockquote className="font-medium italic leading-[1.08] tracking-tight text-[1.8rem] sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.8rem] xl:text-[4.4rem]">
+                    {QUOTE_TEXT}
+                  </blockquote>
+                  <div className="mt-4 sm:mt-6 font-black uppercase tracking-[0.18em] text-[0.72rem] sm:text-sm md:text-base lg:text-lg">
+                    {AUTHOR_TEXT}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
