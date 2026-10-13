@@ -18,7 +18,6 @@ import {
   EscolaridadeEvolucaoLineChart,
   EscolaridadeZoomLineChart,
   ServidoresPorAreaPieChart,
-  TopCargosTable,
   TopCargosBarChart,
   NacionalidadesCharts,
 } from './Charts/ChartComponents';
@@ -109,9 +108,8 @@ export const SLIDE_BG_COLORS = [
   'bg-[#6b213b]', // 3: Escolaridade PAEPE - Aux 2 (Vinho Profundo)
   'bg-[#c05621]', // 4: Escolaridade Zoom - Aux 3 (Terracota)
   'bg-[#701a75]', // 5: Nacionalidades - Aux 2 (Ameixa DGRH)
-  'bg-[#0d6e8a]', // 6: Top 20 Cargos Tabela - Azul Petróleo
-  'bg-[#b8801a]', // 7: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
-  'bg-[#8b5f2d]', // 8: Citação final - Marrom Dourado
+  'bg-[#b8801a]', // 6: Top 20 Cargos Gráfico - Dourado Profundo 60 Anos
+  'bg-[#8b5f2d]', // 7: Citação final - Marrom Dourado
 ];
 
 const SLIDES: SlideDefinition[] = [
@@ -158,18 +156,11 @@ const SLIDES: SlideDefinition[] = [
     tag: 'Nacionalidades',
   },
   {
-    id: 'cargosTabela',
-    category: 'Quadro Funcional',
-    title: 'Ranking dos 20 Cargos com Mais Servidores em 2026',
-    subtitle: 'Tabela quantitativa dos cargos com maior contingente de profissionais na Unicamp',
-    tag: 'Top 20 Cargos (Tabela)',
-  },
-  {
     id: 'cargos',
     category: 'Quadro Funcional',
     title: 'Ranking dos 20 Cargos com Mais Servidores em 2026',
     subtitle: 'Gráfico comparativo dos 20 cargos com maior número de profissionais em atividade',
-    tag: 'Top 20 Cargos (Gráfico)',
+    tag: 'Top 20 Cargos',
   },
   {
     id: 'zeferinoCitation',
@@ -515,13 +506,6 @@ export const HistoricalDashboard: React.FC<HistoricalDashboardProps> = ({
           {currentSlide?.id === 'nacionalidade' && (
             <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
               <NacionalidadesCharts />
-            </div>
-          )}
-
-          {/* ================= SLIDE: TOP 20 CARGOS (TABELA QUANTITATIVA) ================= */}
-          {currentSlide?.id === 'cargosTabela' && (
-            <div className="flex-1 flex flex-col justify-center min-h-0 py-1 overflow-hidden">
-              <TopCargosTable />
             </div>
           )}
 

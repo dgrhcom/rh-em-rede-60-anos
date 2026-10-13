@@ -4,6 +4,7 @@ import { soundFx } from '../utils/soundEffects';
 
 export type OpeningPhase =
   | 'bg_only'
+  | 'logo_fade_in'
   | 'yellow_fade'
   | 'logo_hold'
   | 'logo_fade_out'
@@ -118,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isLogoAtCenter =
     isCentered &&
     isLogoInCenterScreen &&
-    (openingPhase === 'yellow_fade' || openingPhase === 'logo_hold');
+    (openingPhase === 'logo_fade_in' || openingPhase === 'yellow_fade' || openingPhase === 'logo_hold');
 
   const isLogoFadingOutAtCenter =
     isCentered &&

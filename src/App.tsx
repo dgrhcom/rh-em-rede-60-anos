@@ -85,25 +85,25 @@ export function App() {
 		}
 
 		if (openingPhase === 'bg_only') {
-			// 1. Tela inicial aparece com a imagem de fundo sem o bg amarelo por 2 segundos
+			// 1. Tela inicial aparece somente com a imagem de fundo por 2 segundos
 			const timer = setTimeout(() => {
-				setOpeningPhase('yellow_fade');
+				setOpeningPhase('logo_fade_in');
 			}, 2000);
 			return () => clearTimeout(timer);
 		}
 
-		if (openingPhase === 'yellow_fade') {
-			// 2. Fundo amarelo e logotipo surgem simultaneamente no centro
+		if (openingPhase === 'logo_fade_in' || openingPhase === 'yellow_fade') {
+			// 2. Logotipo surge no centro sobre a imagem de fundo (fundo amarelo permanece oculto até o avanço)
 			const timer = setTimeout(() => {
 				setOpeningPhase('logo_hold');
 			}, 2000);
 			return () => clearTimeout(timer);
 		}
 
-		// 3. logo_hold: Pausado no logotipo pequeno central até o usuário navegar (sem timer automático)
+		// 3. logo_hold: Pausado no logotipo pequeno central até o usuário navegar (somente imagem de fundo)
 
 		if (openingPhase === 'logo_fade_out') {
-			// 4. Logotipo desaparece gradualmente no centro (1.2s de transição)
+			// 4. Logotipo desaparece no centro e o fundo amarelo surge suavemente (1.2s de transição)
 			const timer = setTimeout(() => {
 				setOpeningPhase('quote_typing');
 			}, 1200);
@@ -128,7 +128,7 @@ export function App() {
 	}, [timelineResetTrigger]);
 
 	const handleAdvanceOpening = useCallback(() => {
-		if (openingPhase === 'bg_only' || openingPhase === 'yellow_fade') {
+		if (openingPhase === 'bg_only' || openingPhase === 'logo_fade_in' || openingPhase === 'yellow_fade') {
 			setOpeningPhase('logo_hold');
 		} else if (openingPhase === 'logo_hold') {
 			soundFx.playCardTick();
@@ -257,7 +257,12 @@ export function App() {
 	}, [handleSelectPeriod, periods.length]);
 
 	const isYellowBgVisible =
-		hasIntroCompleted || currentView === 'dashboard' || openingPhase !== 'bg_only';
+		hasIntroCompleted ||
+		currentView === 'dashboard' ||
+		openingPhase === 'logo_fade_out' ||
+		openingPhase === 'quote_typing' ||
+		openingPhase === 'logo_top_appear' ||
+		openingPhase === 'first_stop';
 
 	return (
 		<div className="min-h-screen w-full bg-[#cbd5e1] text-slate-950 flex flex-col relative font-body overflow-x-hidden">
