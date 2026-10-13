@@ -103,10 +103,10 @@ export function App() {
 		// 3. logo_hold: Pausado no logotipo pequeno central até o usuário navegar (somente imagem de fundo)
 
 		if (openingPhase === 'logo_fade_out') {
-			// 4. Logotipo desaparece no centro e o fundo amarelo surge suavemente (1.2s de transição)
+			// 4. Logotipo e fundo branco dissolvem suavemente (500ms); fundo amarelo surge (1.1s de transição)
 			const timer = setTimeout(() => {
 				setOpeningPhase('quote_typing');
-			}, 1200);
+			}, 1100);
 			return () => clearTimeout(timer);
 		}
 
@@ -276,7 +276,7 @@ export function App() {
 
 			{/* Layer 2: Yellow Theme Background Color + Texture blend */}
 			<div
-				className={`fixed inset-0 pointer-events-none z-0 transition-opacity duration-2000 ease-in-out ${isYellowBgVisible ? 'opacity-100' : 'opacity-0'
+				className={`fixed inset-0 pointer-events-none z-0 transition-opacity duration-1000 ease-in-out ${isYellowBgVisible ? 'opacity-100' : 'opacity-0'
 					}`}
 			>
 				<div className="absolute inset-0 bg-dgrh-secondary" />

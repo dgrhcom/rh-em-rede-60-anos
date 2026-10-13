@@ -149,23 +149,27 @@ export const Header: React.FC<HeaderProps> = ({
         }}
       >
         <div
-          className={`flex items-center justify-center transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`flex items-center justify-center transition-opacity ${
+            isLogoFadingOutAtCenter ? 'duration-500 ease-out opacity-0' : 'duration-[1200ms] ease-out opacity-100'
+          } ${
             isCentered && isLogoInCenterScreen && (isLogoAtCenter || isLogoFadingOutAtCenter)
-              ? `bg-white px-7 py-3.5 sm:px-9 sm:py-4.5 md:px-11 md:py-5 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-900/10 ${
-                  isLogoFadingOutAtCenter ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-                }`
-              : 'bg-transparent p-0 rounded-none shadow-none border-0 opacity-100 scale-100'
+              ? 'bg-white px-7 py-3.5 sm:px-9 sm:py-4.5 md:px-11 md:py-5 rounded-2xl sm:rounded-3xl shadow-lg shadow-black/10'
+              : 'bg-transparent p-0 rounded-none shadow-none'
           }`}
         >
           <img
             ref={logoRef}
             src="/logo_dgrh.svg"
             alt="DGRH - Diretoria Geral de Recursos Humanos"
-            className={`w-auto object-contain select-none pointer-events-auto transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`w-auto object-contain select-none pointer-events-auto transition-all ${
+              isLogoFadingOutAtCenter
+                ? 'duration-500 ease-out opacity-0'
+                : 'duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
+            } ${
               isPreAnimating && isCentered
                 ? 'animate-logo-reveal-bottom-up'
                 : isLogoHiddenInIntro || isLogoFadingOutAtCenter
-                ? 'opacity-0 scale-95'
+                ? 'opacity-0'
                 : (openingPhase === 'logo_top_appear' || openingPhase === 'first_stop') && isLogoAtUpperThird
                 ? 'opacity-100 scale-[1.35] sm:scale-[1.58] md:scale-[1.8] origin-center drop-shadow-2xl'
                 : isLogoAtCenter
