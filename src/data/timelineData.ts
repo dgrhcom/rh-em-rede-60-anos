@@ -141,7 +141,7 @@ export const timelinePeriods: HistoricalPeriod[] = [
       {
         id: "m2-8",
         year: "1974",
-        text: "Contagem de Tempo e Serviço",
+        text: "Contagem de Tempo de Serviço",
         category: "organizacao",
       },
     ],
