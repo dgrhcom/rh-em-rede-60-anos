@@ -1103,6 +1103,12 @@ export const timelinePeriods: HistoricalPeriod[] = [
         text: "eSocial: início dos eventos de saúde e segurança do trabalho",
         category: "saude",
       },
+      {
+        id: "m12-dcc",
+        year: "2023",
+        text: "Criação da Divisão de Concursos e Carreira (DCC)",
+        category: "carreira",
+      },
     ],
     photos: [
       {
