@@ -428,20 +428,29 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                     return acc;
                   }, {} as Record<string, typeof period.milestones>);
                   const yearGroups = Object.entries(groupedMilestones);
+                  const is20202023 = period.id === 'period-14' || period.period.includes('2020 - 2023');
 
                   return (
-                    <div className="flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 space-y-4">
+                    <div
+                      className={`flex-1 overflow-y-auto py-1 pr-5 sm:pr-7 lg:pr-8 ${
+                        is20202023 ? 'space-y-3' : 'space-y-4'
+                      }`}
+                    >
                       {yearGroups.map(([year, milestones], gIdx) => (
                         <div key={year} className="flex flex-col text-left">
                           {/* Cabeçalho do Ano: 20px */}
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className={`flex items-center gap-2 ${is20202023 ? 'mb-1.5' : 'mb-2'}`}>
                             <span className="text-[20px] font-black text-[#e5a93a] tracking-wider drop-shadow-xs">
                               {year}
                             </span>
                           </div>
 
                           {/* Tópicos dos marcos para o ano: 26px */}
-                          <ul className="space-y-3.5 list-disc pl-5 sm:pl-6">
+                          <ul
+                            className={`${
+                              is20202023 ? 'space-y-2.5 sm:space-y-3' : 'space-y-3.5'
+                            } list-disc pl-5 sm:pl-6`}
+                          >
                             {milestones.map((m) => {
                               const isHeading = m.text.endsWith(':');
                               return (
@@ -459,8 +468,8 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
                             })}
                           </ul>
 
-                          {/* Separador horizontal entre anos */}
-                          {gIdx < yearGroups.length - 1 && (
+                          {/* Separador horizontal entre anos (omitido no card 2020-2023 para ganho de espaço) */}
+                          {!is20202023 && gIdx < yearGroups.length - 1 && (
                             <hr className="border-t border-white/20 mt-4" />
                           )}
                         </div>
